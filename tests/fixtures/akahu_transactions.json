@@ -1,0 +1,47 @@
+[
+  {
+    "_id": "txn_salary_001",
+    "_account": "acc_bnz_cash_example",
+    "status": "SETTLED",
+    "date": "2026-06-01",
+    "settlement_date": "2026-06-01",
+    "amount": 5000.00,
+    "currency": "NZD",
+    "description": "ACME PAYROLL SALARY",
+    "merchant": {"name": "ACME Payroll"},
+    "category": {"nzfcc": "income"}
+  },
+  {
+    "_id": "txn_spark_001",
+    "_account": "acc_bnz_cash_example",
+    "status": "SETTLED",
+    "date": "2026-06-03",
+    "settlement_date": "2026-06-04",
+    "amount": -89.99,
+    "currency": "NZD",
+    "description": "SPARK NZ LTD AUCKLAND NZ",
+    "merchant": {"name": "Spark NZ"},
+    "category": {"nzfcc": "software"}
+  },
+  {
+    "_id": "txn_pending_001",
+    "_account": "acc_bnz_cash_example",
+    "status": "PENDING",
+    "date": "2026-06-05",
+    "amount": -12.50,
+    "currency": "NZD",
+    "description": "PENDING COFFEE TEST",
+    "merchant": {"name": "Coffee Test"}
+  },
+  {
+    "_id": "txn_asset_001",
+    "_account": "acc_bnz_cash_example",
+    "status": "SETTLED",
+    "date": "2026-06-06",
+    "settlement_date": "2026-06-06",
+    "amount": -1999.00,
+    "currency": "NZD",
+    "description": "PB TECH LAPTOP",
+    "merchant": {"name": "PB Tech"}
+  }
+]

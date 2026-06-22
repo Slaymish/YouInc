@@ -1,0 +1,1 @@
+"""Local BI reporting dashboard."""

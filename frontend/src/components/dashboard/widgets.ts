@@ -1,0 +1,288 @@
+import type { WidgetPlacement } from "./grid";
+
+export type WidgetId =
+  | "control-brief"
+  | "metric-net-worth"
+  | "metric-runway"
+  | "metric-burn"
+  | "metric-margin"
+  | "metric-assets"
+  | "metric-liabilities"
+  | "liquidity"
+  | "asset-mix"
+  | "month-pulse"
+  | "runway-projection"
+  | "operating-statement"
+  | "rolling-burn"
+  | "net-worth-trend"
+  | "expense-breakdown"
+  | "income-breakdown"
+  | "ledger-confidence"
+  | "ingestion"
+  | "balance-sheet"
+  | "manual-accounts"
+  | "journal"
+  | "suspense-queue"
+  | "source-systems";
+
+export type WidgetCategory =
+  | "overview"
+  | "stats"
+  | "finance"
+  | "data"
+  | "actions";
+
+export interface WidgetDefinition {
+  id: WidgetId;
+  label: string;
+  category: WidgetCategory;
+  defaultW: number;
+  defaultH: number;
+  minW: number;
+  minH: number;
+}
+
+export const WIDGET_REGISTRY: WidgetDefinition[] = [
+  {
+    id: "control-brief",
+    label: "Control Brief",
+    category: "overview",
+    defaultW: 6,
+    defaultH: 3,
+    minW: 4,
+    minH: 2,
+  },
+  {
+    id: "metric-net-worth",
+    label: "Net Worth",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "metric-runway",
+    label: "Runway",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "metric-burn",
+    label: "Burn / Mo",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "metric-margin",
+    label: "Margin",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "metric-assets",
+    label: "Assets",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "metric-liabilities",
+    label: "Liabilities",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "liquidity",
+    label: "Cash Position",
+    category: "stats",
+    defaultW: 2,
+    defaultH: 3,
+    minW: 2,
+    minH: 2,
+  },
+  {
+    id: "operating-statement",
+    label: "Operating Statement",
+    category: "finance",
+    defaultW: 7,
+    defaultH: 6,
+    minW: 4,
+    minH: 4,
+  },
+  {
+    id: "ledger-confidence",
+    label: "Ledger Confidence",
+    category: "finance",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "balance-sheet",
+    label: "Balance Sheet",
+    category: "finance",
+    defaultW: 7,
+    defaultH: 6,
+    minW: 4,
+    minH: 4,
+  },
+  {
+    id: "ingestion",
+    label: "Ingestion",
+    category: "actions",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "manual-accounts",
+    label: "Manual Accounts",
+    category: "data",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "journal",
+    label: "Journal",
+    category: "data",
+    defaultW: 7,
+    defaultH: 6,
+    minW: 4,
+    minH: 4,
+  },
+  {
+    id: "source-systems",
+    label: "Source Systems",
+    category: "data",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "month-pulse",
+    label: "Month Pulse",
+    category: "overview",
+    defaultW: 4,
+    defaultH: 4,
+    minW: 3,
+    minH: 3,
+  },
+  {
+    id: "runway-projection",
+    label: "Runway Projection",
+    category: "overview",
+    defaultW: 5,
+    defaultH: 4,
+    minW: 4,
+    minH: 3,
+  },
+  {
+    id: "asset-mix",
+    label: "Asset Mix",
+    category: "stats",
+    defaultW: 3,
+    defaultH: 4,
+    minW: 2,
+    minH: 3,
+  },
+  {
+    id: "net-worth-trend",
+    label: "Net Worth Trend",
+    category: "finance",
+    defaultW: 7,
+    defaultH: 6,
+    minW: 4,
+    minH: 4,
+  },
+  {
+    id: "rolling-burn",
+    label: "Rolling Average",
+    category: "finance",
+    defaultW: 6,
+    defaultH: 5,
+    minW: 4,
+    minH: 4,
+  },
+  {
+    id: "expense-breakdown",
+    label: "Expense Breakdown",
+    category: "finance",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "income-breakdown",
+    label: "Income Breakdown",
+    category: "finance",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "suspense-queue",
+    label: "Suspense Queue",
+    category: "data",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+];
+
+export const WIDGET_MAP = new Map(WIDGET_REGISTRY.map((w) => [w.id, w]));
+
+export const CATEGORY_LABELS: Record<WidgetCategory, string> = {
+  overview: "Overview",
+  stats: "Stats",
+  finance: "Finance",
+  data: "Data",
+  actions: "Actions",
+};
+
+export const CATEGORY_ORDER: WidgetCategory[] = [
+  "overview",
+  "stats",
+  "finance",
+  "data",
+  "actions",
+];
+
+export const DEFAULT_LAYOUT: WidgetPlacement[] = [
+  { id: "control-brief", x: 0, y: 0, w: 6, h: 3 },
+  { id: "metric-net-worth", x: 6, y: 0, w: 2, h: 3 },
+  { id: "metric-runway", x: 8, y: 0, w: 2, h: 3 },
+  { id: "metric-burn", x: 10, y: 0, w: 2, h: 3 },
+  { id: "metric-margin", x: 0, y: 3, w: 2, h: 3 },
+  { id: "metric-assets", x: 2, y: 3, w: 2, h: 3 },
+  { id: "metric-liabilities", x: 4, y: 3, w: 2, h: 3 },
+  { id: "operating-statement", x: 0, y: 6, w: 7, h: 6 },
+  { id: "ledger-confidence", x: 7, y: 6, w: 5, h: 6 },
+  { id: "ingestion", x: 0, y: 12, w: 5, h: 6 },
+  { id: "balance-sheet", x: 5, y: 12, w: 7, h: 6 },
+  { id: "manual-accounts", x: 0, y: 18, w: 5, h: 6 },
+  { id: "journal", x: 5, y: 18, w: 7, h: 6 },
+  { id: "source-systems", x: 0, y: 24, w: 5, h: 6 },
+];

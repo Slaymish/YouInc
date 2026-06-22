@@ -1,0 +1,92 @@
+# YouInc Ledger
+
+Local-first Personal ERP and Akahu/BNZ Open Finance ledger engine.
+
+## What it does
+
+- Pulls Akahu transactions with pagination, rate limiting, and graceful HTTP error handling.
+- Caches raw transactions idempotently using Akahu `_id` or deterministic fallback hashes.
+- Posts only settled transactions to a strict double-entry SQLite ledger.
+- Routes transactions through hot-reloadable YAML rules with NZFCC fallback and suspense safety.
+- Exports hledger-compatible plain text accounting journals.
+- Provides a local Streamlit BI dashboard for balance sheet and P&L reporting.
+
+See `docs/architecture_design.md` for the Phase 1 architecture design and `docs/persona_frontend_information_design.md` for the persona-led frontend, information model, and ingestion design.
+
+## Quick start
+
+```sh
+python -m venv .venv
+. .venv/bin/activate
+pip install -e '.[dev]'
+cp .env.example .env
+python -m youinc_ledger.cli init-db
+python -m youinc_ledger.cli accounts
+python -m youinc_ledger.cli sync --account-id acc_your_akahu_account_id --start-date 2026-06-01
+python -m youinc_ledger.cli reclassify
+python -m youinc_ledger.cli export-journal --output ledger.journal
+python -m streamlit run src/youinc_ledger/bi_reporting/dashboard.py
+```
+
+## TanStack Start frontend
+
+A React frontend lives in `frontend/` and reads the same local SQLite ledger through TanStack Start server functions. It also exposes local live-ingestion controls and source-account mapping edits backed by `config/rules.yaml`.
+
+```sh
+cd frontend
+npm install
+npm run dev
+```
+
+Then open `http://localhost:3000`. Use the Ingestion panel to sync a live Akahu account. Click **Load Akahu accounts** and select the real Akahu account id (`acc_...`) rather than entering a bank label such as `BNZ`. Use Source Systems to map raw account IDs to ledger accounts before ongoing syncs. By default it reads `../data/youinc-ledger.sqlite3` from the frontend directory. Set `YOUINC_DB_PATH` if your ledger database is elsewhere:
+
+```sh
+YOUINC_DB_PATH=/absolute/path/to/youinc-ledger.sqlite3 npm run dev
+```
+
+Optional frontend ingestion environment variables:
+
+```sh
+YOUINC_RULES_PATH=/absolute/path/to/rules.yaml
+YOUINC_PROJECT_ROOT=/absolute/path/to/YouInc
+YOUINC_PYTHON=/absolute/path/to/python
+AKAHU_CA_BUNDLE=/absolute/path/to/network-or-corporate-ca.pem
+```
+
+If `npm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, run it with local proxy variables unset:
+
+```sh
+env -u HTTPS_PROXY -u HTTP_PROXY -u ALL_PROXY -u https_proxy -u http_proxy -u all_proxy npm install
+```
+
+Akahu sync ignores generic `REQUESTS_CA_BUNDLE`, `SSL_CERT_FILE`, and `CURL_CA_BUNDLE` values so local mitmproxy/corporate cert settings do not silently affect banking ingestion. If live sync must run on a TLS-inspecting network, set `AKAHU_CA_BUNDLE` to that network's PEM CA bundle and restart the frontend.
+
+If `pip install` fails with `ProxyError` against `127.0.0.1:8080`, your shell is configured to use a local proxy that is not running. Either start that proxy, or unset the proxy variables for this terminal session:
+
+```sh
+unset HTTPS_PROXY HTTP_PROXY ALL_PROXY https_proxy http_proxy all_proxy
+pip install -e '.[dev]'
+```
+
+## Live Akahu sync
+
+Set these in `.env` or as environment variables:
+
+- `AKAHU_BASE_URL`
+- `AKAHU_APP_TOKEN`
+- `AKAHU_USER_TOKEN`
+
+Then run:
+
+```sh
+python -m youinc_ledger.cli sync --account-id acc_bnz_your_account --start-date 2026-01-01 --end-date 2026-01-31
+```
+
+Use `--delta` for incremental sync using the stored last successful timestamp.
+
+## Safety notes
+
+- Pending transactions are cached but not posted by default.
+- Every journal posting is validated so debits equal credits before commit.
+- Unmatched transactions route to `Expenses:Uncategorized:Suspense`.
+- Real credentials and local database files are ignored by git.

@@ -1,0 +1,2 @@
+[console_scripts]
+youinc-ledger = youinc_ledger.cli:main
