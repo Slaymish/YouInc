@@ -11,10 +11,13 @@ import {
 import { snapToGrid } from "./grid";
 import { useDashboardLayout } from "./useDashboardLayout";
 import { DashboardPanel } from "./DashboardPanel";
+import { DashboardTabs } from "./DashboardTabs";
 import { WidgetPicker } from "./WidgetPicker";
 import { WIDGET_MAP, type WidgetId } from "./widgets";
 import type { LedgerDashboardData } from "~/server/ledger";
 
+import { AttentionWidget } from "../widgets/AttentionWidget";
+import type { AttentionTargetView } from "../widgets/derive";
 import { ControlBriefWidget } from "../widgets/ControlBriefWidget";
 import { MetricWidget } from "../widgets/MetricWidget";
 import { OperatingStatementWidget } from "../widgets/OperatingStatementWidget";
@@ -33,6 +36,12 @@ import { AssetMixWidget } from "../widgets/AssetMixWidget";
 import { RollingAverageWidget } from "../widgets/RollingAverageWidget";
 import { NetWorthTrendWidget } from "../widgets/NetWorthTrendWidget";
 import { RunwayProjectionWidget } from "../widgets/RunwayProjectionWidget";
+import { RecurringWidget } from "../widgets/RecurringWidget";
+import { NetWorthVelocityWidget } from "../widgets/NetWorthVelocityWidget";
+import { IncomeConcentrationWidget } from "../widgets/IncomeConcentrationWidget";
+import { CashflowWaterfallWidget } from "../widgets/CashflowWaterfallWidget";
+import { SpendingAnomaliesWidget } from "../widgets/SpendingAnomaliesWidget";
+import { SpendCalendarWidget } from "../widgets/SpendCalendarWidget";
 
 const ROW_HEIGHT = 80;
 const METRIC_IDS = new Set([
@@ -44,11 +53,16 @@ const METRIC_IDS = new Set([
   "metric-liabilities",
 ]);
 
-function renderWidgetContent(id: WidgetId, dashboard: LedgerDashboardData) {
+function renderWidgetContent(
+  id: WidgetId,
+  dashboard: LedgerDashboardData,
+  onNavigate: (view: AttentionTargetView) => void,
+) {
   if (METRIC_IDS.has(id)) {
     return <MetricWidget id={id} dashboard={dashboard} />;
   }
   switch (id) {
+    case "attention": return <AttentionWidget dashboard={dashboard} onNavigate={onNavigate} />;
     case "control-brief": return <ControlBriefWidget dashboard={dashboard} />;
     case "operating-statement": return <OperatingStatementWidget dashboard={dashboard} />;
     case "ledger-confidence": return <LedgerConfidenceWidget dashboard={dashboard} />;
@@ -66,6 +80,12 @@ function renderWidgetContent(id: WidgetId, dashboard: LedgerDashboardData) {
     case "rolling-burn": return <RollingAverageWidget dashboard={dashboard} />;
     case "net-worth-trend": return <NetWorthTrendWidget dashboard={dashboard} />;
     case "runway-projection": return <RunwayProjectionWidget dashboard={dashboard} />;
+    case "recurring": return <RecurringWidget dashboard={dashboard} />;
+    case "net-worth-velocity": return <NetWorthVelocityWidget dashboard={dashboard} />;
+    case "income-concentration": return <IncomeConcentrationWidget dashboard={dashboard} />;
+    case "cashflow-waterfall": return <CashflowWaterfallWidget dashboard={dashboard} />;
+    case "spending-anomalies": return <SpendingAnomaliesWidget dashboard={dashboard} />;
+    case "spend-calendar": return <SpendCalendarWidget dashboard={dashboard} />;
     default: return null;
   }
 }
@@ -82,8 +102,15 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
   const [draggingSize, setDraggingSize] = useState<{ width: number; height: number } | null>(null);
 
   const {
+    views,
+    activeId,
     layout,
     isEditing,
+    canDeleteView,
+    selectView,
+    addView,
+    renameView,
+    deleteView,
     enterEditMode,
     saveEdits,
     cancelEdits,
@@ -129,8 +156,19 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
 
   return (
     <>
-      <div className="dashboard-edit-controls">
-        {isEditing ? (
+      <div className="dashboard-bar">
+        <DashboardTabs
+          views={views}
+          activeId={activeId}
+          isEditing={isEditing}
+          canDelete={canDeleteView}
+          onSelect={selectView}
+          onAdd={addView}
+          onRename={renameView}
+          onDelete={deleteView}
+        />
+        <div className="dashboard-edit-controls">
+          {isEditing ? (
           <>
             <button
               type="button"
@@ -147,17 +185,26 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
             </button>
           </>
         ) : (
-          <button type="button" className="dashboard-edit-btn" onClick={enterEditMode}>
-            Customize
-          </button>
-        )}
+            <button type="button" className="dashboard-edit-btn" onClick={enterEditMode}>
+              Customize
+            </button>
+          )}
+        </div>
       </div>
 
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div
+          key={activeId}
           ref={containerRef}
           className={`dashboard-grid${isEditing ? " dashboard-grid--editing" : ""}`}
         >
+          {layout.length === 0 ? (
+            <p className="dashboard-empty">
+              {isEditing
+                ? "Empty view — use “+ Add widget” to place widgets here."
+                : "Empty view — click Customize to add widgets."}
+            </p>
+          ) : null}
           {layout.map((placement) => {
             const def = WIDGET_MAP.get(placement.id as WidgetId);
             const isMiniMetric = METRIC_IDS.has(placement.id);
@@ -173,7 +220,7 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
                 onResize={resizeWidget}
                 containerRef={containerRef}
               >
-                {renderWidgetContent(placement.id as WidgetId, dashboard)}
+                {renderWidgetContent(placement.id as WidgetId, dashboard, selectView)}
               </DashboardPanel>
             );
           })}

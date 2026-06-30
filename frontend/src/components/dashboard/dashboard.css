@@ -2,6 +2,113 @@
   --row-height: 80px;
 }
 
+/* ── View tab bar ── */
+
+.dashboard-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--line);
+  margin-top: 8px;
+}
+
+.dashboard-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.dashboard-tab {
+  font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  border-bottom: none;
+  padding: 8px 14px;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dashboard-tab:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.dashboard-tab--active {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+.dashboard-tab--editing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 5px;
+  margin-bottom: -1px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-bottom: none;
+}
+
+.dashboard-tab-input {
+  width: 9ch;
+  border: 1px solid var(--line-subtle);
+  padding: 4px 6px;
+  font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--code-bg);
+  color: var(--text);
+}
+
+.dashboard-tab-delete {
+  border: 1px solid var(--line-subtle);
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  width: 22px;
+  height: 26px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dashboard-tab-delete:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.dashboard-tab-delete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dashboard-tab--add {
+  padding: 8px 12px;
+  color: var(--text-muted);
+}
+
+.dashboard-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 32px 12px;
+  text-align: center;
+  font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
 /* ── Edit mode controls ── */
 
 .dashboard-edit-controls {

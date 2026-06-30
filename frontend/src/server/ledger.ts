@@ -3,6 +3,24 @@ import fs from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 import Database from "better-sqlite3";
+import {
+  readCategoryMonthly,
+  readDailySpend,
+  readRecurringPayments,
+} from "./analytics";
+
+export type {
+  CategoryMonthPoint,
+  DailySpendPoint,
+  RecurringCadence,
+  RecurringPayment,
+} from "./analytics";
+
+import type {
+  CategoryMonthPoint,
+  DailySpendPoint,
+  RecurringPayment,
+} from "./analytics";
 
 const execFileAsync = promisify(execFile);
 
@@ -126,6 +144,13 @@ export interface AccountMappingInput {
   accountType: "asset" | "liability";
 }
 
+export interface ClassifyTransactionInput {
+  externalId: string;
+  targetAccount: string;
+  mode: "rule" | "once";
+  memo?: string;
+}
+
 interface AccountMapping {
   ledgerAccount: string;
   accountType: "asset" | "liability";
@@ -192,8 +217,12 @@ export interface LedgerDashboardData {
   suspenseQueue: SuspenseItem[];
   netWorthTrend: NetWorthPoint[];
   recentTransactions: JournalTransactionRow[];
+  recurringPayments: RecurringPayment[];
+  categoryMonthly: CategoryMonthPoint[];
+  dailySpend: DailySpendPoint[];
   pipeline: PipelineHealth;
   sourceAccounts: SourceAccountRow[];
+  knownAccounts: string[];
   routing: RoutingHealth;
   syncState: SyncStateRow[];
   error: string | null;
@@ -409,10 +438,6 @@ function validateAccountMapping(
   return { accountId, ledgerAccount, accountType };
 }
 
-function formatYamlKey(key: string) {
-  return /^[A-Za-z0-9_.-]+$/.test(key) ? key : `'${key.replaceAll("'", "''")}'`;
-}
-
 function parseYamlKey(key: string) {
   const trimmed = key.trim();
   if (trimmed.startsWith("'") && trimmed.endsWith("'")) {
@@ -422,14 +447,6 @@ function parseYamlKey(key: string) {
     return trimmed.slice(1, -1);
   }
   return trimmed;
-}
-
-function accountMappingLines(mapping: AccountMappingInput) {
-  return [
-    `  ${formatYamlKey(mapping.accountId)}:`,
-    `    ledger_account: ${mapping.ledgerAccount}`,
-    `    account_type: ${mapping.accountType}`,
-  ];
 }
 
 function parseAccountMappings(rulesPath = resolveRulesPath()) {
@@ -591,6 +608,72 @@ export async function reclassifyLedger(): Promise<SyncLedgerResult> {
   }
 }
 
+/**
+ * Run a youinc_ledger CLI subcommand and capture its result. All frontend
+ * mutations shell out through here so the Python CLI owns the business logic.
+ */
+async function runLedgerCli(args: string[]): Promise<SyncLedgerResult> {
+  const python = resolvePythonCommand();
+  const fullArgs = ["-m", "youinc_ledger.cli", ...args];
+  const env = buildSyncEnvironment();
+  try {
+    const { stdout, stderr } = await execFileAsync(python, fullArgs, {
+      cwd: resolveProjectRoot(),
+      env,
+      timeout: 120_000,
+      maxBuffer: 1024 * 1024,
+    });
+    return { ok: true, command: [python, ...fullArgs].join(" "), stdout, stderr, code: 0 };
+  } catch (error) {
+    const failure = error as NodeJS.ErrnoException & {
+      stdout?: string;
+      stderr?: string;
+      code?: number | null;
+    };
+    return {
+      ok: false,
+      command: [python, ...fullArgs].join(" "),
+      stdout: failure.stdout ?? "",
+      stderr: failure.stderr ?? failure.message,
+      code: failure.code ?? null,
+    };
+  }
+}
+
+export async function classifyTransaction(
+  input: ClassifyTransactionInput,
+): Promise<SyncLedgerResult> {
+  const externalId = sanitizeOptionalText(input.externalId);
+  const targetAccount = sanitizeOptionalText(input.targetAccount);
+  if (!externalId) {
+    throw new Error("A transaction is required to classify.");
+  }
+  if (!targetAccount || !targetAccount.includes(":")) {
+    throw new Error(
+      "Target account must be a colon-delimited account, e.g. Expenses:OpEx:MealsAndProvisions.",
+    );
+  }
+
+  const args = [
+    "classify",
+    "--db-path",
+    resolveDatabasePath(),
+    "--rules-path",
+    resolveRulesPath(),
+    "--external-id",
+    externalId,
+    "--target-account",
+    targetAccount,
+    "--mode",
+    input.mode === "once" ? "once" : "rule",
+  ];
+  const memo = sanitizeOptionalText(input.memo);
+  if (memo) {
+    args.push("--memo", memo);
+  }
+  return runLedgerCli(args);
+}
+
 export async function syncLedger(
   input: SyncLedgerInput,
 ): Promise<SyncLedgerResult> {
@@ -674,62 +757,24 @@ export async function syncLedger(
   }
 }
 
-export function upsertAccountMapping(input: AccountMappingInput) {
+export async function upsertAccountMapping(
+  input: AccountMappingInput,
+): Promise<AccountMappingInput> {
   const mapping = validateAccountMapping(input);
-  const rulesPath = resolveRulesPath();
-  const existingText = fs.existsSync(rulesPath)
-    ? fs.readFileSync(rulesPath, "utf-8")
-    : "defaults:\n  currency: NZD\n  suspense_account: Expenses:Uncategorized:Suspense\n";
-  const lines = existingText.replace(/\s*$/, "").split(/\r?\n/);
-  let start = lines.findIndex((line) => /^account_mappings:\s*$/.test(line));
-
-  if (start === -1) {
-    lines.push("", "account_mappings:", ...accountMappingLines(mapping));
-    fs.mkdirSync(path.dirname(rulesPath), { recursive: true });
-    fs.writeFileSync(rulesPath, `${lines.join("\n")}\n`, "utf-8");
-    return mapping;
+  const result = await runLedgerCli([
+    "map-account",
+    "--rules-path",
+    resolveRulesPath(),
+    "--account-id",
+    mapping.accountId,
+    "--ledger-account",
+    mapping.ledgerAccount,
+    "--account-type",
+    mapping.accountType,
+  ]);
+  if (!result.ok) {
+    throw new Error(result.stderr.trim() || "Failed to update account mapping.");
   }
-
-  let end = lines.length;
-  for (let index = start + 1; index < lines.length; index += 1) {
-    if (/^\S/.test(lines[index]) && lines[index].trim() !== "") {
-      end = index;
-      break;
-    }
-  }
-
-  let accountStart = -1;
-  let accountEnd = end;
-  for (let index = start + 1; index < end; index += 1) {
-    const accountMatch = lines[index].match(
-      /^  ([^:]+|'(?:[^']|'')+'|"[^"]+"):\s*$/,
-    );
-    if (!accountMatch || parseYamlKey(accountMatch[1]) !== mapping.accountId) {
-      continue;
-    }
-
-    accountStart = index;
-    for (let next = index + 1; next < end; next += 1) {
-      if (/^  \S/.test(lines[next])) {
-        accountEnd = next;
-        break;
-      }
-    }
-    break;
-  }
-
-  if (accountStart === -1) {
-    lines.splice(end, 0, ...accountMappingLines(mapping));
-  } else {
-    lines.splice(
-      accountStart,
-      accountEnd - accountStart,
-      ...accountMappingLines(mapping),
-    );
-  }
-
-  fs.mkdirSync(path.dirname(rulesPath), { recursive: true });
-  fs.writeFileSync(rulesPath, `${lines.join("\n")}\n`, "utf-8");
   return mapping;
 }
 
@@ -764,8 +809,12 @@ function emptyDashboard(
     suspenseQueue: [],
     netWorthTrend: [],
     recentTransactions: [],
+    recurringPayments: [],
+    categoryMonthly: [],
+    dailySpend: [],
     pipeline: emptyPipeline(),
     sourceAccounts: [],
+    knownAccounts: [],
     routing: emptyRouting(),
     syncState: [],
     error,
@@ -928,6 +977,17 @@ export function readLedgerDashboard(): LedgerDashboardData {
       )
       .all() as SuspenseQueueQueryRow[];
 
+    const knownAccountRows = db
+      .prepare(
+        `
+        SELECT DISTINCT account
+        FROM journal_entries
+        WHERE account NOT LIKE 'Expenses:Uncategorized:Suspense%'
+        ORDER BY account
+      `,
+      )
+      .all() as Array<{ account: string }>;
+
     const netWorthTrendRows = db
       .prepare(
         `
@@ -984,6 +1044,10 @@ export function readLedgerDashboard(): LedgerDashboardData {
           .all() as ManualBalanceQueryRow[])
       : [];
 
+    const recurringPayments = readRecurringPayments(db);
+    const categoryMonthly = readCategoryMonthly(db);
+    const dailySpend = readDailySpend(db);
+
     db.close();
 
     const manualBalances: ManualBalanceRow[] = rawManualBalances.map((r) => ({
@@ -992,6 +1056,15 @@ export function readLedgerDashboard(): LedgerDashboardData {
       asOfDate: r.as_of_date,
       updatedAt: r.updated_at,
     }));
+
+    // Selectable classification targets: every non-suspense account already in
+    // the journal, plus configured source-account ledger mappings.
+    const knownAccounts = Array.from(
+      new Set<string>([
+        ...knownAccountRows.map((row) => row.account),
+        ...Array.from(accountMappings.values(), (m) => m.ledgerAccount),
+      ]),
+    ).sort((a, b) => a.localeCompare(b));
 
     // Any account in manual_account_balances supersedes its journal-derived
     // balance AND any journal-derived parent account (e.g. Sharesies:Spend
@@ -1223,6 +1296,9 @@ export function readLedgerDashboard(): LedgerDashboardData {
       suspenseQueue,
       netWorthTrend,
       recentTransactions,
+      recurringPayments,
+      categoryMonthly,
+      dailySpend,
       pipeline,
       sourceAccounts: sourceAccounts.map((row) => {
         const mapping = accountMappings.get(row.account_id);
@@ -1245,6 +1321,7 @@ export function readLedgerDashboard(): LedgerDashboardData {
           mappingStatus: mapping ? "configured" : "unmapped",
         };
       }),
+      knownAccounts,
       routing,
       syncState: syncState.map((row) => ({
         key: row.key,
@@ -1261,30 +1338,29 @@ export function readLedgerDashboard(): LedgerDashboardData {
   }
 }
 
-export function upsertManualBalance(input: ManualBalanceInput): void {
-  const databasePath = resolveDatabasePath();
-  const db = new Database(databasePath);
+export async function upsertManualBalance(
+  input: ManualBalanceInput,
+): Promise<void> {
+  const account = input.account.trim();
+  if (!account.includes(":")) {
+    throw new Error(
+      "Account must be a colon-delimited account, e.g. Assets:Investments:Blossom.",
+    );
+  }
+  if (!Number.isFinite(input.balanceCents)) {
+    throw new Error("Balance must be a valid number.");
+  }
 
-  db.prepare(
-    `CREATE TABLE IF NOT EXISTS manual_account_balances (
-      account TEXT PRIMARY KEY,
-      balance_cents INTEGER NOT NULL,
-      as_of_date TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    )`,
-  ).run();
-
-  const now = new Date().toISOString();
-  const today = now.slice(0, 10);
-
-  db.prepare(
-    `INSERT INTO manual_account_balances (account, balance_cents, as_of_date, updated_at)
-     VALUES (?, ?, ?, ?)
-     ON CONFLICT(account) DO UPDATE SET
-       balance_cents = excluded.balance_cents,
-       as_of_date    = excluded.as_of_date,
-       updated_at    = excluded.updated_at`,
-  ).run(input.account, input.balanceCents, today, now);
-
-  db.close();
+  const result = await runLedgerCli([
+    "set-balance",
+    "--db-path",
+    resolveDatabasePath(),
+    "--account",
+    account,
+    "--balance-cents",
+    String(Math.round(input.balanceCents)),
+  ]);
+  if (!result.ok) {
+    throw new Error(result.stderr.trim() || "Failed to set manual balance.");
+  }
 }

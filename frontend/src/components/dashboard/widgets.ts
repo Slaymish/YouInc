@@ -1,6 +1,7 @@
 import type { WidgetPlacement } from "./grid";
 
 export type WidgetId =
+  | "attention"
   | "control-brief"
   | "metric-net-worth"
   | "metric-runway"
@@ -23,7 +24,13 @@ export type WidgetId =
   | "manual-accounts"
   | "journal"
   | "suspense-queue"
-  | "source-systems";
+  | "source-systems"
+  | "recurring"
+  | "net-worth-velocity"
+  | "income-concentration"
+  | "cashflow-waterfall"
+  | "spending-anomalies"
+  | "spend-calendar";
 
 export type WidgetCategory =
   | "overview"
@@ -43,6 +50,15 @@ export interface WidgetDefinition {
 }
 
 export const WIDGET_REGISTRY: WidgetDefinition[] = [
+  {
+    id: "attention",
+    label: "Action Center",
+    category: "overview",
+    defaultW: 12,
+    defaultH: 4,
+    minW: 6,
+    minH: 3,
+  },
   {
     id: "control-brief",
     label: "Control Brief",
@@ -250,6 +266,60 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     minW: 3,
     minH: 4,
   },
+  {
+    id: "recurring",
+    label: "Recurring & Subscriptions",
+    category: "finance",
+    defaultW: 5,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "net-worth-velocity",
+    label: "Net-Worth Velocity",
+    category: "overview",
+    defaultW: 5,
+    defaultH: 4,
+    minW: 3,
+    minH: 3,
+  },
+  {
+    id: "income-concentration",
+    label: "Income Concentration",
+    category: "finance",
+    defaultW: 4,
+    defaultH: 6,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "cashflow-waterfall",
+    label: "Cashflow Waterfall",
+    category: "finance",
+    defaultW: 6,
+    defaultH: 6,
+    minW: 4,
+    minH: 4,
+  },
+  {
+    id: "spending-anomalies",
+    label: "Spending Anomalies",
+    category: "finance",
+    defaultW: 5,
+    defaultH: 5,
+    minW: 3,
+    minH: 4,
+  },
+  {
+    id: "spend-calendar",
+    label: "Spend Calendar",
+    category: "finance",
+    defaultW: 7,
+    defaultH: 4,
+    minW: 4,
+    minH: 3,
+  },
 ];
 
 export const WIDGET_MAP = new Map(WIDGET_REGISTRY.map((w) => [w.id, w]));
@@ -285,4 +355,10 @@ export const DEFAULT_LAYOUT: WidgetPlacement[] = [
   { id: "manual-accounts", x: 0, y: 18, w: 5, h: 6 },
   { id: "journal", x: 5, y: 18, w: 7, h: 6 },
   { id: "source-systems", x: 0, y: 24, w: 5, h: 6 },
+  { id: "net-worth-velocity", x: 5, y: 24, w: 5, h: 4 },
+  { id: "recurring", x: 0, y: 30, w: 5, h: 6 },
+  { id: "cashflow-waterfall", x: 5, y: 30, w: 7, h: 6 },
+  { id: "income-concentration", x: 0, y: 36, w: 4, h: 6 },
+  { id: "spending-anomalies", x: 4, y: 36, w: 5, h: 5 },
+  { id: "spend-calendar", x: 0, y: 42, w: 7, h: 4 },
 ];
