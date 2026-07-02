@@ -63,3 +63,10 @@
     transform: none;
   }
 }
+
+.demo-banner {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  flex-wrap: wrap; padding: 1rem 1.5rem; max-width: 1200px; margin: 0 auto;
+  border-bottom: 1px solid var(--mk-line); font-family: var(--mk-sans); font-size: 0.9rem;
+}
+.demo-banner__cta { display: flex; gap: 0.8rem; align-items: center; }

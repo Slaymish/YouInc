@@ -2,7 +2,7 @@ import { createCsrfMiddleware, createMiddleware, createStart } from "@tanstack/r
 
 const SESSION_COOKIE = "youinc_session";
 const LOGIN_PATH = "/login";
-const PUBLIC_PATHS = new Set(["/", LOGIN_PATH]);
+const PUBLIC_PATHS = new Set(["/", "/demo", LOGIN_PATH]);
 
 function readCookie(request: Request, name: string): string | undefined {
   const header = request.headers.get("cookie");
