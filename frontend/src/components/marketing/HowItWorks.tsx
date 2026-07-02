@@ -1,5 +1,5 @@
 const STEPS = [
-  { n: "01", title: "Connect your bank", body: "Securely link your accounts through Akahu — New Zealand's open-banking layer. Read-only, revoke anytime." },
+  { n: "01", title: "Connect every bank", body: "Securely link every account, across every bank, into one place through Akahu — New Zealand's open-banking layer. Read-only, revoke anytime." },
   { n: "02", title: "It syncs & categorizes, live", body: "Transactions flow in, get matched to a double-entry ledger, and stay current automatically." },
   { n: "03", title: "Read your dashboard", body: "Net worth, runway, cashflow and more — arranged exactly how you think about money." },
 ];
