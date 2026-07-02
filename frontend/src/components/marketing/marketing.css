@@ -127,7 +127,15 @@
 .showcase__card--3 { grid-column: span 3; }
 .showcase__card:nth-child(n+5) { grid-column: span 3; }
 .showcase__label { font-family: var(--mk-sans); font-size: 0.7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--mk-soft); margin: 0 0 0.6rem; }
-@media (max-width: 900px) { .showcase__grid { grid-template-columns: 1fr; } .showcase__card, .showcase__card--0, .showcase__card--1, .showcase__card--2, .showcase__card--3 { grid-column: span 1; transform: none; } }
+@media (max-width: 900px) {
+  .showcase__grid { grid-template-columns: 1fr; }
+  .showcase__card, .showcase__card--0, .showcase__card--1, .showcase__card--2, .showcase__card--3 { grid-column: span 1; transform: none; }
+  .showcase__card:nth-child(n+5) { grid-column: span 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase__card:hover { transform: none; }
+}
 
 /* Bespoke */
 .bespoke { text-align: center; }
