@@ -55,3 +55,11 @@
 }
 .waitlist-error { color: #d4553f; font-size: 0.85rem; width: 100%; margin: 0.3rem 0 0; }
 .waitlist-done { font-family: var(--mk-sans); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-btn,
+  .mk-btn--primary:hover {
+    transition: none;
+    transform: none;
+  }
+}
