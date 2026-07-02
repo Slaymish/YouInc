@@ -103,7 +103,7 @@ mix, month pulse) live in `src/components/widgets/derive.ts`. Locale is `en-NZ`,
 The dashboard is a custom 12-column draggable/resizable grid — not a library layout.
 
 - `src/components/dashboard/widgets.ts` — `WIDGET_REGISTRY` (single source of truth for every
-  widget's id, label, category, default and min sizes), `WIDGET_MAP`, and `DEFAULT_LAYOUT`.
+  widget's id, label, category, default and min sizes) and `WIDGET_MAP`.
   **Adding a widget means: add a `WidgetDefinition` here, add the `WidgetId` union member, and
   wire the component into `renderWidgetContent` in `DashboardGrid.tsx`.**
 - `src/components/dashboard/grid.ts` — pure layout math (collision resolution, vertical

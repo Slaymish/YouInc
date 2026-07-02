@@ -234,10 +234,14 @@ th,
 }
 
 .panel {
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
+  height: 100%;
 }
 
 .panel > header {
+  flex: none;
   border-bottom: 1px solid var(--line);
   padding: 8px 10px;
   background: var(--surface-muted);
@@ -252,6 +256,8 @@ th,
 }
 
 .panel-body {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
 }
 
@@ -268,16 +274,20 @@ th,
 }
 
 .metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   grid-column: span 2;
   min-width: 0;
   min-height: 112px;
+  height: 100%;
   padding: 10px;
 }
 
 .metric strong {
   display: block;
   max-width: 100%;
-  margin-top: 18px;
+  margin-top: 8px;
   overflow-wrap: anywhere;
   font-size: clamp(1rem, 1.45vw, 1.7rem);
   line-height: 1;
@@ -589,6 +599,18 @@ td small {
   font-size: 1rem;
 }
 
+.liquidity-row--float {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+}
+
+.liquidity-note {
+  margin: 8px 0 0;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
 .tier-heading-row td {
   padding-top: 14px;
   padding-bottom: 4px;
@@ -799,9 +821,15 @@ td.indented {
 }
 
 .no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 80px;
   border: 1px dashed var(--dash);
   padding: 14px;
   background: var(--page);
+  text-align: center;
 }
 
 /* ── Breakdown (expense / income) ── */
@@ -963,7 +991,8 @@ td.indented {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  transition: border-color var(--duration-fast, 150ms) ease,
+  transition:
+    border-color var(--duration-fast, 150ms) ease,
     background-color var(--duration-fast, 150ms) ease;
 }
 

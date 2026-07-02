@@ -173,8 +173,6 @@
 
 .panel .panel-body {
   padding: 10px;
-  overflow: auto;
-  height: calc(100% - 38px);
 }
 
 .panel > header {
@@ -205,7 +203,7 @@
 .metric-inner strong {
   display: block;
   max-width: 100%;
-  margin-top: 18px;
+  margin-top: 8px;
   overflow-wrap: anywhere;
   font-size: clamp(1rem, 1.45vw, 1.7rem);
   line-height: 1;
@@ -326,20 +324,12 @@
   width: 18px;
   height: 18px;
   cursor: nwse-resize;
-  background: linear-gradient(
-    135deg,
-    transparent 50%,
-    var(--line-subtle) 50%
-  );
+  background: linear-gradient(135deg, transparent 50%, var(--line-subtle) 50%);
   z-index: 3;
 }
 
 .widget-resize-handle:hover {
-  background: linear-gradient(
-    135deg,
-    transparent 50%,
-    var(--text-muted) 50%
-  );
+  background: linear-gradient(135deg, transparent 50%, var(--text-muted) 50%);
 }
 
 /* ── Drag ghost overlay ── */
@@ -384,8 +374,12 @@
 }
 
 @keyframes picker-slide-in {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .widget-picker-header {
@@ -459,7 +453,9 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  transition: border-color 100ms, background 100ms;
+  transition:
+    border-color 100ms,
+    background 100ms;
 }
 
 .widget-picker-item:hover {
