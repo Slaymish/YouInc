@@ -8,3 +8,4 @@ __pycache__/
 ledger.journal
 *.sqlite3
 *.db
+.superpowers/
