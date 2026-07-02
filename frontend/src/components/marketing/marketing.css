@@ -1,0 +1,57 @@
+/* frontend/src/components/marketing/marketing.css */
+/* Landing palette — explicit, light-first, not coupled to app data-theme tokens. */
+.mk {
+  --mk-paper: #fbfbf9;
+  --mk-ink: #111111;
+  --mk-soft: #55534d;
+  --mk-line: #e3e3dd;
+  --mk-accent: #12a150;
+  --mk-card: #ffffff;
+  --mk-serif: Georgia, "Times New Roman", serif;
+  --mk-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: var(--mk-paper);
+  color: var(--mk-ink);
+  font-family: var(--mk-sans);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+.mk-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--mk-sans); font-size: 0.95rem; font-weight: 600;
+  padding: 0.7rem 1.2rem; border-radius: 6px; text-decoration: none;
+  border: 1px solid transparent; cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+.mk-btn--primary { background: var(--mk-ink); color: #fff; }
+.mk-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(0,0,0,.5); }
+.mk-btn--ghost { background: transparent; color: var(--mk-ink); border-bottom: 2px solid var(--mk-ink); border-radius: 0; padding: 0.5rem 0; }
+.mk-btn:focus-visible { outline: 3px solid #6ea8fe; outline-offset: 2px; }
+
+/* Demo board */
+.demo-board {
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: 1rem;
+  padding: 1.5rem; max-width: 1200px; margin: 0 auto;
+}
+.demo-panel {
+  grid-column: span 6; background: var(--mk-card);
+  border: 1px solid var(--mk-line); border-radius: 12px; padding: 1rem 1.2rem;
+  box-shadow: 0 12px 30px -18px rgba(40,40,30,.4);
+}
+.demo-panel__title { margin: 0 0 0.5rem; font-family: var(--mk-sans); font-size: 0.75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--mk-soft); }
+@media (max-width: 900px) { .demo-panel { grid-column: span 12; } }
+
+/* Waitlist form */
+.waitlist-form { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+.waitlist-form input[type="email"] {
+  font: inherit; padding: 0.7rem 0.9rem; border: 1px solid var(--mk-line);
+  border-radius: 6px; min-width: 15rem; background: #fff;
+}
+.waitlist-error { color: #d4553f; font-size: 0.85rem; width: 100%; margin: 0.3rem 0 0; }
+.waitlist-done { font-family: var(--mk-sans); }
