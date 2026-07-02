@@ -6,6 +6,8 @@ import type { LedgerDashboardData, ManualBalanceInput, ManualBalanceRow } from "
 const upsertManualBalanceFn = createServerFn({ method: "POST" })
   .validator((data: ManualBalanceInput) => data)
   .handler(async ({ data }) => {
+    const { requireSession } = await import("~/server/auth");
+    requireSession();
     const { upsertManualBalance } = await import("~/server/ledger");
     return upsertManualBalance(data);
   });

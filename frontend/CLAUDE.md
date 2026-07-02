@@ -44,8 +44,26 @@ All paths default relative to the `frontend/` cwd and assume the standard parent
 - `YOUINC_PYTHON` — python executable; defaults to `<root>/.venv/bin/python`, else `python3`
 - `AKAHU_CA_BUNDLE` — PEM CA bundle for TLS-inspecting networks (Akahu sync only)
 - `YOUINC_ALLOW_PROXY=1` — opt back into proxy env vars during CLI shell-outs
+- `YOUINC_ENROLLMENT_TOKEN` — set temporarily to enrol a passkey via the `/login` "Enrol a new passkey" form, then unset to disable registration. Unset by default (registration disabled).
+- `YOUINC_RP_ID` / `YOUINC_RP_ORIGIN` — WebAuthn relying-party id/origin. Derived from the request by default (works for localhost and a deployed domain); override only behind a proxy that rewrites Host/Origin.
+- `YOUINC_AUTH_DB_PATH` — passkey credential + session store (default `../data/youinc-auth.sqlite3`, separate from the ledger).
 
 ## Architecture
+
+### Global middleware
+
+`src/start.ts` configures TanStack Start's `requestMiddleware`, which runs before every request (pages, SSR, server functions). It holds the **passkey session gate** plus the CSRF middleware that Start installs automatically when there is no `start.ts` — defining a custom `start.ts` opts out of that default, so it's re-added explicitly here.
+
+### Auth (passkey / WebAuthn)
+
+`src/server/auth.ts` is the server-only auth module (single-user, no user table). It uses `@simplewebauthn/server` for the registration/authentication ceremonies and a small separate SQLite file (`YOUINC_AUTH_DB_PATH`) for the one credential, live sessions, and pending challenges. Two layers of protection:
+
+1. **`sessionGate` in `start.ts`** redirects full-page (`handlerType === "router"`) requests without a valid session cookie to `/login`. `/login` and static assets stay open.
+2. **`requireSession()`** is called at the top of every data/mutating server function (defense in depth) so data never leaves the server without a session, even though the gate lets serverFn requests through.
+
+`src/routes/login.tsx` runs the browser ceremony with `@simplewebauthn/browser`. Registration is gated by `YOUINC_ENROLLMENT_TOKEN` (set to enrol, unset to disable).
+
+> **reflect-metadata ordering:** `@simplewebauthn/server` pulls in `@peculiar/x509` + `tsyringe`, whose decorators call `Reflect.getMetadata` at import time. The bundler tree-shakes tsyringe's own polyfill, so `auth.ts` statically imports `src/server/reflect-polyfill.ts` (consumed, not tree-shaken) and imports `@simplewebauthn/server` **lazily** inside each ceremony function — never statically, which the bundler would hoist ahead of the polyfill.
 
 ### Data flow
 

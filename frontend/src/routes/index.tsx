@@ -6,6 +6,8 @@ import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
 import "~/components/dashboard/dashboard.css";
 
 const getLedgerDashboard = createServerFn({ method: "GET" }).handler(async () => {
+  const { requireSession } = await import("~/server/auth");
+  requireSession();
   const { readLedgerDashboard } = await import("~/server/ledger");
   return readLedgerDashboard();
 });

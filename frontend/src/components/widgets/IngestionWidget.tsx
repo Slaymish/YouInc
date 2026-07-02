@@ -6,11 +6,15 @@ import type { LedgerDashboardData, SyncLedgerInput, SyncLedgerResult } from "~/s
 const syncLedgerFn = createServerFn({ method: "POST" })
   .validator((data: SyncLedgerInput) => data)
   .handler(async ({ data }) => {
+    const { requireSession } = await import("~/server/auth");
+    requireSession();
     const { syncLedger } = await import("~/server/ledger");
     return syncLedger(data);
   });
 
 const reclassifyFn = createServerFn({ method: "POST" }).handler(async () => {
+  const { requireSession } = await import("~/server/auth");
+  requireSession();
   const { reclassifyLedger } = await import("~/server/ledger");
   return reclassifyLedger();
 });

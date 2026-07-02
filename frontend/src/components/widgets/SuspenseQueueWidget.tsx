@@ -11,6 +11,8 @@ import { formatMoney } from "./format";
 const classifyFn = createServerFn({ method: "POST" })
   .validator((data: ClassifyTransactionInput) => data)
   .handler(async ({ data }) => {
+    const { requireSession } = await import("~/server/auth");
+    requireSession();
     const { classifyTransaction } = await import("~/server/ledger");
     return classifyTransaction(data);
   });
@@ -18,6 +20,8 @@ const classifyFn = createServerFn({ method: "POST" })
 const syncAndReclassifyFn = createServerFn({ method: "POST" })
   .validator((data: { accountId: string }) => data)
   .handler(async ({ data }) => {
+    const { requireSession } = await import("~/server/auth");
+    requireSession();
     const { syncLedger, reclassifyLedger } = await import("~/server/ledger");
     const sync = await syncLedger({ accountId: data.accountId, delta: true });
     const reclassify = await reclassifyLedger();
