@@ -25,8 +25,13 @@ function baseDashboard(): LedgerDashboardData {
       runwayMonths: 12,
       transactionCount: 100,
       rawTransactionCount: 100,
+      cashCents: 3_000_00,
+      creditHeadroomCents: 0,
+      creditLimitCents: 0,
+      availableLiquidityCents: 3_000_00,
     },
     balances: [],
+    creditFacilities: [],
     pnl: [],
     incomeBreakdown: [],
     expenseBreakdown: [],
@@ -91,7 +96,9 @@ describe("buildAttentionItems", () => {
   it("flags suspense items as an action with the right count and target", () => {
     const dashboard = baseDashboard();
     dashboard.routing.suspenseCount = 3;
-    const item = buildAttentionItems(dashboard, NOW).find((i) => i.id === "suspense");
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "suspense",
+    );
     expect(item).toMatchObject({ severity: "action", targetView: "books" });
     expect(item?.label).toContain("3");
     expect(item?.label).toContain("transactions");
@@ -100,7 +107,9 @@ describe("buildAttentionItems", () => {
   it("flags low runway as critical and routes to wealth", () => {
     const dashboard = baseDashboard();
     dashboard.totals.runwayMonths = 2.8;
-    const item = buildAttentionItems(dashboard, NOW).find((i) => i.id === "runway");
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "runway",
+    );
     expect(item).toMatchObject({ severity: "critical", targetView: "wealth" });
   });
 
@@ -117,7 +126,9 @@ describe("buildAttentionItems", () => {
   it("flags a stale sync once past the threshold", () => {
     const dashboard = baseDashboard();
     dashboard.pipeline.lastSeenAt = "2026-06-20T00:00:00Z"; // 10 days
-    const item = buildAttentionItems(dashboard, NOW).find((i) => i.id === "stale-sync");
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "stale-sync",
+    );
     expect(item).toMatchObject({ severity: "action" });
     expect(item?.label).toContain("10");
   });
@@ -133,7 +144,9 @@ describe("buildAttentionItems", () => {
       { mappingStatus: "unmapped" },
       { mappingStatus: "configured" },
     ] as LedgerDashboardData["sourceAccounts"];
-    const item = buildAttentionItems(dashboard, NOW).find((i) => i.id === "unmapped");
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "unmapped",
+    );
     expect(item).toMatchObject({ severity: "action", targetView: "books" });
     expect(item?.label).toContain("1");
   });
@@ -141,7 +154,9 @@ describe("buildAttentionItems", () => {
   it("summarizes spending anomalies as one review row to cash flow", () => {
     const dashboard = baseDashboard();
     dashboard.categoryMonthly = spikingCategory();
-    const item = buildAttentionItems(dashboard, NOW).find((i) => i.id === "anomalies");
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "anomalies",
+    );
     expect(item).toMatchObject({ severity: "review", targetView: "cash-flow" });
     expect(item?.label).toContain("Groceries");
   });
@@ -161,7 +176,9 @@ describe("buildAttentionItems", () => {
         lastDate: "2026-06-29",
       },
     ];
-    const item = buildAttentionItems(dashboard, NOW).find((i) => i.id === "new-recurring");
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "new-recurring",
+    );
     expect(item).toMatchObject({ severity: "review", targetView: "cash-flow" });
     expect(item?.label).toContain("Streaming Co");
   });
@@ -185,16 +202,55 @@ describe("buildAttentionItems", () => {
     expect(items.find((i) => i.id === "new-recurring")).toBeUndefined();
   });
 
+  it("flags a credit facility above the utilization threshold", () => {
+    const dashboard = baseDashboard();
+    dashboard.creditFacilities = [
+      {
+        account: "Liabilities:CreditCard:Amex",
+        accountId: "acc_amex",
+        limitCents: 500_00,
+        drawnCents: 400_00,
+        headroomCents: 100_00,
+        utilization: 0.8,
+      },
+    ];
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "credit-utilization",
+    );
+    expect(item).toMatchObject({ severity: "review", targetView: "wealth" });
+    expect(item?.label).toContain("Amex");
+  });
+
+  it("does not flag a facility well under the utilization threshold", () => {
+    const dashboard = baseDashboard();
+    dashboard.creditFacilities = [
+      {
+        account: "Liabilities:CreditCard:Amex",
+        accountId: "acc_amex",
+        limitCents: 500_00,
+        drawnCents: 50_00,
+        headroomCents: 450_00,
+        utilization: 0.1,
+      },
+    ];
+    const items = buildAttentionItems(dashboard, NOW);
+    expect(items.find((i) => i.id === "credit-utilization")).toBeUndefined();
+  });
+
   it("orders items critical → action → review", () => {
     const dashboard = baseDashboard();
     dashboard.totals.runwayMonths = 2; // critical
     dashboard.routing.suspenseCount = 4; // action
     dashboard.categoryMonthly = spikingCategory(); // review
-    const severities = buildAttentionItems(dashboard, NOW).map((i) => i.severity);
-    expect(severities).toEqual([...severities].sort((a, b) => {
-      const rank = { critical: 0, action: 1, review: 2 } as const;
-      return rank[a] - rank[b];
-    }));
+    const severities = buildAttentionItems(dashboard, NOW).map(
+      (i) => i.severity,
+    );
+    expect(severities).toEqual(
+      [...severities].sort((a, b) => {
+        const rank = { critical: 0, action: 1, review: 2 } as const;
+        return rank[a] - rank[b];
+      }),
+    );
     expect(severities[0]).toBe("critical");
   });
 });

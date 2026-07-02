@@ -4,3 +4,5 @@ node_modules/
 .tanstack/
 dist/
 .DS_Store
+.env
+.env.local

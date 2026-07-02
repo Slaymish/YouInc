@@ -15,6 +15,9 @@ from youinc_ledger.models import RawTransaction, cents_to_decimal
 class AccountMapping:
     ledger_account: str
     account_type: str
+    # Credit limit for revolving liability accounts (credit cards). None for
+    # asset accounts or liabilities without a fixed facility limit.
+    credit_limit_cents: int | None = None
 
 
 @dataclass(frozen=True)
@@ -49,9 +52,13 @@ class RulesRouter:
     def account_mapping_for(self, account_id: str) -> AccountMapping:
         raw = self.account_mappings.get(account_id)
         if raw:
+            credit_limit_cents = raw.get("credit_limit_cents")
             return AccountMapping(
                 ledger_account=str(raw["ledger_account"]),
                 account_type=str(raw.get("account_type", "asset")).lower(),
+                credit_limit_cents=int(credit_limit_cents)
+                if credit_limit_cents is not None
+                else None,
             )
         safe_id = re.sub(r"[^A-Za-z0-9_:-]", "_", account_id)
         return AccountMapping(ledger_account=f"Assets:Unmapped:{safe_id}", account_type="asset")

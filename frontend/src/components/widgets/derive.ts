@@ -7,7 +7,12 @@ import type {
   LiquidityTier,
   NetWorthPoint,
 } from "~/server/ledger";
-import { formatMoney, formatMonths, formatPercent, leafAccount } from "./format";
+import {
+  formatMoney,
+  formatMonths,
+  formatPercent,
+  leafAccount,
+} from "./format";
 
 type PnlRows = LedgerDashboardData["pnl"];
 
@@ -24,15 +29,22 @@ export interface RollingPoint {
  * Trailing simple moving average of income and burn. Early months average over
  * however many months exist so far (1, 2, then the full window).
  */
-export function rollingAverages(pnl: PnlRows, window = ROLLING_WINDOW): RollingPoint[] {
+export function rollingAverages(
+  pnl: PnlRows,
+  window = ROLLING_WINDOW,
+): RollingPoint[] {
   return pnl.map((point, index) => {
     const start = Math.max(0, index - window + 1);
     const slice = pnl.slice(start, index + 1);
     const count = slice.length;
     return {
       month: point.month,
-      incomeCents: Math.round(slice.reduce((sum, r) => sum + r.incomeCents, 0) / count),
-      expensesCents: Math.round(slice.reduce((sum, r) => sum + r.expensesCents, 0) / count),
+      incomeCents: Math.round(
+        slice.reduce((sum, r) => sum + r.incomeCents, 0) / count,
+      ),
+      expensesCents: Math.round(
+        slice.reduce((sum, r) => sum + r.expensesCents, 0) / count,
+      ),
     };
   });
 }
@@ -124,7 +136,9 @@ export function runwayProjection(
 ): RunwayProjection {
   const months = monthlyBurnCents > 0 ? cashCents / monthlyBurnCents : null;
   const horizon =
-    months === null ? 1 : Math.min(PROJECTION_MAX_MONTHS, Math.ceil(months) + 1);
+    months === null
+      ? 1
+      : Math.min(PROJECTION_MAX_MONTHS, Math.ceil(months) + 1);
   const points: RunwayPoint[] = [];
   for (let monthIndex = 0; monthIndex <= horizon; monthIndex += 1) {
     points.push({
@@ -139,7 +153,10 @@ export function runwayProjection(
  * Projects a depletion date from a fractional month count. Returns null when
  * runway is effectively infinite (no burn).
  */
-export function depletionDate(months: number | null, from = new Date()): Date | null {
+export function depletionDate(
+  months: number | null,
+  from = new Date(),
+): Date | null {
   if (months === null || !Number.isFinite(months)) return null;
   const result = new Date(from);
   const wholeMonths = Math.floor(months);
@@ -403,7 +420,14 @@ export function cashflowWaterfall(
     1,
   );
 
-  return { month, steps, incomeCents, expensesCents, netCents: running, maxCents };
+  return {
+    month,
+    steps,
+    incomeCents,
+    expensesCents,
+    netCents: running,
+    maxCents,
+  };
 }
 
 // ── Spending anomalies (per-category z-score) ──────────────────────────────
@@ -522,7 +546,9 @@ function weekdayIndex(date: string): number {
  * Lays out daily spend into a GitHub-style heatmap: weeks down the columns,
  * weekdays down the rows, padded to whole-week boundaries.
  */
-export function spendCalendar(dailySpend: DailySpendPoint[]): SpendCalendar | null {
+export function spendCalendar(
+  dailySpend: DailySpendPoint[],
+): SpendCalendar | null {
   if (!dailySpend.length) return null;
 
   const byDate = new Map(dailySpend.map((row) => [row.date, row]));
@@ -535,11 +561,11 @@ export function spendCalendar(dailySpend: DailySpendPoint[]): SpendCalendar | nu
   const firstEpoch = epochDay(first);
   const lastEpoch = epochDay(last);
 
-  const maxSpendCents = Math.max(
-    1,
-    ...dailySpend.map((row) => row.spendCents),
+  const maxSpendCents = Math.max(1, ...dailySpend.map((row) => row.spendCents));
+  const totalSpendCents = dailySpend.reduce(
+    (sum, row) => sum + row.spendCents,
+    0,
   );
-  const totalSpendCents = dailySpend.reduce((sum, row) => sum + row.spendCents, 0);
 
   const weeks: CalendarCell[][] = [];
   let week: CalendarCell[] = [];
@@ -573,7 +599,11 @@ export function spendCalendar(dailySpend: DailySpendPoint[]): SpendCalendar | nu
 // ── Attention / Action Center ──────────────────────────────────────────────
 
 export type AttentionSeverity = "critical" | "action" | "review";
-export type AttentionTargetView = "this-week" | "cash-flow" | "wealth" | "books";
+export type AttentionTargetView =
+  | "this-week"
+  | "cash-flow"
+  | "wealth"
+  | "books";
 
 export interface AttentionItem {
   /** Stable key per signal type. */
@@ -592,6 +622,7 @@ const RUNWAY_CRITICAL_MONTHS = 3;
 const RUNWAY_WARN_MONTHS = 6;
 const STALE_SYNC_DAYS = 7;
 const NEW_RECURRING_DAYS = 35;
+const CREDIT_UTILIZATION_WARN = 0.7;
 
 const SEVERITY_RANK: Record<AttentionSeverity, number> = {
   critical: 0,
@@ -732,6 +763,24 @@ export function buildAttentionItems(
       severity: "review",
       label: `Runway ${formatMonths(runway)}`,
       detail: "Getting tight — watch burn over the next few months.",
+      targetView: "wealth",
+    });
+  }
+
+  const hotFacilities = dashboard.creditFacilities.filter(
+    (facility) => (facility.utilization ?? 0) >= CREDIT_UTILIZATION_WARN,
+  );
+  if (hotFacilities.length > 0) {
+    const top = hotFacilities[0];
+    items.push({
+      id: "credit-utilization",
+      severity: "review",
+      label:
+        hotFacilities.length === 1
+          ? `${leafAccount(top.account)} at ${formatPercent(top.utilization)}`
+          : `${hotFacilities.length} facilities above ${formatPercent(CREDIT_UTILIZATION_WARN)}`,
+      detail:
+        "High utilization shrinks available liquidity and headroom for timing gaps.",
       targetView: "wealth",
     });
   }

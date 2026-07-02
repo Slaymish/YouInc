@@ -16,6 +16,10 @@ from youinc_ledger.ledger_pipeline.pipeline import LedgerPipeline
 from youinc_ledger.persistence_layer.db import LedgerDatabase
 from youinc_ledger.persistence_layer.ledger_exporter import export_hledger
 from youinc_ledger.rules_router.rules import RulesRouter
+from youinc_ledger.rules_router.rules_editor import (
+    append_classification_rule,
+    upsert_account_mapping,
+)
 
 
 def _build_database(db_path: Path | None) -> LedgerDatabase:
@@ -170,6 +174,134 @@ def cmd_reclassify(args: argparse.Namespace) -> int:
     return 1 if result.errors else 0
 
 
+def _validate_ledger_account(account: str) -> str:
+    account = (account or "").strip()
+    if ":" not in account:
+        raise SystemExit(
+            "Target account must be a colon-delimited account, e.g. Expenses:OpEx:MealsAndProvisions"
+        )
+    return account
+
+
+def cmd_classify(args: argparse.Namespace) -> int:
+    settings = load_settings()
+    database = _build_database(args.db_path)
+    rules_path = args.rules_path or settings.rules_path
+
+    try:
+        target_account = _validate_ledger_account(args.target_account)
+    except SystemExit as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+    transaction = database.fetch_raw_transaction(args.external_id)
+    if transaction is None:
+        print(f"ERROR: no transaction found for external id {args.external_id}", file=sys.stderr)
+        return 1
+
+    summary: dict[str, object] = {
+        "externalId": args.external_id,
+        "targetAccount": target_account,
+        "mode": args.mode,
+    }
+
+    if args.mode == "once":
+        database.set_manual_classification(args.external_id, target_account, args.memo)
+    else:
+        rule_id, pattern = append_classification_rule(
+            rules_path,
+            description=transaction.description,
+            target_account=target_account,
+            pattern=args.pattern,
+            memo=args.memo,
+        )
+        summary["ruleId"] = rule_id
+        summary["pattern"] = pattern
+
+    router = RulesRouter.from_file(rules_path)
+    pipeline = LedgerPipeline(database, router, discard_pending=settings.discard_pending)
+    result = pipeline.reclassify_existing_journals()
+    summary["reclassified"] = result.posted
+
+    if args.json:
+        print(json.dumps(summary, sort_keys=True))
+    else:
+        label = summary.get("ruleId", "one-off")
+        print(
+            f"Classified {args.external_id} -> {target_account} "
+            f"({args.mode}:{label}); reclassified={result.posted}"
+        )
+    for error in result.errors:
+        print(f"ERROR: {error}", file=sys.stderr)
+    return 1 if result.errors else 0
+
+
+def cmd_map_account(args: argparse.Namespace) -> int:
+    settings = load_settings()
+    rules_path = args.rules_path or settings.rules_path
+    ledger_account = (args.ledger_account or "").strip()
+    if ":" not in ledger_account:
+        print(
+            "ERROR: ledger account must be colon-delimited, e.g. Assets:Bank:BNZ", file=sys.stderr
+        )
+        return 1
+    if args.account_type not in {"asset", "liability"}:
+        print("ERROR: account type must be 'asset' or 'liability'", file=sys.stderr)
+        return 1
+    if args.credit_limit_cents is not None and args.credit_limit_cents < 0:
+        print("ERROR: credit limit cents must be zero or positive", file=sys.stderr)
+        return 1
+
+    upsert_account_mapping(
+        rules_path,
+        account_id=args.account_id.strip(),
+        ledger_account=ledger_account,
+        account_type=args.account_type,
+        credit_limit_cents=args.credit_limit_cents,
+    )
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "accountId": args.account_id.strip(),
+                    "ledgerAccount": ledger_account,
+                    "accountType": args.account_type,
+                    "creditLimitCents": args.credit_limit_cents,
+                },
+                sort_keys=True,
+            )
+        )
+    else:
+        limit_label = (
+            f", limit {args.credit_limit_cents / 100:.2f}"
+            if args.credit_limit_cents is not None
+            else ""
+        )
+        print(
+            f"Mapped {args.account_id.strip()} -> {ledger_account} "
+            f"({args.account_type}{limit_label})"
+        )
+    return 0
+
+
+def cmd_set_balance(args: argparse.Namespace) -> int:
+    database = _build_database(args.db_path)
+    account = (args.account or "").strip()
+    if ":" not in account:
+        print(
+            "ERROR: account must be colon-delimited, e.g. Assets:Investments:Blossom",
+            file=sys.stderr,
+        )
+        return 1
+
+    database.set_manual_balance(account, args.balance_cents, args.as_of_date)
+    if args.json:
+        print(json.dumps({"account": account, "balanceCents": args.balance_cents}, sort_keys=True))
+    else:
+        print(f"Set manual balance {account} = {args.balance_cents} cents")
+    return 0
+
+
 def cmd_rules_test(args: argparse.Namespace) -> int:
     settings = load_settings()
     router = RulesRouter.from_file(args.rules_path or settings.rules_path)
@@ -237,6 +369,43 @@ def build_parser() -> argparse.ArgumentParser:
     reclassify.add_argument("--db-path", type=Path)
     reclassify.add_argument("--rules-path", type=Path)
     reclassify.set_defaults(func=cmd_reclassify)
+
+    classify = subparsers.add_parser(
+        "classify", help="Classify a parked transaction and reclassify affected journals"
+    )
+    classify.add_argument("--db-path", type=Path)
+    classify.add_argument("--rules-path", type=Path)
+    classify.add_argument("--external-id", required=True)
+    classify.add_argument("--target-account", required=True)
+    classify.add_argument("--mode", choices=("rule", "once"), default="rule")
+    classify.add_argument("--pattern", help="Override the derived description_regex (rule mode)")
+    classify.add_argument("--memo")
+    classify.add_argument("--json", action="store_true")
+    classify.set_defaults(func=cmd_classify)
+
+    map_account = subparsers.add_parser(
+        "map-account", help="Map a source account id to a ledger account in rules.yaml"
+    )
+    map_account.add_argument("--rules-path", type=Path)
+    map_account.add_argument("--account-id", required=True)
+    map_account.add_argument("--ledger-account", required=True)
+    map_account.add_argument("--account-type", choices=("asset", "liability"), default="asset")
+    map_account.add_argument(
+        "--credit-limit-cents",
+        type=int,
+        default=None,
+        help="Credit limit for a revolving liability account (credit card), in cents",
+    )
+    map_account.add_argument("--json", action="store_true")
+    map_account.set_defaults(func=cmd_map_account)
+
+    set_balance = subparsers.add_parser("set-balance", help="Set a manual account balance override")
+    set_balance.add_argument("--db-path", type=Path)
+    set_balance.add_argument("--account", required=True)
+    set_balance.add_argument("--balance-cents", type=int, required=True)
+    set_balance.add_argument("--as-of-date")
+    set_balance.add_argument("--json", action="store_true")
+    set_balance.set_defaults(func=cmd_set_balance)
 
     rules_test = subparsers.add_parser("rules-test", help="Dry-run classification rules")
     rules_test.add_argument("--db-path", type=Path)

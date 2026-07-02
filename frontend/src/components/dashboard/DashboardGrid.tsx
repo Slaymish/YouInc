@@ -27,7 +27,10 @@ import { BalanceSheetWidget } from "../widgets/BalanceSheetWidget";
 import { ManualAccountsWidget } from "../widgets/ManualAccountsWidget";
 import { JournalWidget } from "../widgets/JournalWidget";
 import { SourceSystemsWidget } from "../widgets/SourceSystemsWidget";
-import { LiquidityWidget } from "../widgets/LiquidityWidget";
+import {
+  LiquidityWidget,
+  CreditFacilityWidget,
+} from "../widgets/LiquidityWidget";
 import { ExpenseBreakdownWidget } from "../widgets/ExpenseBreakdownWidget";
 import { IncomeBreakdownWidget } from "../widgets/IncomeBreakdownWidget";
 import { SuspenseQueueWidget } from "../widgets/SuspenseQueueWidget";
@@ -51,6 +54,7 @@ const METRIC_IDS = new Set([
   "metric-margin",
   "metric-assets",
   "metric-liabilities",
+  "metric-available-liquidity",
 ]);
 
 function renderWidgetContent(
@@ -62,31 +66,58 @@ function renderWidgetContent(
     return <MetricWidget id={id} dashboard={dashboard} />;
   }
   switch (id) {
-    case "attention": return <AttentionWidget dashboard={dashboard} onNavigate={onNavigate} />;
-    case "control-brief": return <ControlBriefWidget dashboard={dashboard} />;
-    case "operating-statement": return <OperatingStatementWidget dashboard={dashboard} />;
-    case "ledger-confidence": return <LedgerConfidenceWidget dashboard={dashboard} />;
-    case "ingestion": return <IngestionWidget dashboard={dashboard} />;
-    case "balance-sheet": return <BalanceSheetWidget dashboard={dashboard} />;
-    case "manual-accounts": return <ManualAccountsWidget dashboard={dashboard} />;
-    case "journal": return <JournalWidget dashboard={dashboard} />;
-    case "source-systems": return <SourceSystemsWidget dashboard={dashboard} />;
-    case "liquidity": return <LiquidityWidget dashboard={dashboard} />;
-    case "expense-breakdown": return <ExpenseBreakdownWidget dashboard={dashboard} />;
-    case "income-breakdown": return <IncomeBreakdownWidget dashboard={dashboard} />;
-    case "suspense-queue": return <SuspenseQueueWidget dashboard={dashboard} />;
-    case "month-pulse": return <MonthPulseWidget dashboard={dashboard} />;
-    case "asset-mix": return <AssetMixWidget dashboard={dashboard} />;
-    case "rolling-burn": return <RollingAverageWidget dashboard={dashboard} />;
-    case "net-worth-trend": return <NetWorthTrendWidget dashboard={dashboard} />;
-    case "runway-projection": return <RunwayProjectionWidget dashboard={dashboard} />;
-    case "recurring": return <RecurringWidget dashboard={dashboard} />;
-    case "net-worth-velocity": return <NetWorthVelocityWidget dashboard={dashboard} />;
-    case "income-concentration": return <IncomeConcentrationWidget dashboard={dashboard} />;
-    case "cashflow-waterfall": return <CashflowWaterfallWidget dashboard={dashboard} />;
-    case "spending-anomalies": return <SpendingAnomaliesWidget dashboard={dashboard} />;
-    case "spend-calendar": return <SpendCalendarWidget dashboard={dashboard} />;
-    default: return null;
+    case "attention":
+      return <AttentionWidget dashboard={dashboard} onNavigate={onNavigate} />;
+    case "control-brief":
+      return <ControlBriefWidget dashboard={dashboard} />;
+    case "operating-statement":
+      return <OperatingStatementWidget dashboard={dashboard} />;
+    case "ledger-confidence":
+      return <LedgerConfidenceWidget dashboard={dashboard} />;
+    case "ingestion":
+      return <IngestionWidget dashboard={dashboard} />;
+    case "balance-sheet":
+      return <BalanceSheetWidget dashboard={dashboard} />;
+    case "manual-accounts":
+      return <ManualAccountsWidget dashboard={dashboard} />;
+    case "journal":
+      return <JournalWidget dashboard={dashboard} />;
+    case "source-systems":
+      return <SourceSystemsWidget dashboard={dashboard} />;
+    case "liquidity":
+      return <LiquidityWidget dashboard={dashboard} />;
+    case "credit-facility":
+      return <CreditFacilityWidget dashboard={dashboard} />;
+    case "expense-breakdown":
+      return <ExpenseBreakdownWidget dashboard={dashboard} />;
+    case "income-breakdown":
+      return <IncomeBreakdownWidget dashboard={dashboard} />;
+    case "suspense-queue":
+      return <SuspenseQueueWidget dashboard={dashboard} />;
+    case "month-pulse":
+      return <MonthPulseWidget dashboard={dashboard} />;
+    case "asset-mix":
+      return <AssetMixWidget dashboard={dashboard} />;
+    case "rolling-burn":
+      return <RollingAverageWidget dashboard={dashboard} />;
+    case "net-worth-trend":
+      return <NetWorthTrendWidget dashboard={dashboard} />;
+    case "runway-projection":
+      return <RunwayProjectionWidget dashboard={dashboard} />;
+    case "recurring":
+      return <RecurringWidget dashboard={dashboard} />;
+    case "net-worth-velocity":
+      return <NetWorthVelocityWidget dashboard={dashboard} />;
+    case "income-concentration":
+      return <IncomeConcentrationWidget dashboard={dashboard} />;
+    case "cashflow-waterfall":
+      return <CashflowWaterfallWidget dashboard={dashboard} />;
+    case "spending-anomalies":
+      return <SpendingAnomaliesWidget dashboard={dashboard} />;
+    case "spend-calendar":
+      return <SpendCalendarWidget dashboard={dashboard} />;
+    default:
+      return null;
   }
 }
 
@@ -99,7 +130,10 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
   const [showPicker, setShowPicker] = useState(false);
   const [replacingId, setReplacingId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [draggingSize, setDraggingSize] = useState<{ width: number; height: number } | null>(null);
+  const [draggingSize, setDraggingSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   const {
     views,
@@ -151,8 +185,12 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
     moveWidget(id, placement.x + deltaCol, placement.y + deltaRow);
   }
 
-  const draggingPlacement = draggingId ? layout.find((w) => w.id === draggingId) : null;
-  const draggingDef = draggingId ? WIDGET_MAP.get(draggingId as WidgetId) : null;
+  const draggingPlacement = draggingId
+    ? layout.find((w) => w.id === draggingId)
+    : null;
+  const draggingDef = draggingId
+    ? WIDGET_MAP.get(draggingId as WidgetId)
+    : null;
 
   return (
     <>
@@ -169,30 +207,46 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
         />
         <div className="dashboard-edit-controls">
           {isEditing ? (
-          <>
+            <>
+              <button
+                type="button"
+                className="dashboard-edit-btn dashboard-edit-btn--add"
+                onClick={() => setShowPicker(true)}
+              >
+                + Add widget
+              </button>
+              <button
+                type="button"
+                className="dashboard-edit-btn dashboard-edit-btn--done"
+                onClick={saveEdits}
+              >
+                Done
+              </button>
+              <button
+                type="button"
+                className="dashboard-edit-btn"
+                onClick={cancelEdits}
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
             <button
               type="button"
-              className="dashboard-edit-btn dashboard-edit-btn--add"
-              onClick={() => setShowPicker(true)}
+              className="dashboard-edit-btn"
+              onClick={enterEditMode}
             >
-              + Add widget
-            </button>
-            <button type="button" className="dashboard-edit-btn dashboard-edit-btn--done" onClick={saveEdits}>
-              Done
-            </button>
-            <button type="button" className="dashboard-edit-btn" onClick={cancelEdits}>
-              Cancel
-            </button>
-          </>
-        ) : (
-            <button type="button" className="dashboard-edit-btn" onClick={enterEditMode}>
               Customize
             </button>
           )}
         </div>
       </div>
 
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <div
           key={activeId}
           ref={containerRef}
@@ -216,11 +270,18 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
                 isEditing={isEditing}
                 isMiniMetric={isMiniMetric}
                 onRemove={removeWidget}
-                onReplace={(id) => { setReplacingId(id); setShowPicker(true); }}
+                onReplace={(id) => {
+                  setReplacingId(id);
+                  setShowPicker(true);
+                }}
                 onResize={resizeWidget}
                 containerRef={containerRef}
               >
-                {renderWidgetContent(placement.id as WidgetId, dashboard, selectView)}
+                {renderWidgetContent(
+                  placement.id as WidgetId,
+                  dashboard,
+                  selectView,
+                )}
               </DashboardPanel>
             );
           })}
@@ -231,8 +292,12 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
             <div
               className="widget-drag-ghost"
               style={{
-                width: draggingSize ? `${draggingSize.width}px` : `${(draggingPlacement.w / 12) * 100}%`,
-                height: draggingSize ? `${draggingSize.height}px` : `${draggingPlacement.h * ROW_HEIGHT}px`,
+                width: draggingSize
+                  ? `${draggingSize.width}px`
+                  : `${(draggingPlacement.w / 12) * 100}%`,
+                height: draggingSize
+                  ? `${draggingSize.height}px`
+                  : `${draggingPlacement.h * ROW_HEIGHT}px`,
               }}
             >
               {draggingDef.label}
@@ -254,7 +319,10 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
             setReplacingId(null);
             setShowPicker(false);
           }}
-          onClose={() => { setReplacingId(null); setShowPicker(false); }}
+          onClose={() => {
+            setReplacingId(null);
+            setShowPicker(false);
+          }}
         />
       )}
     </>

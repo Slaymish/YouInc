@@ -56,6 +56,20 @@ CREATE TABLE IF NOT EXISTS sync_state (
     updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS manual_classifications (
+    external_id TEXT PRIMARY KEY,
+    target_account TEXT NOT NULL,
+    memo TEXT,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS manual_account_balances (
+    account TEXT PRIMARY KEY,
+    balance_cents INTEGER NOT NULL,
+    as_of_date TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_raw_transactions_account_date
     ON raw_transactions(account_id, transaction_date);
 CREATE INDEX IF NOT EXISTS idx_journal_transactions_date
@@ -223,23 +237,86 @@ class LedgerDatabase:
                 ORDER BY rt.transaction_date, rt.id
                 """
             ).fetchall()
-        return [
-            RawTransaction(
-                idempotency_hash=str(row["idempotency_hash"]),
-                akahu_transaction_id=row["akahu_transaction_id"],
-                account_id=str(row["account_id"]),
-                status=str(row["status"]),
-                amount_cents=int(row["amount_cents"]),
-                currency=str(row["currency"]),
-                transaction_date=str(row["transaction_date"]),
-                settlement_date=row["settlement_date"],
-                description=str(row["description"]),
-                merchant_name=row["merchant_name"],
-                nzfcc=row["nzfcc"],
-                raw_json=str(row["raw_json"]),
+        return [self._raw_from_row(row) for row in rows]
+
+    def fetch_raw_transaction(self, external_id: str) -> RawTransaction | None:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM raw_transactions WHERE idempotency_hash = ?",
+                (external_id,),
+            ).fetchone()
+        return self._raw_from_row(row) if row else None
+
+    @staticmethod
+    def _raw_from_row(row: sqlite3.Row) -> RawTransaction:
+        return RawTransaction(
+            idempotency_hash=str(row["idempotency_hash"]),
+            akahu_transaction_id=row["akahu_transaction_id"],
+            account_id=str(row["account_id"]),
+            status=str(row["status"]),
+            amount_cents=int(row["amount_cents"]),
+            currency=str(row["currency"]),
+            transaction_date=str(row["transaction_date"]),
+            settlement_date=row["settlement_date"],
+            description=str(row["description"]),
+            merchant_name=row["merchant_name"],
+            nzfcc=row["nzfcc"],
+            raw_json=str(row["raw_json"]),
+        )
+
+    def get_manual_classification(
+        self, external_id: str
+    ) -> tuple[str, str | None] | None:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT target_account, memo FROM manual_classifications WHERE external_id = ?",
+                (external_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        memo = row["memo"]
+        return str(row["target_account"]), (str(memo) if memo is not None else None)
+
+    def set_manual_classification(
+        self, external_id: str, target_account: str, memo: str | None = None
+    ) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO manual_classifications(external_id, target_account, memo, updated_at)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(external_id) DO UPDATE SET
+                    target_account = excluded.target_account,
+                    memo = excluded.memo,
+                    updated_at = excluded.updated_at
+                """,
+                (external_id, target_account, memo, utc_now_iso()),
             )
-            for row in rows
-        ]
+
+    def clear_manual_classification(self, external_id: str) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                "DELETE FROM manual_classifications WHERE external_id = ?",
+                (external_id,),
+            )
+
+    def set_manual_balance(
+        self, account: str, balance_cents: int, as_of_date: str | None = None
+    ) -> None:
+        now = utc_now_iso()
+        as_of = as_of_date or now[:10]
+        with self.connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO manual_account_balances(account, balance_cents, as_of_date, updated_at)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(account) DO UPDATE SET
+                    balance_cents = excluded.balance_cents,
+                    as_of_date = excluded.as_of_date,
+                    updated_at = excluded.updated_at
+                """,
+                (account, balance_cents, as_of, now),
+            )
 
     def get_sync_state(self, key: str) -> str | None:
         with self.connect() as connection:

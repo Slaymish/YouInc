@@ -21,5 +21,8 @@ src/youinc_ledger/persistence_layer/db.py
 src/youinc_ledger/persistence_layer/ledger_exporter.py
 src/youinc_ledger/rules_router/__init__.py
 src/youinc_ledger/rules_router/rules.py
+src/youinc_ledger/rules_router/rules_editor.py
+tests/test_akahu_client.py
+tests/test_classify.py
 tests/test_pipeline_idempotency.py
 tests/test_rules_router.py

@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+#
+# youinc — single entry point for the YouInc Ledger project.
+#
+# Usage:
+#   ./youinc setup              First-time setup: Python venv + deps, frontend deps
+#   ./youinc cli <args...>      Run the Python ledger CLI (passthrough)
+#   ./youinc frontend           Start the TanStack Start frontend (http://localhost:3000)
+#   ./youinc dashboard          Start the Streamlit BI dashboard
+#   ./youinc test               Run the Python test suite
+#   ./youinc shell              Open a shell with the project venv activated
+#   ./youinc help               Show this help
+#
+# Common CLI shortcuts (all forward to `youinc cli ...`):
+#   ./youinc init-db
+#   ./youinc accounts
+#   ./youinc sync --account-id acc_... --start-date 2026-06-01
+#   ./youinc reclassify
+#   ./youinc export-journal --output ledger.journal
+#
+set -euo pipefail
+
+# --- locate repo root (this script lives at the root) ---------------------
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV="$ROOT/.venv"
+VENV_PY="$VENV/bin/python"
+FRONTEND="$ROOT/frontend"
+
+# Proxy vars that break local installs/sync when no proxy is running.
+PROXY_VARS=(HTTPS_PROXY HTTP_PROXY ALL_PROXY https_proxy http_proxy all_proxy)
+no_proxy_env() {
+  local unset_args=()
+  local v
+  for v in "${PROXY_VARS[@]}"; do unset_args+=(-u "$v"); done
+  env "${unset_args[@]}" "$@"
+}
+
+c_blue=$'\033[34m'; c_dim=$'\033[2m'; c_off=$'\033[0m'
+say() { printf '%s==>%s %s\n' "$c_blue" "$c_off" "$*"; }
+
+# Pick the project python: venv if it exists, else system python3.
+python_bin() {
+  if [[ -x "$VENV_PY" ]]; then echo "$VENV_PY"; else echo "python3"; fi
+}
+
+require_venv() {
+  if [[ ! -x "$VENV_PY" ]]; then
+    echo "No virtualenv found at .venv — run './youinc setup' first." >&2
+    exit 1
+  fi
+}
+
+cmd_setup() {
+  say "Creating Python virtualenv (.venv)"
+  if [[ ! -x "$VENV_PY" ]]; then
+    python3 -m venv "$VENV"
+  fi
+  say "Installing Python package (editable, with dev extras)"
+  no_proxy_env "$VENV_PY" -m pip install --upgrade pip >/dev/null
+  no_proxy_env "$VENV_PY" -m pip install -e "$ROOT[dev]"
+
+  if [[ ! -f "$ROOT/.env" ]]; then
+    say "Creating .env from .env.example"
+    cp "$ROOT/.env.example" "$ROOT/.env"
+  fi
+
+  say "Initializing local SQLite ledger"
+  no_proxy_env "$VENV_PY" -m youinc_ledger.cli init-db
+
+  say "Installing frontend dependencies (pnpm)"
+  ( cd "$FRONTEND" && no_proxy_env pnpm install )
+
+  say "Setup complete."
+  printf '%s  Frontend: ./youinc frontend   CLI: ./youinc cli --help%s\n' "$c_dim" "$c_off"
+}
+
+cmd_cli() {
+  require_venv
+  no_proxy_env "$VENV_PY" -m youinc_ledger.cli "$@"
+}
+
+cmd_frontend() {
+  cd "$FRONTEND"
+  say "Starting frontend on http://localhost:3000 (Ctrl-C to stop)"
+  no_proxy_env pnpm dev "$@"
+}
+
+cmd_dashboard() {
+  require_venv
+  say "Starting Streamlit dashboard (Ctrl-C to stop)"
+  no_proxy_env "$VENV_PY" -m streamlit run "$ROOT/src/youinc_ledger/bi_reporting/dashboard.py" "$@"
+}
+
+cmd_test() {
+  require_venv
+  no_proxy_env "$VENV_PY" -m pytest "$@"
+}
+
+cmd_shell() {
+  require_venv
+  say "Launching shell with .venv activated (exit to return)"
+  exec "${SHELL:-/bin/bash}" -c "source '$VENV/bin/activate'; exec ${SHELL:-/bin/bash}"
+}
+
+cmd_help() { awk 'NR>=3 && /^#/ {sub(/^# ?/,""); print; next} NR>=3 {exit}' "${BASH_SOURCE[0]}"; }
+
+# CLI subcommands that should forward to `youinc cli ...`.
+CLI_PASSTHROUGH="init-db sync accounts reclassify classify map-account set-balance rules-test export-journal"
+
+main() {
+  local sub="${1:-help}"; shift || true
+  case "$sub" in
+    setup)              cmd_setup "$@" ;;
+    cli)                cmd_cli "$@" ;;
+    frontend|dev|web)   cmd_frontend "$@" ;;
+    dashboard|bi)       cmd_dashboard "$@" ;;
+    test|tests)         cmd_test "$@" ;;
+    shell)              cmd_shell "$@" ;;
+    help|-h|--help)     cmd_help ;;
+    *)
+      if [[ " $CLI_PASSTHROUGH " == *" $sub "* ]]; then
+        cmd_cli "$sub" "$@"
+      else
+        echo "Unknown command: $sub" >&2
+        echo >&2
+        cmd_help >&2
+        exit 1
+      fi
+      ;;
+  esac
+}
+
+main "$@"

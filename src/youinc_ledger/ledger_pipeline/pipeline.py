@@ -5,7 +5,7 @@ from typing import Iterable
 
 from youinc_ledger.models import JournalTransaction, Posting, RawTransaction
 from youinc_ledger.persistence_layer.db import LedgerDatabase
-from youinc_ledger.rules_router.rules import RulesRouter
+from youinc_ledger.rules_router.rules import RouteDecision, RulesRouter
 
 
 @dataclass(frozen=True)
@@ -115,9 +115,22 @@ class LedgerPipeline:
         values.update(changes)
         return PipelineResult(**values)
 
+    def _resolve_route(self, transaction: RawTransaction) -> RouteDecision:
+        """Manual per-transaction classifications win over rule/nzfcc routing."""
+        override = self.database.get_manual_classification(transaction.idempotency_hash)
+        if override is not None:
+            target_account, memo = override
+            return RouteDecision(
+                target_account=target_account,
+                rule_id="manual:override",
+                memo=memo,
+                matched_by="manual",
+            )
+        return self.router.route(transaction)
+
     def _build_journal_transaction(self, transaction: RawTransaction) -> JournalTransaction:
         account_mapping = self.router.account_mapping_for(transaction.account_id)
-        route = self.router.route(transaction)
+        route = self._resolve_route(transaction)
         amount_cents = abs(transaction.amount_cents)
 
         if transaction.amount_cents > 0:

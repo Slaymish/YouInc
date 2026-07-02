@@ -2,6 +2,7 @@ import { createCsrfMiddleware, createMiddleware, createStart } from "@tanstack/r
 
 const SESSION_COOKIE = "youinc_session";
 const LOGIN_PATH = "/login";
+const PUBLIC_PATHS = new Set(["/", LOGIN_PATH]);
 
 function readCookie(request: Request, name: string): string | undefined {
   const header = request.headers.get("cookie");
@@ -15,12 +16,13 @@ function readCookie(request: Request, name: string): string | undefined {
 
 /**
  * Passkey session gate. Full-page (router) requests without a valid session
- * cookie are redirected to /login. The login page and static assets stay open,
- * and server functions gate themselves via `requireSession()` in auth.ts so
- * data never leaves the server without a session (defense in depth).
+ * cookie are redirected to /login. The landing page, login page, and static
+ * assets stay open, and server functions gate themselves via
+ * `requireSession()` in auth.ts so data never leaves the server without a
+ * session (defense in depth).
  */
 const sessionGate = createMiddleware().server(async ({ next, request, pathname, handlerType }) => {
-  if (handlerType !== "router" || pathname === LOGIN_PATH) {
+  if (handlerType !== "router" || PUBLIC_PATHS.has(pathname)) {
     return next();
   }
 

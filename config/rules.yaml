@@ -10,13 +10,21 @@ account_mappings:
   acc_cmqp4p4h500ex02k0btl0g6fs:
     ledger_account: Assets:Treasury:SlushFund
     account_type: asset
-  acc_cmqp4p4hc00ez02k0bh9h62iz:
-    ledger_account: Assets:Bank:BNZ:TwistedFrequency
+  # Sharesies accounts. Only Spend exposes a transaction feed via Akahu;
+  # Growth/Emergencies/KiwiSaver are balance-only and tracked as manual
+  # balance snapshots (see `set-balance`), not synced transactions.
+  acc_cmoxiaqsd005n02juf9vi6sww:
+    ledger_account: Assets:Investments:Sharesies:Spend
     account_type: asset
-  acc_cmqp4p4hj00f102k0bwp05fss:
-    ledger_account: Assets:Bank:BNZ:Paychase
+  acc_cmoxiaqse005p02ju9jww3sb0:
+    ledger_account: Assets:Investments:Sharesies:Growth
     account_type: asset
-
+  acc_cmoxiaqse005o02ju4a01hudz:
+    ledger_account: Assets:Investments:Sharesies:Emergencies
+    account_type: asset
+  acc_cmoxiaqru005m02ju4x9a0srj:
+    ledger_account: Assets:Investments:Sharesies:KiwiSaver
+    account_type: asset
 nzfcc_mappings:
   income:
     target_account: Income:Operating:EmploymentServices
@@ -35,29 +43,43 @@ nzfcc_mappings:
 
 rules:
   # Balance-sheet transfers and treasury allocation first.
-  - id: transfer_slush_fund
+  # BNZ Operating <-> SlushFund transfer, BNZ leg. SlushFund is a live,
+  # independently-synced Akahu account (see account_mappings above), so both
+  # legs post to a clearing account rather than SlushFund directly -- same
+  # rationale as the BNZ <-> Sharesies Spend clearing pair below. Without
+  # this, the SlushFund-side inbound leg falls through to
+  # owner_capital_unknown_credit and double-counts the transfer as both a
+  # SlushFund deposit and fabricated owner capital.
+  - id: transfer_slush_fund_bnz_leg
     priority: 5
     match:
-      description_regex: "(?i)slush find"
+      description_regex: "(?i)slush fund"
+      account_ids: [acc_cmqp4p4gx00ev02k09dbja392]
     route:
-      target_account: Assets:Treasury:SlushFund
-      memo: Internal treasury reserve transfer
+      target_account: Assets:Internal:TransferClearing
+      memo: BNZ leg of a BNZ <-> SlushFund transfer
 
+  # SlushFund-side leg of the same transfer.
+  - id: transfer_slush_fund_slushfund_leg
+    priority: 5
+    match:
+      account_ids: [acc_cmqp4p4h500ex02k0btl0g6fs]
+    route:
+      target_account: Assets:Internal:TransferClearing
+      memo: SlushFund leg of a BNZ <-> SlushFund transfer (verify against TransferClearing balance)
+
+  # Twisted Frequency is a Blossom account (not connected to Akahu), tracked
+  # via manual balance snapshots (see `set-balance`). Unlike the Sharesies
+  # transfers above, Blossom has no independent Akahu feed to double-post
+  # from, so this stays a normal one-sided transfer rather than routing
+  # through the clearing account.
   - id: transfer_twisted_frequency
     priority: 6
     match:
       description_regex: "(?i)twisted frequency"
     route:
-      target_account: Assets:Bank:BNZ:TwistedFrequency
-      memo: Internal account transfer
-
-  - id: transfer_paychase
-    priority: 7
-    match:
-      description_regex: "(?i)paychase limited"
-    route:
-      target_account: Assets:Bank:BNZ:Paychase
-      memo: Internal Paychase account transfer
+      target_account: Assets:Investments:Blossom:TwistedFrequency
+      memo: Transfer to Blossom Twisted Frequency pot (tracked via manual balance, not Akahu)
 
   - id: transfer_travel_reserve
     priority: 8
@@ -83,13 +105,38 @@ rules:
       target_account: Assets:Investments:Blossom
       memo: Treasury investment allocation
 
+  # BNZ <-> Sharesies Spend transfer, BNZ leg. The Sharesies-side leg of the
+  # same transfer is matched separately below by transfer_bnz_sharesies_inbound.
+  # Both legs post to a clearing account instead of Sharesies:Spend directly,
+  # so the transfer isn't double-counted now that both accounts are synced
+  # independently (BNZ posts an outflow, Sharesies posts an inflow — without
+  # a shared clearing account the amount would land on the balance sheet twice
+  # and Sharesies' "Deposit from BURKE H A" would be miscoded as new equity).
   - id: investment_sharesies
     priority: 11
     match:
       description_regex: "(?i)sharesies"
+      account_ids:
+        [acc_cmqp4p4gx00ev02k09dbja392, acc_cmqp4p4h500ex02k0btl0g6fs]
     route:
-      target_account: Assets:Investments:Sharesies
-      memo: Investment allocation
+      target_account: Assets:Internal:TransferClearing
+      memo: BNZ leg of a BNZ <-> Sharesies Spend transfer
+
+  # Sharesies-side leg of the same BNZ <-> Sharesies Spend transfer. Akahu
+  # renders the counterparty as the depositor's own name (e.g. "Deposit from
+  # BURKE H A") or "Transfer from/to Wallet" rather than mentioning BNZ, so
+  # match on the Sharesies Spend account instead of description text. This is
+  # broader than ideal — it will also catch genuinely new external deposits
+  # into Sharesies Spend, which is the safer failure mode (clearing account
+  # needs a one-off manual look versus silently fabricating equity).
+  - id: transfer_bnz_sharesies_inbound
+    priority: 11
+    match:
+      description_regex: "(?i)deposit from|transfer from wallet|transfer to wallet"
+      account_ids: [acc_cmoxiaqsd005n02juf9vi6sww]
+    route:
+      target_account: Assets:Internal:TransferClearing
+      memo: Sharesies leg of a BNZ <-> Sharesies Spend transfer (verify against TransferClearing balance)
 
   - id: owner_drawings_cash
     priority: 12
@@ -136,14 +183,6 @@ rules:
       target_account: Expenses:OpEx:FounderPerformance
       memo: Reversal/contra expense
 
-  - id: owner_capital_unknown_credit
-    priority: 29
-    match:
-      amount_greater_than: 0
-    route:
-      target_account: Equity:Owner:Contributions
-      memo: Unmatched credit treated as owner/entity capital until reviewed
-
   # Software, AI tooling, cloud, and communications.
   - id: ai_and_coding_tools
     priority: 40
@@ -156,7 +195,7 @@ rules:
   - id: productivity_cloud
     priority: 41
     match:
-      description_regex: "(?i)google workspace|google|icloud|apple|youtube|utube"
+      description_regex: '(?i)google workspace|google|icloud|apple\.com/bill|itunes|youtube|utube'
     route:
       target_account: Expenses:OpEx:Software:CloudServices
       memo: Cloud/productivity subscription
@@ -174,7 +213,7 @@ rules:
   - id: facilities_rent
     priority: 50
     match:
-      description_regex: "(?i)bills and rent|\brent\b"
+      description_regex: '(?i)bills and rent|\brent\b'
     route:
       target_account: Expenses:OpEx:Facilities:Rent
       memo: Operating facility baseline
@@ -204,10 +243,97 @@ rules:
       memo: Operating sustenance/provisions for You Inc.
 
   - id: capital_asset_large_purchase
-    priority: 90
+    priority: 35
     match:
       amount_abs_greater_than: 1000.00
-      description_regex: "(?i)pb tech|computer|laptop|equipment"
+      description_regex: "(?i)pb tech|computer|laptop|equipment|apple"
     route:
       target_account: Assets:Equipment:Computer
       memo: Capital equipment
+  - id: manual_sals_pizza_cuba_st
+    priority: 500
+    match:
+      description_regex: '(?i)SALS\ PIZZA\ CUBA\ ST'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_san_fran
+    priority: 500
+    match:
+      description_regex: '(?i)SAN\ FRAN'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_aroy_thai_newtown
+    priority: 500
+    match:
+      description_regex: '(?i)Aroy\ Thai\ Newtown'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_uber_eats_help_uber
+    priority: 500
+    match:
+      description_regex: '(?i)UBER\ \*EATS\ HELP\.UBER'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_1154_pastaria
+    priority: 500
+    match:
+      description_regex: '(?i)1154\ Pastaria'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_st_pierre_s_cuba_st
+    priority: 500
+    match:
+      description_regex: '(?i)ST\ PIERRE''S\ CUBA\ ST'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_nyx_vending_direct_lim
+    priority: 500
+    match:
+      description_regex: '(?i)NYX\*VENDING\ DIRECT\ LIM'
+    route:
+      target_account: Expenses:OpEx:MealsAndProvisions
+  - id: manual_plimmer_steps_medical
+    priority: 500
+    match:
+      description_regex: '(?i)Plimmer\ Steps\ Medical'
+    route:
+      target_account: Expenses:OpEx:FounderPerformance
+  - id: manual_rentahuman_ai
+    priority: 500
+    match:
+      description_regex: '(?i)RENTAHUMAN\.AI'
+    route:
+      target_account: Expenses:OpEx:Software:AIAndTools
+  - id: manual_flamingo_scooters
+    priority: 500
+    match:
+      description_regex: "(?i)flamingo scooters"
+    route:
+      target_account: Expenses:OpEx:Transport
+  - id: manual_tower_insurance_eis
+    priority: 500
+    match:
+      description_regex: '(?i)TOWER\ INSURANCE\ \-\ EIS'
+    route:
+      target_account: Expenses:OpEx:Insurance
+  - id: manual_paychase_limited_internet_xfr
+    priority: 500
+    match:
+      description_regex: "(?i)PAYCHASE LIMITED"
+    route:
+      target_account: Equity:Owner:Drawings
+      memo: "Closing out Paychase account (funding from negative to zero)"
+  - id: manual_the_library_bar
+    priority: 500
+    match:
+      description_regex: '(?i)The\ Library\ Bar'
+    route:
+      target_account: Expenses:OpEx:Entertainment
+      memo: "Social/entertainment spend"
+  - id: manual_swappedcom_e127890b
+    priority: 500
+    match:
+      description_regex: '(?i)SWAPPEDCOM\*\ \#E127890B'
+    route:
+      target_account: Assets:Investments:Speculative:Crypto
+      memo: "Speculative crypto purchase"

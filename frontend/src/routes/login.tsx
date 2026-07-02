@@ -60,7 +60,7 @@ function LoginPage() {
       const response = await startAuthentication({ optionsJSON });
       const { verified } = await verifyAuthenticationFn({ data: response });
       if (!verified) throw new Error("Passkey was not accepted.");
-      await router.navigate({ to: "/" });
+      await router.navigate({ to: "/dashboard" });
     } catch (error) {
       setStatus(errorMessage(error));
     } finally {
@@ -78,7 +78,7 @@ function LoginPage() {
         data: { response, token: enrollToken },
       });
       if (!verified) throw new Error("Registration failed.");
-      await router.navigate({ to: "/" });
+      await router.navigate({ to: "/dashboard" });
     } catch (error) {
       setStatus(errorMessage(error));
     } finally {

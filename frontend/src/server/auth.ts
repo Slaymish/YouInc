@@ -177,8 +177,26 @@ export function requireSession(): void {
     throw new Response("Unauthorized", { status: 401 });
   }
 }
-// ponytail: no logout — single user, 30-day cookie. Add a destroySession +
-// button (delete the sessions row, clear the cookie) when you actually want it.
+
+/** Whether the current request carries a live session cookie. Safe for public routes. */
+export function hasValidSession(): boolean {
+  return isValidSession(getCookie(SESSION_COOKIE));
+}
+
+/** Ends the current session: removes it from the store and clears the cookie. */
+export function destroySession(): void {
+  const token = getCookie(SESSION_COOKIE);
+  if (token) {
+    db().prepare(`DELETE FROM sessions WHERE token = ?`).run(token);
+  }
+  setCookie(SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: (process.env.YOUINC_RP_ORIGIN ?? "").startsWith("https") || process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+}
 
 // --- Enrollment gate ----------------------------------------------------------
 // Registration is disabled unless YOUINC_ENROLLMENT_TOKEN is set AND the caller

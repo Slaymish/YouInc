@@ -36,13 +36,21 @@ export interface BalanceRow {
 }
 
 function liquidityTierForAccount(account: string): LiquidityTier {
-  if (account.startsWith("Assets:Bank:") || account.startsWith("Assets:Treasury:")) {
+  if (
+    account.startsWith("Assets:Bank:") ||
+    account.startsWith("Assets:Treasury:") ||
+    account.startsWith("Assets:Internal:")
+  ) {
     return "cash";
   }
   if (account === "Assets:Investments:Sharesies:Spend") {
     return "cash";
   }
-  if (account.startsWith("Assets:Investments:Blossom")) {
+  if (
+    account.startsWith("Assets:Investments:Blossom") ||
+    // Confirmed: withdrawal from Sharesies Emergencies takes a couple of days.
+    account === "Assets:Investments:Sharesies:Emergencies"
+  ) {
     return "semi_liquid";
   }
   return "illiquid";
@@ -105,6 +113,7 @@ export interface SourceAccountRow {
   ledgerAccount: string;
   accountType: "asset" | "liability";
   mappingStatus: "configured" | "unmapped";
+  creditLimitCents: number | null;
 }
 
 export interface SyncLedgerInput {
@@ -142,6 +151,7 @@ export interface AccountMappingInput {
   accountId: string;
   ledgerAccount: string;
   accountType: "asset" | "liability";
+  creditLimitCents?: number | null;
 }
 
 export interface ClassifyTransactionInput {
@@ -154,6 +164,7 @@ export interface ClassifyTransactionInput {
 interface AccountMapping {
   ledgerAccount: string;
   accountType: "asset" | "liability";
+  creditLimitCents: number | null;
 }
 
 export interface RoutingHealth {
@@ -190,6 +201,15 @@ export interface NetWorthPoint {
   netWorthCents: number;
 }
 
+export interface CreditFacilityRow {
+  account: string;
+  accountId: string | null;
+  limitCents: number | null;
+  drawnCents: number;
+  headroomCents: number | null;
+  utilization: number | null;
+}
+
 export interface LedgerDashboardData {
   databasePath: string;
   databaseExists: boolean;
@@ -209,8 +229,13 @@ export interface LedgerDashboardData {
     runwayMonths: number | null;
     transactionCount: number;
     rawTransactionCount: number;
+    cashCents: number;
+    creditHeadroomCents: number;
+    creditLimitCents: number;
+    availableLiquidityCents: number;
   };
   balances: BalanceRow[];
+  creditFacilities: CreditFacilityRow[];
   pnl: PnlRow[];
   incomeBreakdown: AccountTotal[];
   expenseBreakdown: AccountTotal[];
@@ -422,6 +447,7 @@ function validateAccountMapping(
   const accountId = input.accountId.trim();
   const ledgerAccount = input.ledgerAccount.trim();
   const accountType = input.accountType;
+  const creditLimitCents = input.creditLimitCents ?? null;
 
   if (!accountId) {
     throw new Error("Source account id is required.");
@@ -434,8 +460,14 @@ function validateAccountMapping(
   if (accountType !== "asset" && accountType !== "liability") {
     throw new Error("Account type must be asset or liability.");
   }
+  if (
+    creditLimitCents !== null &&
+    (!Number.isFinite(creditLimitCents) || creditLimitCents < 0)
+  ) {
+    throw new Error("Credit limit must be a positive amount in cents.");
+  }
 
-  return { accountId, ledgerAccount, accountType };
+  return { accountId, ledgerAccount, accountType, creditLimitCents };
 }
 
 function parseYamlKey(key: string) {
@@ -475,6 +507,7 @@ function parseAccountMappings(rulesPath = resolveRulesPath()) {
     const accountId = parseYamlKey(accountMatch[1]);
     let ledgerAccount: string | undefined;
     let accountType: "asset" | "liability" = "asset";
+    let creditLimitCents: number | null = null;
 
     for (let child = index + 1; child < lines.length; child += 1) {
       const childLine = lines[child];
@@ -491,10 +524,17 @@ function parseAccountMappings(rulesPath = resolveRulesPath()) {
       if (typeMatch && typeMatch[1].toLowerCase() === "liability") {
         accountType = "liability";
       }
+
+      const limitMatch = childLine.match(
+        /^    credit_limit_cents:\s*(\d+)\s*$/,
+      );
+      if (limitMatch) {
+        creditLimitCents = Number(limitMatch[1]);
+      }
     }
 
     if (ledgerAccount) {
-      mappings.set(accountId, { ledgerAccount, accountType });
+      mappings.set(accountId, { ledgerAccount, accountType, creditLimitCents });
     }
   }
 
@@ -623,7 +663,13 @@ async function runLedgerCli(args: string[]): Promise<SyncLedgerResult> {
       timeout: 120_000,
       maxBuffer: 1024 * 1024,
     });
-    return { ok: true, command: [python, ...fullArgs].join(" "), stdout, stderr, code: 0 };
+    return {
+      ok: true,
+      command: [python, ...fullArgs].join(" "),
+      stdout,
+      stderr,
+      code: 0,
+    };
   } catch (error) {
     const failure = error as NodeJS.ErrnoException & {
       stdout?: string;
@@ -718,7 +764,13 @@ export async function syncLedger(
 
   try {
     const { stdout, stderr } = await execFileAsync(python, args, execOpts);
-    return { ok: true, command: [python, ...args].join(" "), stdout, stderr, code: 0 };
+    return {
+      ok: true,
+      command: [python, ...args].join(" "),
+      stdout,
+      stderr,
+      code: 0,
+    };
   } catch (error) {
     const failure = error as NodeJS.ErrnoException & {
       stdout?: string;
@@ -730,7 +782,10 @@ export async function syncLedger(
     // The stored delta marker can be ahead of Akahu's UTC clock when NZT is
     // already the next calendar day. Retry with yesterday (UTC) so we never
     // ask for a future date.
-    if (input.delta && failureStderr.includes("Start date cannot be in the future")) {
+    if (
+      input.delta &&
+      failureStderr.includes("Start date cannot be in the future")
+    ) {
       const yesterday = new Date();
       yesterday.setUTCDate(yesterday.getUTCDate() - 1);
       const retryArgs = [
@@ -739,11 +794,31 @@ export async function syncLedger(
         yesterday.toISOString().slice(0, 10),
       ];
       try {
-        const { stdout: rs, stderr: re } = await execFileAsync(python, retryArgs, execOpts);
-        return { ok: true, command: [python, ...retryArgs].join(" "), stdout: rs, stderr: re, code: 0 };
+        const { stdout: rs, stderr: re } = await execFileAsync(
+          python,
+          retryArgs,
+          execOpts,
+        );
+        return {
+          ok: true,
+          command: [python, ...retryArgs].join(" "),
+          stdout: rs,
+          stderr: re,
+          code: 0,
+        };
       } catch (retryError) {
-        const rf = retryError as NodeJS.ErrnoException & { stdout?: string; stderr?: string; code?: number | null };
-        return { ok: false, command: [python, ...retryArgs].join(" "), stdout: rf.stdout ?? "", stderr: rf.stderr ?? rf.message, code: rf.code ?? null };
+        const rf = retryError as NodeJS.ErrnoException & {
+          stdout?: string;
+          stderr?: string;
+          code?: number | null;
+        };
+        return {
+          ok: false,
+          command: [python, ...retryArgs].join(" "),
+          stdout: rf.stdout ?? "",
+          stderr: rf.stderr ?? rf.message,
+          code: rf.code ?? null,
+        };
       }
     }
 
@@ -761,7 +836,7 @@ export async function upsertAccountMapping(
   input: AccountMappingInput,
 ): Promise<AccountMappingInput> {
   const mapping = validateAccountMapping(input);
-  const result = await runLedgerCli([
+  const cliArgs = [
     "map-account",
     "--rules-path",
     resolveRulesPath(),
@@ -771,9 +846,18 @@ export async function upsertAccountMapping(
     mapping.ledgerAccount,
     "--account-type",
     mapping.accountType,
-  ]);
+  ];
+  if (
+    mapping.creditLimitCents !== null &&
+    mapping.creditLimitCents !== undefined
+  ) {
+    cliArgs.push("--credit-limit-cents", String(mapping.creditLimitCents));
+  }
+  const result = await runLedgerCli(cliArgs);
   if (!result.ok) {
-    throw new Error(result.stderr.trim() || "Failed to update account mapping.");
+    throw new Error(
+      result.stderr.trim() || "Failed to update account mapping.",
+    );
   }
   return mapping;
 }
@@ -800,9 +884,14 @@ function emptyDashboard(
       runwayMonths: null,
       transactionCount: 0,
       rawTransactionCount: 0,
+      cashCents: 0,
+      creditHeadroomCents: 0,
+      creditLimitCents: 0,
+      availableLiquidityCents: 0,
     },
     manualBalances: [],
     balances: [],
+    creditFacilities: [],
     pnl: [],
     incomeBreakdown: [],
     expenseBreakdown: [],
@@ -1118,6 +1207,52 @@ export function readLedgerDashboard(): LedgerDashboardData {
       : 0;
     const netWorthCents = assetsCents - liabilitiesCents;
 
+    const cashCents = typedBalances
+      .filter(
+        (row) => row.accountType === "Assets" && row.liquidityTier === "cash",
+      )
+      .reduce((sum, row) => sum + row.balanceCents, 0);
+
+    // Revolving credit facilities: liability accounts with a configured
+    // credit_limit_cents are treated as float, not just debt. Headroom
+    // (limit - drawn) is available short-term liquidity, distinct from net
+    // worth, which still fully reflects the drawn balance as a liability.
+    const creditFacilities: CreditFacilityRow[] = Array.from(
+      accountMappings.entries(),
+    )
+      .filter(
+        ([, mapping]) =>
+          mapping.accountType === "liability" &&
+          mapping.creditLimitCents !== null,
+      )
+      .map(([accountId, mapping]) => {
+        const drawnCents = typedBalances
+          .filter((row) => row.account === mapping.ledgerAccount)
+          .reduce((sum, row) => sum + row.balanceCents, 0);
+        const limitCents = mapping.creditLimitCents;
+        const headroomCents =
+          limitCents !== null ? Math.max(0, limitCents - drawnCents) : null;
+        const utilization = limitCents ? drawnCents / limitCents : null;
+        return {
+          account: mapping.ledgerAccount,
+          accountId,
+          limitCents,
+          drawnCents,
+          headroomCents,
+          utilization,
+        };
+      });
+
+    const creditLimitCents = creditFacilities.reduce(
+      (sum, facility) => sum + (facility.limitCents ?? 0),
+      0,
+    );
+    const creditHeadroomCents = creditFacilities.reduce(
+      (sum, facility) => sum + (facility.headroomCents ?? 0),
+      0,
+    );
+    const availableLiquidityCents = cashCents + creditHeadroomCents;
+
     const monthly = incomeStatement.reduce<
       Record<string, { incomeCents: number; expensesCents: number }>
     >((months, row) => {
@@ -1152,9 +1287,15 @@ export function readLedgerDashboard(): LedgerDashboardData {
     for (const row of incomeStatement) {
       const amount = Number(row.amount_cents);
       if (row.account.startsWith("Income:")) {
-        incomeTotals.set(row.account, (incomeTotals.get(row.account) ?? 0) + amount);
+        incomeTotals.set(
+          row.account,
+          (incomeTotals.get(row.account) ?? 0) + amount,
+        );
       } else if (row.account.startsWith("Expenses:")) {
-        expenseTotals.set(row.account, (expenseTotals.get(row.account) ?? 0) - amount);
+        expenseTotals.set(
+          row.account,
+          (expenseTotals.get(row.account) ?? 0) - amount,
+        );
       }
     }
 
@@ -1288,8 +1429,13 @@ export function readLedgerDashboard(): LedgerDashboardData {
           : null,
         transactionCount,
         rawTransactionCount,
+        cashCents,
+        creditHeadroomCents,
+        creditLimitCents,
+        availableLiquidityCents,
       },
       balances: typedBalances,
+      creditFacilities,
       pnl,
       incomeBreakdown,
       expenseBreakdown,
@@ -1319,6 +1465,7 @@ export function readLedgerDashboard(): LedgerDashboardData {
             mapping?.ledgerAccount ?? `Assets:Unmapped:${safeAccountId}`,
           accountType: mapping?.accountType ?? "asset",
           mappingStatus: mapping ? "configured" : "unmapped",
+          creditLimitCents: mapping?.creditLimitCents ?? null,
         };
       }),
       knownAccounts,
