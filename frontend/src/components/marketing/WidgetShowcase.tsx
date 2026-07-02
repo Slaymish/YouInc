@@ -3,8 +3,7 @@ import { WIDGET_MAP } from "../dashboard/widgets";
 import { renderWidgetContent } from "../dashboard/renderWidget";
 import { SAMPLE_DASHBOARD } from "./sampleDashboard";
 import { SHOWCASE_WIDGET_IDS } from "./demoWidgets";
-
-const noop = () => {};
+import { noop } from "./noop";
 
 export function WidgetShowcase() {
   return (

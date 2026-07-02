@@ -3,6 +3,7 @@ import { WIDGET_MAP, type WidgetId } from "../dashboard/widgets";
 import { renderWidgetContent } from "../dashboard/renderWidget";
 import { SAMPLE_DASHBOARD } from "./sampleDashboard";
 import { DEMO_WIDGET_IDS } from "./demoWidgets";
+import { noop } from "./noop";
 
 /** Forces light theme while mounted so widget tokens stay consistent on public pages. */
 export function useLightTheme() {
@@ -16,8 +17,6 @@ export function useLightTheme() {
     };
   }, []);
 }
-
-const noop = () => {};
 
 export function DemoBoard({ ids = DEMO_WIDGET_IDS }: { ids?: WidgetId[] }) {
   return (

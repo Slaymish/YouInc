@@ -73,4 +73,16 @@ describe("recordLead", () => {
     expect(recordLead({ email: "bot@b.com", company: "Acme Spam" })).toEqual({ ok: true });
     expect(countRows()).toBe(0);
   });
+
+  it("rejects a honeypot value over 200 chars with a 400 Response", async () => {
+    const { recordLead } = await freshModule();
+    try {
+      recordLead({ email: "bot@b.com", company: "x".repeat(201) });
+      expect.unreachable("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(Response);
+      expect((err as Response).status).toBe(400);
+    }
+    expect(countRows()).toBe(0);
+  });
 });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createServerFn } from "@tanstack/react-start";
 
 export const joinWaitlist = createServerFn({ method: "POST" })
@@ -16,6 +16,11 @@ interface WaitlistFormProps {
 export function WaitlistForm({ source, onDone }: WaitlistFormProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  // Gate the submit button until React has hydrated, so a click that lands before
+  // handleSubmit is attached can't fall through to a native GET submission (which
+  // would leak the email into the URL query string and skip recordLead entirely).
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -74,7 +79,7 @@ export function WaitlistForm({ source, onDone }: WaitlistFormProps) {
         name="company"
         aria-hidden="true"
       />
-      <button className="mk-btn mk-btn--primary" type="submit" disabled={status === "loading"}>
+      <button className="mk-btn mk-btn--primary" type="submit" disabled={!hydrated || status === "loading"}>
         {status === "loading" ? "Joining…" : "Start free →"}
       </button>
       {error ? (

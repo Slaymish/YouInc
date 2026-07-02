@@ -13,7 +13,7 @@ const WaitlistSchema = z.object({
   source: z.string().max(60).optional(),
   userAgent: z.string().max(400).optional(),
   // Honeypot: real users never fill this. Bots do.
-  company: z.string().optional(),
+  company: z.string().max(200).optional(),
 });
 
 export type WaitlistInput = z.infer<typeof WaitlistSchema>;

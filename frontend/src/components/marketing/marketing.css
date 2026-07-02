@@ -62,6 +62,9 @@
     transition: none;
     transform: none;
   }
+  .live-dot { animation: none; }
+  .mk-btn:hover { transform: none; }
+  .showcase__card:hover { transform: none; }
 }
 
 .demo-banner {
@@ -74,6 +77,10 @@
 /* Section rhythm */
 .section-heading { font-family: var(--mk-serif); font-weight: 400; font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: -.02em; margin: 0 0 2rem; }
 .mk section { padding: clamp(3rem, 6vw, 6rem) clamp(1.25rem, 5vw, 4rem); max-width: 1200px; margin: 0 auto; }
+/* .demo-panel is a <section> nested inside .mk, but it's a demo-board grid item,
+   not a landing-page section — override the .mk section rhythm above so its own
+   compact padding/sizing (see .demo-panel above) wins. */
+.mk .demo-panel { padding: 1rem 1.2rem; max-width: none; margin: 0; }
 
 /* Hero */
 .hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: center; position: relative; min-height: 34rem; }
@@ -99,7 +106,6 @@
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mk-accent); }
 @keyframes mk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 .live-dot { animation: mk-pulse 1.7s infinite; }
-@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } .mk-btn:hover { transform: none; } }
 
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; }
@@ -133,17 +139,13 @@
   .showcase__card:nth-child(n+5) { grid-column: span 1; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .showcase__card:hover { transform: none; }
-}
-
 /* Bespoke */
 .bespoke { text-align: center; }
 .bespoke .section-heading em { font-style: italic; color: var(--mk-accent); }
 .bespoke__body { max-width: 42rem; margin: 0 auto 1.8rem; color: var(--mk-soft); line-height: 1.65; font-size: 1.05rem; }
 
 /* Nav */
-.mk-nav { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem clamp(1.25rem, 5vw, 4rem); max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--mk-line); }
+.mk-nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 1.1rem clamp(1.25rem, 5vw, 4rem); max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--mk-line); }
 .mk-nav__logo { font-weight: 800; letter-spacing: .02em; font-size: 1.1rem; }
 .mk-nav__links { display: flex; gap: 1.4rem; align-items: center; font-size: 0.9rem; }
 .mk-nav__links a { color: var(--mk-ink); text-decoration: none; opacity: .85; }
@@ -159,7 +161,9 @@
 .tier__cadence { font-family: var(--mk-sans); font-size: 0.9rem; color: var(--mk-soft); }
 .tier__features { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; color: var(--mk-soft); font-size: 0.92rem; }
 .tier__features li::before { content: "✓ "; color: var(--mk-accent); font-weight: 700; }
-.tier { margin-top: auto; }
+/* CTA (link, ghost link, or WaitlistForm) is always the last child of .tier —
+   push it to the bottom of the flex column so CTAs align across unequal-height cards. */
+.tier > :last-child { margin-top: auto; }
 @media (max-width: 900px) { .pricing__grid { grid-template-columns: 1fr; } }
 
 /* Final CTA + FAQ + footer */
