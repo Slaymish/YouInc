@@ -6,3 +6,6 @@ dist/
 .DS_Store
 .env
 .env.local
+playwright-report/
+test-results/
+.e2e-leads.sqlite3*
