@@ -6,7 +6,7 @@ import type {
   LedgerDashboardData,
   SuspenseItem,
 } from "~/server/ledger";
-import { formatMoney } from "./format";
+import { formatMoney, leafAccount } from "./format";
 
 const classifyFn = createServerFn({ method: "POST" })
   .validator((data: ClassifyTransactionInput) => data)
@@ -34,6 +34,8 @@ const syncAndReclassifyFn = createServerFn({ method: "POST" })
 
 type ClassifyMode = ClassifyTransactionInput["mode"];
 
+const NEW_CATEGORY_OPTION = "__new_category__";
+
 function QueueRow({
   item,
   knownAccounts,
@@ -44,16 +46,20 @@ function QueueRow({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [account, setAccount] = useState("");
+  const [newAccount, setNewAccount] = useState("");
   const [mode, setMode] = useState<ClassifyMode>("rule");
   const [message, setMessage] = useState<string | null>(null);
 
+  const isNewCategory = account === NEW_CATEGORY_OPTION;
+  const targetAccount = isNewCategory ? newAccount.trim() : account;
+
   function classify() {
-    if (!account) return;
+    if (!targetAccount) return;
     setMessage(null);
     startTransition(async () => {
       try {
         const result = await classifyFn({
-          data: { externalId: item.externalId, targetAccount: account, mode },
+          data: { externalId: item.externalId, targetAccount, mode },
         });
         if (!result.ok) {
           setMessage(result.stderr.trim() || "Classify failed.");
@@ -66,14 +72,28 @@ function QueueRow({
     });
   }
 
+  const sourceAccount = item.counterAccount
+    ? leafAccount(item.counterAccount)
+    : "unknown account";
+  const flowLabel =
+    item.direction === "out"
+      ? `Paid from ${sourceAccount}`
+      : `Received into ${sourceAccount}`;
+
   return (
     <article className="queue-item">
       <div className="queue-item-head">
         <div>
           <time>{item.transactionDate}</time>
           <strong>{item.description}</strong>
+          <span className={`queue-flow queue-flow-${item.direction}`}>
+            <span className="queue-flow-tag">{item.direction === "out" ? "Out" : "In"}</span>
+            {flowLabel}
+          </span>
         </div>
-        <span className="numeric">{formatMoney(item.amountCents)}</span>
+        <span className={`numeric queue-amount-${item.direction}`}>
+          {formatMoney(item.amountCents)}
+        </span>
       </div>
       <div className="queue-classify">
         <select
@@ -87,7 +107,16 @@ function QueueRow({
               {acct}
             </option>
           ))}
+          <option value={NEW_CATEGORY_OPTION}>+ New category…</option>
         </select>
+        {isNewCategory ? (
+          <input
+            aria-label="New category account"
+            placeholder="Income:Personal:Gifts"
+            value={newAccount}
+            onChange={(e) => setNewAccount(e.currentTarget.value)}
+          />
+        ) : null}
         <select
           aria-label="Classification scope"
           value={mode}
@@ -96,7 +125,7 @@ function QueueRow({
           <option value="rule">Rule</option>
           <option value="once">Just this one</option>
         </select>
-        <button type="button" disabled={isPending || !account} onClick={classify}>
+        <button type="button" disabled={isPending || !targetAccount} onClick={classify}>
           {isPending ? "…" : "Classify"}
         </button>
       </div>
@@ -149,7 +178,9 @@ export function SuspenseQueueWidget({ dashboard }: { dashboard: LedgerDashboardD
     );
   }
 
-  const totalCents = items.reduce((sum, item) => sum + item.amountCents, 0);
+  // Sum magnitudes (not signed) so the header reflects total value parked,
+  // not a near-zero net of offsetting inflows and outflows.
+  const totalCents = items.reduce((sum, item) => sum + Math.abs(item.amountCents), 0);
 
   return (
     <div className="stack">

@@ -337,3 +337,21 @@ rules:
     route:
       target_account: Assets:Investments:Speculative:Crypto
       memo: "Speculative crypto purchase"
+  - id: manual_10820473_10820473
+    priority: 500
+    match:
+      description_regex: '(?i)10820473\ 10820473'
+    route:
+      target_account: Income:Personal:Gifts
+  - id: manual_10722712_10722712
+    priority: 500
+    match:
+      description_regex: '(?i)10722712\ 10722712'
+    route:
+      target_account: Income:Personal:Gifts
+  - id: manual_slush_find
+    priority: 500
+    match:
+      description_regex: '(?i)slush\ find'
+    route:
+      target_account: Assets:Internal:TransferClearing

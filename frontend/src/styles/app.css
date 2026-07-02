@@ -970,13 +970,14 @@ td.indented {
 }
 
 .queue-classify {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
 }
 
 .queue-classify select,
+.queue-classify input,
 .queue-classify button {
   font-size: 0.72rem;
   padding: 4px 6px;
@@ -984,6 +985,12 @@ td.indented {
   border-radius: 6px;
   background: var(--surface-raised, transparent);
   color: inherit;
+}
+
+.queue-classify select:first-child,
+.queue-classify input {
+  flex: 1 1 160px;
+  min-width: 0;
 }
 
 .queue-classify button {
@@ -1059,7 +1066,42 @@ td.indented {
   font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
   font-size: 0.84rem;
   font-weight: 700;
+}
+
+.queue-amount-out {
   color: var(--danger);
+}
+
+.queue-amount-in {
+  color: var(--ok);
+}
+
+.queue-flow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.queue-flow-tag {
+  font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+}
+
+.queue-flow-out .queue-flow-tag {
+  color: var(--danger);
+}
+
+.queue-flow-in .queue-flow-tag {
+  color: var(--ok);
 }
 
 /* ── Month pulse ── */

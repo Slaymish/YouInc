@@ -191,7 +191,12 @@ export interface SuspenseItem {
   externalId: string;
   transactionDate: string;
   description: string;
+  /** Signed cents: negative when money left the account, positive when it arrived. */
   amountCents: number;
+  /** "out" = money left the account, "in" = money arrived. */
+  direction: "in" | "out";
+  /** The real (non-suspense) account the money moved through. */
+  counterAccount: string;
 }
 
 export interface NetWorthPoint {
@@ -325,6 +330,8 @@ type SuspenseQueueQueryRow = {
   transaction_date: string;
   description: string;
   amount_cents: number | null;
+  suspense_side: "debit" | "credit";
+  counter_account: string | null;
 };
 
 type NetWorthTrendQueryRow = {
@@ -1054,12 +1061,16 @@ export function readLedgerDashboard(): LedgerDashboardData {
           jt.external_id,
           jt.transaction_date,
           jt.description,
-          SUM(je.amount_cents) AS amount_cents
+          susp.amount_cents AS amount_cents,
+          susp.side AS suspense_side,
+          other.account AS counter_account
         FROM journal_transactions jt
-        JOIN journal_entries je ON je.journal_transaction_id = jt.id
-        WHERE je.account LIKE 'Expenses:Uncategorized:Suspense%'
-          AND je.side = 'debit'
-        GROUP BY jt.id
+        JOIN journal_entries susp
+          ON susp.journal_transaction_id = jt.id
+         AND susp.account LIKE 'Expenses:Uncategorized:Suspense%'
+        JOIN journal_entries other
+          ON other.journal_transaction_id = jt.id
+         AND other.account NOT LIKE 'Expenses:Uncategorized:Suspense%'
         ORDER BY jt.transaction_date DESC, jt.id DESC
         LIMIT 50
       `,
@@ -1322,12 +1333,22 @@ export function readLedgerDashboard(): LedgerDashboardData {
       };
     });
 
-    const suspenseQueue: SuspenseItem[] = suspenseQueueRows.map((row) => ({
-      externalId: row.external_id,
-      transactionDate: row.transaction_date,
-      description: row.description,
-      amountCents: Number(row.amount_cents ?? 0),
-    }));
+    const suspenseQueue: SuspenseItem[] = suspenseQueueRows.map((row) => {
+      // The suspense leg is debited when money left the account, credited when
+      // it arrived. amount_cents is always a positive magnitude; sign it so the
+      // UI can show direction directly.
+      const magnitude = Number(row.amount_cents ?? 0);
+      const direction: SuspenseItem["direction"] =
+        row.suspense_side === "debit" ? "out" : "in";
+      return {
+        externalId: row.external_id,
+        transactionDate: row.transaction_date,
+        description: row.description,
+        amountCents: direction === "out" ? -magnitude : magnitude,
+        direction,
+        counterAccount: row.counter_account ?? "",
+      };
+    });
 
     const incomeCents = pnl.reduce(
       (total, month) => total + month.incomeCents,
