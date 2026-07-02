@@ -7,7 +7,7 @@ import Database from "better-sqlite3";
 import { z } from "zod";
 
 const WaitlistSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().toLowerCase().email(),
   name: z.string().max(120).optional(),
   interest: z.enum(["self-serve", "concierge"]).optional(),
   source: z.string().max(60).optional(),

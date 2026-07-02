@@ -51,8 +51,21 @@ describe("recordLead", () => {
 
   it("rejects an invalid email with a 400 Response", async () => {
     const { recordLead } = await freshModule();
-    expect(() => recordLead({ email: "not-an-email" })).toThrow();
+    try {
+      recordLead({ email: "not-an-email" });
+      expect.unreachable("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(Response);
+      expect((err as Response).status).toBe(400);
+    }
     expect(countRows()).toBe(0);
+  });
+
+  it("normalizes email case so the same address dedupes", async () => {
+    const { recordLead } = await freshModule();
+    recordLead({ email: "Jane@Example.com", source: "hero" });
+    recordLead({ email: "jane@example.com", source: "pricing" });
+    expect(countRows()).toBe(1);
   });
 
   it("silently drops honeypot submissions without storing", async () => {
