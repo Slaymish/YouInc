@@ -2,12 +2,16 @@ import { PRODUCT, BOOKING_URL } from "./config";
 import { WaitlistForm } from "./WaitlistForm";
 
 export function Hero() {
+  const headlineWords = PRODUCT.heroHeadline.split(" ");
+  const headlineLead = headlineWords.slice(0, -1).join(" ");
+  const headlineLastWord = headlineWords[headlineWords.length - 1];
+
   return (
     <section className="hero" aria-labelledby="hero-heading">
       <div className="hero__copy">
         <p className="hero__eyebrow">{PRODUCT.heroEyebrow}</p>
         <h1 id="hero-heading" className="hero__headline">
-          Run yourself like a <em>company.</em>
+          {headlineLead} <em>{headlineLastWord}</em>
         </h1>
         <p className="hero__sub">{PRODUCT.heroSub}</p>
         <div className="hero__ctas">
