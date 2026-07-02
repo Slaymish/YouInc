@@ -22,7 +22,7 @@ test("waitlist signup succeeds and offers the demo", async ({ page }) => {
   await page.waitForLoadState("networkidle");
   const form = page.locator(".hero .waitlist-form");
   await form.getByPlaceholder("you@email.com").fill("e2e@example.com");
-  await form.getByRole("button", { name: /start free/i }).click();
+  await form.getByRole("button", { name: /join the waitlist/i }).click();
   await expect(page.getByText(/you're on the list/i)).toBeVisible();
   await expect(page.getByRole("link", { name: /open the live demo/i })).toBeVisible();
 });

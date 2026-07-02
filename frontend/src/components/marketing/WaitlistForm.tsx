@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createServerFn } from "@tanstack/react-start";
+import { PRICING } from "./config";
 
 export const joinWaitlist = createServerFn({ method: "POST" })
   .validator((data: unknown) => data)
@@ -80,7 +81,7 @@ export function WaitlistForm({ source, onDone }: WaitlistFormProps) {
         aria-hidden="true"
       />
       <button className="mk-btn mk-btn--primary" type="submit" disabled={!hydrated || status === "loading"}>
-        {status === "loading" ? "Joining…" : "Start free →"}
+        {status === "loading" ? "Joining…" : `${PRICING.selfServe.cta} →`}
       </button>
       {error ? (
         <p className="waitlist-error" role="alert">

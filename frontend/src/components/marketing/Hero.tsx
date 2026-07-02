@@ -1,4 +1,4 @@
-import { PRODUCT, BOOKING_URL } from "./config";
+import { PRODUCT } from "./config";
 import { WaitlistForm } from "./WaitlistForm";
 
 export function Hero() {
@@ -16,8 +16,8 @@ export function Hero() {
         <p className="hero__sub">{PRODUCT.heroSub}</p>
         <div className="hero__ctas">
           <WaitlistForm source="hero" />
-          <a className="mk-btn mk-btn--ghost" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
-            Book a call
+          <a className="mk-btn mk-btn--ghost" href="/demo">
+            Try the free demo →
           </a>
         </div>
       </div>
