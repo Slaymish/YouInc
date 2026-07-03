@@ -5,6 +5,7 @@ export function LiveProofStrip() {
         <span className="live-dot" />
         Synced live via{" "}
         <a href="https://akahu.nz" target="_blank" rel="noopener noreferrer">
+          <img src="/akahu-logo.svg" alt="" width="14" height="16" style={{ verticalAlign: "-2px", marginRight: "4px" }} />
           Akahu
         </a>
       </span>
