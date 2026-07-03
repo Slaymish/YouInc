@@ -1,7 +1,7 @@
 // frontend/src/components/marketing/MarketingPage.tsx
 import { Link } from "@tanstack/react-router";
 import { PRODUCT, BOOKING_URL } from "./config";
-import { useLightTheme } from "./DemoBoard";
+import { useLightTheme } from "./useLightTheme";
 import { Hero } from "./Hero";
 import { LiveProofStrip } from "./LiveProofStrip";
 import { HowItWorks } from "./HowItWorks";

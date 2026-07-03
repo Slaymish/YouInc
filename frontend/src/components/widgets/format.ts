@@ -17,6 +17,13 @@ export function formatMonths(value: number | null): string {
   return value === null ? "n/a" : `${value.toFixed(1)}m`;
 }
 
+export function formatDateTime(value: string | null): string {
+  if (!value) return "n/a";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-NZ", { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
 export function shortMoney(cents: number): string {
   const dollars = cents / 100;
   const abs = Math.abs(dollars);
