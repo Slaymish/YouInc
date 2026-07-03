@@ -18,13 +18,16 @@ const ASSETS = 18_900_000; // $189,000
 const LIABILITIES = 4_662_000; // $46,620
 
 const balances: BalanceRow[] = [
-  { account: "Assets:Bank:BNZ:Everyday", accountType: "asset", balanceCents: 850_000, currency: "NZD", isManual: false, liquidityTier: "cash" },
-  { account: "Assets:Bank:BNZ:Savings", accountType: "asset", balanceCents: 2_000_000, currency: "NZD", isManual: false, liquidityTier: "cash" },
-  { account: "Assets:Investments:Sharesies:Emergencies", accountType: "asset", balanceCents: 1_050_000, currency: "NZD", isManual: false, liquidityTier: "semi_liquid" },
-  { account: "Assets:Investments:KiwiSaver", accountType: "asset", balanceCents: 8_000_000, currency: "NZD", isManual: true, liquidityTier: "illiquid" },
-  { account: "Assets:Property:Garage", accountType: "asset", balanceCents: 7_000_000, currency: "NZD", isManual: true, liquidityTier: "illiquid" },
-  { account: "Liabilities:CreditCard:BNZ:Advantage", accountType: "liability", balanceCents: 462_000, currency: "NZD", isManual: false, liquidityTier: "illiquid" },
-  { account: "Liabilities:Loan:Car", accountType: "liability", balanceCents: 4_200_000, currency: "NZD", isManual: true, liquidityTier: "illiquid" },
+  // accountType here is the balances domain (first path segment, "Assets"/"Liabilities"
+  // per ledger.ts accountType()) — not the lowercase source-account mapping domain used
+  // in sourceAccounts below.
+  { account: "Assets:Bank:BNZ:Everyday", accountType: "Assets", balanceCents: 850_000, currency: "NZD", isManual: false, liquidityTier: "cash" },
+  { account: "Assets:Bank:BNZ:Savings", accountType: "Assets", balanceCents: 2_000_000, currency: "NZD", isManual: false, liquidityTier: "cash" },
+  { account: "Assets:Investments:Sharesies:Emergencies", accountType: "Assets", balanceCents: 1_050_000, currency: "NZD", isManual: false, liquidityTier: "semi_liquid" },
+  { account: "Assets:Investments:KiwiSaver", accountType: "Assets", balanceCents: 8_000_000, currency: "NZD", isManual: true, liquidityTier: "illiquid" },
+  { account: "Assets:Property:Garage", accountType: "Assets", balanceCents: 7_000_000, currency: "NZD", isManual: true, liquidityTier: "illiquid" },
+  { account: "Liabilities:CreditCard:BNZ:Advantage", accountType: "Liabilities", balanceCents: 462_000, currency: "NZD", isManual: false, liquidityTier: "illiquid" },
+  { account: "Liabilities:Loan:Car", accountType: "Liabilities", balanceCents: 4_200_000, currency: "NZD", isManual: true, liquidityTier: "illiquid" },
 ];
 
 const creditFacilities: CreditFacilityRow[] = [

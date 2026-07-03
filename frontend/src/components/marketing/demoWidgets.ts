@@ -37,11 +37,13 @@ export const DEMO_WIDGET_IDS: WidgetId[] = [
   "spend-calendar",
 ];
 
+// The real widgets composed into the landing page's dashboard-frame miniature
+// (DashboardFrame.tsx) — one hero chart, two metrics, three supporting panels.
 export const SHOWCASE_WIDGET_IDS: WidgetId[] = [
+  "net-worth-trend",
   "metric-net-worth",
   "metric-runway",
-  "net-worth-trend",
-  "spend-calendar",
   "expense-breakdown",
-  "asset-mix",
+  "income-breakdown",
+  "cashflow-waterfall",
 ];

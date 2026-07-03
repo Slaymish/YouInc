@@ -5,8 +5,9 @@ import { useLightTheme } from "./useLightTheme";
 import { Hero } from "./Hero";
 import { LiveProofStrip } from "./LiveProofStrip";
 import { HowItWorks } from "./HowItWorks";
-import { WidgetShowcase } from "./WidgetShowcase";
+import { DashboardFrame } from "./DashboardFrame";
 import { BespokeSection } from "./BespokeSection";
+import { ConciergeShowcase } from "./ConciergeShowcase";
 import { Pricing } from "./Pricing";
 import { WaitlistForm } from "./WaitlistForm";
 import { Faq } from "./Faq";
@@ -31,8 +32,9 @@ export function MarketingPage() {
         <Hero />
         <LiveProofStrip />
         <HowItWorks />
-        <WidgetShowcase />
+        <DashboardFrame />
         <BespokeSection />
+        <ConciergeShowcase />
         <Pricing />
         <section className="final-cta" aria-labelledby="final-heading">
           <h2 id="final-heading" className="section-heading">Start running yourself like a company.</h2>
