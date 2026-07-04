@@ -1,0 +1,112 @@
+/* frontend/src/components/marketing/SupportChat.css
+ *
+ * Support-chat affordance (design-direction spec E5 / D#4). Fixed
+ * bottom-left pill with avatar + label; opens a small non-modal popover
+ * linking to a real booking link + email — no chat backend. Self-contained,
+ * scoped under `.mk`, tokens only.
+ */
+
+.mk .sc-root {
+  position: fixed;
+  left: clamp(1rem, 4vw, 2rem);
+  bottom: clamp(1rem, 4vw, 2rem);
+  z-index: 40;
+  font-family: var(--mk-sans);
+}
+
+.mk .sc-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-2);
+  cursor: pointer;
+  color: var(--mk-ink);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.mk .sc-fab:hover { transform: translateY(-2px); box-shadow: var(--shadow-3); }
+.mk .sc-fab:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+
+.mk .sc-fab__avatar {
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mk .sc-fab__label {
+  font-size: var(--text-small);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mk .sc-popover {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + var(--space-3));
+  width: max(16rem, min(20rem, calc(100vw - 2rem)));
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  animation: sc-pop-in 160ms var(--mk-ease, ease-out) both;
+}
+
+@keyframes sc-pop-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mk .sc-popover__title {
+  margin: 0;
+  font-family: var(--mk-serif);
+  font-size: var(--text-h3);
+  font-weight: 400;
+}
+
+.mk .sc-popover__body {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--mk-soft);
+  line-height: var(--leading-body);
+}
+
+.mk .sc-popover__cta {
+  margin-top: var(--space-2);
+  justify-content: center;
+  font-size: var(--text-small);
+}
+
+.mk .sc-popover__email {
+  font-size: var(--text-small);
+  color: var(--mk-soft);
+  text-align: center;
+  text-decoration: underline;
+  text-decoration-color: var(--mk-accent-line);
+}
+
+.mk .sc-popover__email:hover { color: var(--mk-ink); text-decoration-color: currentColor; }
+.mk .sc-popover__email:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+
+/* Keep both fixed widgets from stacking on top of each other on narrow
+   viewports: label collapses to icon-only under 480px. */
+@media (max-width: 480px) {
+  .mk .sc-fab__label { display: none; }
+  .mk .sc-fab { padding: var(--space-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk .sc-fab { transition: none; }
+  .mk .sc-fab:hover { transform: none; }
+  .mk .sc-popover { animation: none; }
+}

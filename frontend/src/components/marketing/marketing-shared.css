@@ -1,0 +1,84 @@
+/* frontend/src/components/marketing/marketing-shared.css
+ *
+ * Cross-route globals for the `.mk` scope — loaded by every marketing entry
+ * point (MarketingPage, /demo, /custom-builds, /widgets) alongside
+ * marketing-tokens.css. Per-section rules live in their own co-located CSS
+ * files; this file only holds chrome shared by all of them: buttons, the
+ * section shell, nav, waitlist form, live-tag/dot, and the reduced motion
+ * block. Footer rules live in MarketingFooter.css (owned by MarketingFooter.tsx).
+ */
+
+.mk {
+  background: var(--mk-paper);
+  color: var(--mk-ink);
+  font-family: var(--mk-sans);
+  font-size: var(--text-body);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+.mk-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--mk-sans); font-size: 0.95rem; font-weight: 600;
+  padding: 0.7rem 1.2rem; border-radius: var(--radius-sm); text-decoration: none;
+  border: 1px solid transparent; cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+.mk-btn--primary { background: var(--mk-ink); color: #fff; }
+.mk-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(0,0,0,.5); }
+.mk-btn--ghost { background: transparent; color: var(--mk-ink); border-bottom: 2px solid var(--mk-ink); border-radius: 0; padding: 0.5rem 0; }
+.mk-btn:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+
+/* Waitlist form */
+.waitlist-form { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+.waitlist-form input[type="email"] {
+  font: inherit; padding: 0.7rem 0.9rem; border: 1px solid var(--mk-line);
+  border-radius: var(--radius-sm); min-width: 15rem; background: #fff;
+}
+.waitlist-error { color: var(--mk-negative); font-size: 0.85rem; width: 100%; margin: 0.3rem 0 0; }
+.waitlist-done { font-family: var(--mk-sans); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-btn,
+  .mk-btn--primary:hover {
+    transition: none;
+    transform: none;
+  }
+  .live-dot { animation: none; }
+  .mk-btn:hover,
+  .bank-chip:hover,
+  .artifact:hover { transform: none; }
+  .bank-chip,
+  .artifact { transition: none; }
+}
+
+/* Section rhythm */
+.section-heading { font-family: var(--mk-serif); font-weight: 400; font-size: var(--text-h2); line-height: var(--leading-head); letter-spacing: var(--tracking-head); margin: 0 0 2rem; }
+.mk-eyebrow { font-size: var(--text-eyebrow); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--mk-soft); margin: 0 0 0.8rem; }
+.mk section { padding: var(--space-section) clamp(1.25rem, 5vw, 4rem); max-width: var(--mk-maxw); margin: 0 auto; }
+
+.live-tag { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.6rem; font-weight: 700; letter-spacing: .08em; color: var(--mk-accent); }
+.live-tag a { color: inherit; text-decoration: underline; text-decoration-color: transparent; transition: text-decoration-color 150ms ease; }
+.live-tag a:hover, .live-tag a:focus-visible { text-decoration-color: currentColor; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mk-accent); }
+@keyframes mk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+.live-dot { animation: mk-pulse 1.7s infinite; }
+
+/* Nav */
+.mk-nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 1.1rem clamp(1.25rem, 5vw, 4rem); max-width: var(--mk-maxw); margin: 0 auto; border-bottom: 1px solid var(--mk-line); }
+.mk-nav__logo { font-weight: 800; letter-spacing: .02em; font-size: 1.1rem; color: var(--mk-ink); text-decoration: none; }
+.mk-nav__links { display: flex; gap: 1.4rem; align-items: center; font-size: 0.9rem; }
+.mk-nav__links a { color: var(--mk-ink); text-decoration: none; opacity: .85; }
+.mk-nav__links a:hover { opacity: 1; }
+.mk-nav__signin { border: 1px solid var(--mk-ink); padding: 0.4rem 0.9rem; border-radius: var(--radius-sm); }
+
+/* Shared tabular-number emphasis (positive/negative deltas quoted in prose) */
+.num { font-variant-numeric: tabular-nums; font-weight: 600; }
+.num.pos { color: var(--mk-positive); }
+.num.neg { color: var(--mk-negative); }

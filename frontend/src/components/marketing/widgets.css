@@ -1,0 +1,33 @@
+/* frontend/src/components/marketing/widgets.css
+ * ─────────────────────────────────────────────────────────────
+ * Widget library (/widgets) — wl- prefix
+ * ───────────────────────────────────────────────────────────── */
+.wl-hero { max-width: 900px; padding-bottom: clamp(1rem, 2vw, 2rem) !important; }
+.wl-hero__headline { font-family: var(--mk-serif); font-weight: 400; font-size: clamp(2.4rem, 5.5vw, 4rem); line-height: .98; letter-spacing: -.025em; margin: 0 0 1rem; }
+.wl-hero__headline em { font-style: italic; }
+.wl-hero__sub { font-size: 1.05rem; color: var(--mk-soft); line-height: 1.65; max-width: 36rem; margin: 0; }
+
+/* Category sections would inherit .mk section's full padding (same trap as
+   nested <section>-emitting components) — tighten it. */
+.mk .wl-cat { padding-block: clamp(1.4rem, 2.5vw, 2.2rem); }
+.wl-cat__heading { font-family: var(--mk-serif); font-weight: 400; font-size: clamp(1.4rem, 2.2vw, 1.9rem); letter-spacing: -.015em; margin: 0 0 1.1rem; display: flex; align-items: baseline; gap: 0.6rem; }
+.wl-cat__count { font-family: var(--mk-sans); font-size: 0.72rem; font-weight: 700; color: var(--mk-soft); border: 1px solid var(--mk-line); border-radius: 999px; padding: 0.12rem 0.55rem; font-variant-numeric: tabular-nums; }
+
+/* Catalogue grid — same 12-col / row-unit system as the dashboard, panels
+   sized from each widget's registry defaults so the composition varies. */
+.wl-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 64px; grid-auto-flow: row dense; gap: 10px; }
+.wl-item { grid-column: span 12; grid-row: span var(--wl-h, 4); min-width: 0; }
+@media (min-width: 901px) { .wl-item { grid-column: span var(--wl-w, 12); } }
+@media (max-width: 900px) { .wl-item--half { grid-column: span 6; } }
+/* Tall widgets (balance sheet, journal) are capped and scroll internally. */
+.wl-grid .panel-body { overflow: auto; }
+
+/* Session-gated placeholder panels */
+.wl-locked { border: 1px dashed var(--mk-soft); border-radius: 10px; background: repeating-linear-gradient(-45deg, transparent 0 10px, rgba(85, 83, 77, .04) 10px 20px), var(--mk-paper); padding: 0.9rem 1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.wl-locked__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.7rem; flex-wrap: wrap; }
+.wl-locked__label { font-family: var(--mk-sans); font-size: 0.8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mk-ink); margin: 0; }
+.wl-locked__tag { flex: none; font-size: 0.6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mk-accent); border: 1px solid var(--mk-accent); border-radius: 999px; padding: 0.15rem 0.5rem; }
+.wl-locked__desc { font-family: var(--mk-serif); font-style: italic; margin: 0; color: var(--mk-soft); line-height: 1.5; font-size: 0.95rem; }
+
+.wl-cta { text-align: center; }
+.wl-cta__row { display: flex; gap: 1.5rem; justify-content: center; align-items: center; flex-wrap: wrap; }

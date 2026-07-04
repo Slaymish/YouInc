@@ -1,0 +1,121 @@
+/* frontend/src/components/marketing/FeedbackWidget.css
+ *
+ * Sharesies-style scroll-triggered feedback widget (design-direction spec
+ * E2). Self-contained: owns only `.fb-*` selectors, scoped under `.mk`.
+ * Fixed bottom-right, slides up on scroll-to-bottom via transform/opacity —
+ * no layout-affecting properties animate.
+ */
+
+.mk .fb-widget {
+  position: fixed;
+  right: clamp(1rem, 4vw, 2rem);
+  bottom: clamp(1rem, 4vw, 2rem);
+  z-index: 40;
+  max-width: min(21rem, calc(100vw - 2rem));
+  font-family: var(--mk-sans);
+  animation: fb-slide-in 220ms var(--mk-ease, ease-out) both;
+}
+
+@keyframes fb-slide-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mk .fb-panel {
+  position: relative;
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  padding: var(--space-4) var(--space-5);
+  padding-right: var(--space-6);
+}
+
+.mk .fb-dismiss {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--mk-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.mk .fb-dismiss:hover { color: var(--mk-ink); }
+.mk .fb-dismiss:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+
+.mk .fb-question {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--mk-ink);
+}
+
+.mk .fb-votes {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mk .fb-vote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.1rem;
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-md);
+  background: var(--mk-surface-0);
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.mk .fb-vote:hover { transform: translateY(-1px); border-color: var(--mk-accent-line); background: var(--mk-accent-tint); }
+.mk .fb-vote:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+.mk .fb-vote--active { border-color: var(--mk-accent-line); background: var(--mk-accent-tint); }
+.mk .fb-vote:disabled { opacity: 0.6; cursor: default; }
+
+.mk .fb-note-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.mk .fb-note {
+  font: inherit;
+  font-size: var(--text-small);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-sm);
+  background: var(--mk-surface-0);
+  resize: vertical;
+  min-height: 3.5rem;
+}
+
+.mk .fb-note:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+
+.mk .fb-note-submit {
+  align-self: flex-start;
+  font-size: var(--text-small);
+  padding: 0.5rem 0.9rem;
+}
+
+.mk .fb-thanks {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--mk-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk .fb-widget { animation: none; }
+  .mk .fb-vote:hover { transform: none; transition: none; }
+}

@@ -1,8 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { renderWidgetContent } from "../dashboard/renderWidget";
-import { SAMPLE_DASHBOARD } from "./sampleDashboard";
-import { noop } from "./noop";
-import type { WidgetId } from "../dashboard/widgets";
+import "./DashboardFrame.css";
 
 /**
  * A single honest artifact instead of a grid of warped cards: a framed
@@ -10,36 +7,24 @@ import type { WidgetId } from "../dashboard/widgets";
  * an asymmetric composition of REAL widgets), with editorial margin notes
  * pinned to it. The whole frame is decorative (aria-hidden) — the accessible
  * content is the heading and the "explore the demo" link around it.
+ *
+ * The canvas itself is a real dashboard render (see
+ * `public/marketing/dashboard-overview*.svg`) rather than a re-rendered
+ * widget grid, so it reads as an actual screenshot. Desktop and mobile
+ * renders have fixed, known dimensions, so both are reserved via
+ * `aspect-ratio` (kept in sync with the `width`/`height` attributes below)
+ * for zero layout shift regardless of which one the browser picks.
  */
 
-function Panel({
-  id,
-  title,
-  area,
-}: {
-  id: WidgetId;
-  title: string;
-  area: string;
-}) {
-  return (
-    <div className={`panel df-panel df-panel--${area}`}>
-      <header>
-        <h2>{title}</h2>
-      </header>
-      <div className="panel-body">
-        {renderWidgetContent(id, SAMPLE_DASHBOARD, noop)}
-      </div>
-    </div>
-  );
-}
+const DESKTOP_SRC = "/marketing/dashboard-overview.svg";
+const DESKTOP_WIDTH = 1140;
+const DESKTOP_HEIGHT = 720;
 
-function Metric({ id, area }: { id: WidgetId; area: string }) {
-  return (
-    <div className={`metric df-metric df-metric--${area}`}>
-      {renderWidgetContent(id, SAMPLE_DASHBOARD, noop)}
-    </div>
-  );
-}
+const MOBILE_SRC = "/marketing/dashboard-overview-mobile.svg";
+const MOBILE_WIDTH = 780;
+const MOBILE_HEIGHT = 1200;
+
+const MOBILE_BREAKPOINT = "(max-width: 600px)";
 
 export function DashboardFrame() {
   return (
@@ -50,20 +35,6 @@ export function DashboardFrame() {
       </h2>
 
       <div className="df-stage">
-        {/* Margin notes — serif, hand-annotated, with thin connector lines */}
-        <figure className="df-note df-note--a" aria-hidden="true">
-          <span className="df-note__text">Every line posted straight from your bank</span>
-          <span className="df-note__line" />
-        </figure>
-        <figure className="df-note df-note--b" aria-hidden="true">
-          <span className="df-note__line" />
-          <span className="df-note__text">Double-entry, so it always balances</span>
-        </figure>
-        <figure className="df-note df-note--c" aria-hidden="true">
-          <span className="df-note__text">Drag anything anywhere</span>
-          <span className="df-note__line" />
-        </figure>
-
         <div className="df-frame" aria-hidden="true">
           {/* Browser chrome */}
           <div className="df-chrome">
@@ -73,57 +44,51 @@ export function DashboardFrame() {
               <span className="df-dot" />
             </span>
             <span className="df-url">
-              <svg viewBox="0 0 12 12" className="df-lock" width="10" height="10" aria-hidden="true">
-                <rect x="2.5" y="5.5" width="7" height="5" rx="1" fill="currentColor" />
-                <path d="M4 5.5V4a2 2 0 0 1 4 0v1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+              <svg
+                viewBox="0 0 12 12"
+                className="df-lock"
+                width="10"
+                height="10"
+                aria-hidden="true"
+              >
+                <rect
+                  x="2.5"
+                  y="5.5"
+                  width="7"
+                  height="5"
+                  rx="1"
+                  fill="currentColor"
+                />
+                <path
+                  d="M4 5.5V4a2 2 0 0 1 4 0v1.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                />
               </svg>
-              youinc.app/dashboard
+              youinc.com/dashboard
             </span>
             <span className="df-chrome__spacer" />
           </div>
 
-          {/* Scrollable canvas — the product screenshot */}
+          {/* Scrollable canvas fallback — the real product render. `picture`
+              swaps to the portrait mobile render below the breakpoint; both
+              sources carry their true dimensions so CSS can reserve the
+              right aspect ratio before either file loads. */}
           <div className="df-scroll">
-            <div className="df-canvas">
-              {/* System header */}
-              <div className="df-head">
-                <div className="df-head__brand">
-                  <p>YouInc</p>
-                  <h3>Entity Control</h3>
-                </div>
-                <dl className="df-head__stats">
-                  <div>
-                    <dt>Ledger</dt>
-                    <dd>ONLINE</dd>
-                  </div>
-                  <div>
-                    <dt>Accounts</dt>
-                    <dd>7</dd>
-                  </div>
-                  <div>
-                    <dt>Raw / Posted</dt>
-                    <dd>4,912 / 4,912</dd>
-                  </div>
-                </dl>
-              </div>
-
-              {/* Tab row */}
-              <div className="df-tabs">
-                <span className="df-tab df-tab--active">Overview</span>
-                <span className="df-tab">Cashflow</span>
-                <span className="df-tab">Balance sheet</span>
-              </div>
-
-              {/* Asymmetric widget composition — one hero, supporting parts */}
-              <div className="df-grid">
-                <Panel id="net-worth-trend" title="Net Worth Trend" area="hero" />
-                <Metric id="metric-net-worth" area="m1" />
-                <Metric id="metric-runway" area="m2" />
-                <Panel id="expense-breakdown" title="Expense Breakdown" area="wide" />
-                <Panel id="income-breakdown" title="Income Breakdown" area="side" />
-                <Panel id="cashflow-waterfall" title="Cashflow Waterfall" area="foot" />
-              </div>
-            </div>
+            <picture>
+              <source media={MOBILE_BREAKPOINT} srcSet={MOBILE_SRC} />
+              <img
+                className="df-canvas-image"
+                src={DESKTOP_SRC}
+                width={DESKTOP_WIDTH}
+                height={DESKTOP_HEIGHT}
+                alt="YouInc executive dashboard showing net worth trend, cashflow waterfall, and expense and income breakdowns rendered live from the ledger."
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+              />
+            </picture>
           </div>
         </div>
       </div>

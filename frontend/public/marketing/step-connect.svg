@@ -1,0 +1,86 @@
+<svg viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+  <defs>
+    <pattern id="sc-grid" patternUnits="userSpaceOnUse" width="32" height="32">
+      <path d="M32 0 H0 V32" fill="none" stroke="#e3e3dd" stroke-width="1" />
+    </pattern>
+    <filter id="sc-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#28281e" flood-opacity="0.10" />
+    </filter>
+  </defs>
+
+  <rect width="640" height="400" fill="#f4f4f0" />
+  <rect width="640" height="400" fill="url(#sc-grid)" opacity="0.55" />
+
+  <!-- Giant faint numeral, editorial texture -->
+  <text x="620" y="392" font-family="Georgia, 'Times New Roman', serif" font-size="230" fill="#111111" opacity="0.05" text-anchor="end">1</text>
+
+  <!-- Three source banks, staggered, larger tiles -->
+  <g filter="url(#sc-shadow)">
+    <rect x="32" y="40" width="168" height="100" rx="14" fill="#ffffff" stroke="#e3e3dd" />
+    <rect x="32" y="150" width="168" height="100" rx="14" fill="#ffffff" stroke="#e3e3dd" />
+    <rect x="32" y="260" width="168" height="100" rx="14" fill="#ffffff" stroke="#e3e3dd" />
+  </g>
+  <rect x="32" y="40" width="168" height="8" rx="4" fill="#1f6f8b" />
+  <rect x="32" y="150" width="168" height="8" rx="4" fill="#c98a2b" />
+  <rect x="32" y="260" width="168" height="8" rx="4" fill="#b0aea6" />
+
+  <!-- Bank-building glyphs, bolder -->
+  <g stroke="#111111" stroke-width="3" fill="none" stroke-linejoin="round">
+    <path d="M76 88 L116 66 L156 88" />
+    <line x1="70" y1="88" x2="162" y2="88" />
+    <line x1="82" y1="88" x2="82" y2="112" />
+    <line x1="104" y1="88" x2="104" y2="112" />
+    <line x1="128" y1="88" x2="128" y2="112" />
+    <line x1="150" y1="88" x2="150" y2="112" />
+    <line x1="70" y1="112" x2="162" y2="112" />
+  </g>
+  <g stroke="#111111" stroke-width="3" fill="none" stroke-linejoin="round">
+    <path d="M76 198 L116 176 L156 198" />
+    <line x1="70" y1="198" x2="162" y2="198" />
+    <line x1="82" y1="198" x2="82" y2="222" />
+    <line x1="104" y1="198" x2="104" y2="222" />
+    <line x1="128" y1="198" x2="128" y2="222" />
+    <line x1="150" y1="198" x2="150" y2="222" />
+    <line x1="70" y1="222" x2="162" y2="222" />
+  </g>
+  <g stroke="#111111" stroke-width="3" fill="none" stroke-linejoin="round">
+    <path d="M76 308 L116 286 L156 308" />
+    <line x1="70" y1="308" x2="162" y2="308" />
+    <line x1="82" y1="308" x2="82" y2="332" />
+    <line x1="104" y1="308" x2="104" y2="332" />
+    <line x1="128" y1="308" x2="128" y2="332" />
+    <line x1="150" y1="308" x2="150" y2="332" />
+    <line x1="70" y1="332" x2="162" y2="332" />
+  </g>
+
+  <!-- Converging connector lines into the lock badge -->
+  <g fill="none" stroke="#12a150" stroke-width="3.5" stroke-linecap="round">
+    <path d="M200,90 C280,90 278,178 310,192" />
+    <path d="M200,200 L310,200" />
+    <path d="M200,310 C280,310 278,222 310,208" />
+  </g>
+
+  <!-- Lock badge -->
+  <circle cx="346" cy="200" r="36" fill="#ffffff" stroke="#12a150" stroke-width="3" filter="url(#sc-shadow)" />
+  <rect x="326" y="196" width="40" height="30" rx="5" fill="#e7f4ec" stroke="#0e8a44" stroke-width="3" />
+  <path d="M334 196 v-12 a12 12 0 0 1 24 0 v12" fill="none" stroke="#0e8a44" stroke-width="3" stroke-linecap="round" />
+  <circle cx="346" cy="211" r="3" fill="#0e8a44" />
+
+  <!-- Straight secure line to ledger -->
+  <line x1="382" y1="200" x2="446" y2="200" stroke="#12a150" stroke-width="3.5" stroke-linecap="round" />
+  <polygon points="446,192 462,200 446,208" fill="#12a150" />
+
+  <!-- Akahu label, clear of the connectors -->
+  <rect x="245" y="350" width="150" height="36" rx="18" fill="#ffffff" stroke="#e3e3dd" filter="url(#sc-shadow)" />
+  <text x="320" y="374" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="20" fill="#55534d" text-anchor="middle">via Akahu</text>
+
+  <!-- YouInc ledger tile -->
+  <g filter="url(#sc-shadow)">
+    <rect x="450" y="104" width="168" height="192" rx="18" fill="#e7f4ec" stroke="#bfe3cd" />
+  </g>
+  <rect x="474" y="144" width="120" height="14" rx="7" fill="#0e8a44" opacity="0.85" />
+  <rect x="474" y="172" width="120" height="14" rx="7" fill="#12a150" opacity="0.55" />
+  <rect x="474" y="200" width="80" height="14" rx="7" fill="#12a150" opacity="0.35" />
+  <circle cx="578" cy="254" r="16" fill="#0e8a44" />
+  <path d="M570 254 l6 6 l12 -13" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -1,0 +1,192 @@
+/* frontend/src/components/marketing/MarketingFooter.css
+ *
+ * Samsung-grade multi-column marketing footer (design-direction spec E1).
+ * Scoped under `.mk`; consumes marketing-tokens.css exclusively — no
+ * hardcoded palette, spacing, radius, or shadow literals.
+ */
+
+.mk-footer {
+  border-top: 1px solid var(--mk-line);
+  background: var(--mk-surface-2);
+  color: var(--mk-soft);
+  font-size: var(--text-small);
+}
+
+.mk-footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr));
+  gap: var(--space-8) var(--space-6);
+  max-width: var(--mk-maxw);
+  margin: 0 auto;
+  padding: var(--space-8) clamp(1.25rem, 5vw, 4rem) var(--space-6);
+}
+
+.mk-footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 26rem;
+}
+
+.mk-footer__logo {
+  font-family: var(--mk-serif);
+  font-size: var(--text-h3);
+  color: var(--mk-ink);
+  letter-spacing: var(--tracking-head);
+}
+
+.mk-footer__tagline {
+  margin: 0;
+  line-height: var(--leading-body);
+}
+
+.mk-footer__social {
+  display: flex;
+  gap: var(--space-3);
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+.mk-footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-pill);
+  color: var(--mk-soft);
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  transition: color 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.mk-footer__social-link:hover {
+  color: var(--mk-accent-strong);
+  border-color: var(--mk-accent-line);
+  box-shadow: var(--shadow-1);
+  transform: translateY(-2px);
+}
+
+.mk-footer__social-link:focus-visible {
+  outline: 3px solid var(--mk-focus);
+  outline-offset: 2px;
+}
+
+.mk-footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mk-footer__heading {
+  margin: 0;
+  font-size: var(--text-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--mk-ink);
+}
+
+.mk-footer__col ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-footer__col a {
+  color: var(--mk-soft);
+  text-decoration: none;
+  transition: color 150ms ease, transform 150ms ease;
+  display: inline-block;
+}
+
+.mk-footer__col a:hover {
+  color: var(--mk-ink);
+  transform: translateX(2px);
+}
+
+.mk-footer__col a:focus-visible,
+.mk-footer__social-link:focus-visible {
+  outline: 3px solid var(--mk-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.mk-footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  max-width: var(--mk-maxw);
+  margin: 0 auto;
+  padding: var(--space-4) clamp(1.25rem, 5vw, 4rem) var(--space-6);
+  border-top: 1px solid var(--mk-line);
+}
+
+.mk-footer__copyright {
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-footer__credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--mk-soft);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 150ms ease, color 150ms ease;
+}
+
+.mk-footer__credit:hover {
+  opacity: 1;
+  color: var(--mk-ink);
+}
+
+.mk-footer__credit img {
+  display: block;
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+
+.mk-footer__credit:hover img {
+  opacity: 1;
+}
+
+.mk-footer__credit:focus-visible {
+  outline: 3px solid var(--mk-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 780px) {
+  .mk-footer__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .mk-footer__brand {
+    max-width: none;
+  }
+
+  .mk-footer__bottom {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-footer__social-link,
+  .mk-footer__col a,
+  .mk-footer__credit {
+    transition: none;
+  }
+
+  .mk-footer__social-link:hover,
+  .mk-footer__col a:hover {
+    transform: none;
+  }
+}

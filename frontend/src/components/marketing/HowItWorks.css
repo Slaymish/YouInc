@@ -1,0 +1,86 @@
+/* frontend/src/components/marketing/HowItWorks.css
+ * Also loaded by routes/custom-builds.tsx, which reuses `.steps__list` /
+ * `.step*` for its 4-step engagement list (see `.cb-steps` override there).
+ * That route renders no `.step__media` — those rules simply don't apply there.
+ */
+.steps__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-grid);
+}
+
+.step {
+  position: relative;
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-5) var(--space-6);
+  box-shadow: var(--shadow-1);
+  transition: transform 220ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.step:hover,
+.step:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2);
+  border-color: var(--mk-accent-line);
+}
+
+/* Overflow thumbnail — image bleeds above the card's top edge (Wispr cue). */
+.step__media {
+  margin: 0 calc(-1 * var(--space-2)) var(--space-4);
+  transform: translateY(calc(-1 * var(--space-6)));
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--mk-line);
+  background: var(--mk-surface-2);
+}
+
+.step__thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8 / 5;
+  object-fit: cover;
+}
+
+.step__n {
+  display: inline-block;
+  font-family: var(--mk-serif);
+  font-size: var(--text-h2);
+  line-height: 1;
+  color: var(--mk-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.step__title {
+  font-family: var(--mk-sans);
+  font-size: var(--text-h3);
+  font-weight: 600;
+  letter-spacing: var(--tracking-head);
+  margin: var(--space-2) 0 var(--space-2);
+}
+
+.step__body {
+  color: var(--mk-soft);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+@media (max-width: 780px) {
+  .steps__list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step {
+    transition: none;
+  }
+  .step:hover,
+  .step:focus-within {
+    transform: none;
+  }
+}

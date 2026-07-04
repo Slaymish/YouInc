@@ -1,0 +1,313 @@
+/* frontend/src/components/marketing/Hero.css
+ *
+ * Editorial-Finance hero. A live net-worth line chart (driven off
+ * SAMPLE_DASHBOARD) reveals on load via a compositor-safe clip-path wipe;
+ * floating figure cards fade in over it. Motion touches transform / opacity /
+ * clip-path only. Base state is the final, fully-visible state — the reveal
+ * animations are gated behind `prefers-reduced-motion: no-preference`, so the
+ * reduced-motion fallback (static chart, at every width) is automatic. */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: var(--space-8);
+  align-items: center;
+  position: relative;
+  min-height: 34rem;
+}
+
+.hero__eyebrow {
+  font-family: var(--mk-sans);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--mk-soft);
+  margin: 0 0 var(--space-3);
+}
+.hero__headline {
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: var(--text-hero);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-head);
+  margin: 0 0 var(--space-4);
+}
+.hero__headline em {
+  font-style: italic;
+}
+.hero__sub {
+  font-family: var(--mk-sans);
+  font-size: var(--text-lead);
+  color: var(--mk-soft);
+  line-height: var(--leading-body);
+  max-width: var(--mk-maxw-narrow);
+  margin: 0 0 var(--space-5);
+}
+.hero__ctas {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Mobile static stat row (hidden ≥900px; shown when the visual hides) ── */
+.hero__statrow {
+  display: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+}
+.hero__stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.hero__stat dt {
+  font-family: var(--mk-sans);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--mk-soft);
+}
+.hero__stat dd {
+  margin: 0;
+  font-family: var(--mk-serif);
+  font-size: var(--text-h3);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.hero__stat--pos {
+  color: var(--mk-positive);
+}
+
+/* ── Product-proof visual ────────────────────────────────────────────────── */
+.hero__visual {
+  position: relative;
+  height: 100%;
+  min-height: 26rem;
+}
+
+.hero__chart {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: var(--space-6);
+  transform: translateY(-50%);
+  margin: 0;
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.hero__chart-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.hero__chart-lab {
+  font-family: var(--mk-sans);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--mk-soft);
+}
+.hero__chart-val {
+  font-family: var(--mk-serif);
+  font-size: var(--text-h2);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.hero__chart-delta {
+  margin-left: auto;
+  font-family: var(--mk-sans);
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--mk-positive);
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__plot {
+  position: relative;
+  height: 8.5rem;
+  border-bottom: 1px solid var(--mk-dv-grid);
+}
+.hero__chart-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Base = fully revealed; the wipe animation (below) starts collapsed. */
+  clip-path: inset(0 0 0 0);
+}
+.hero__area {
+  /* fill supplied inline via url(#heroAreaGrad) */
+}
+.hero__grad-top {
+  stop-color: var(--mk-dv-1);
+  stop-opacity: 0.2;
+}
+.hero__grad-bot {
+  stop-color: var(--mk-dv-1);
+  stop-opacity: 0;
+}
+.hero__line {
+  stroke: var(--mk-dv-1);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.hero__dot {
+  position: absolute;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--mk-dv-1);
+  border: 2px solid var(--mk-card);
+  box-shadow: var(--shadow-1);
+  transform: translate(-50%, -50%);
+}
+
+.hero__axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  font-family: var(--mk-sans);
+  font-size: var(--text-small);
+  color: var(--mk-dv-label);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Floating figure cards ───────────────────────────────────────────────── */
+.fw {
+  position: absolute;
+  background: var(--mk-card);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--mk-sans);
+  font-size: var(--text-small);
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  box-shadow: var(--shadow-2);
+}
+.fw__lab {
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--mk-soft);
+}
+.fw__big {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.fw__up {
+  color: var(--mk-positive);
+  font-weight: 600;
+}
+.fw__down {
+  color: var(--mk-negative);
+  font-weight: 600;
+}
+.fw__spark {
+  width: 100%;
+  height: 20px;
+  margin-top: var(--space-1);
+}
+.fw--runway {
+  top: 0.5rem;
+  right: 8.5rem;
+  width: 9rem;
+  transform: rotate(-4deg);
+  z-index: 3;
+}
+.fw--cash {
+  top: 4.5rem;
+  right: 0;
+  width: 8.5rem;
+  transform: rotate(3deg);
+  z-index: 3;
+}
+.fw--expense {
+  bottom: 1rem;
+  right: 6rem;
+  width: 9.5rem;
+  transform: rotate(-2.5deg);
+  z-index: 3;
+}
+
+/* ── Reveal-on-load motion (only when motion is welcome) ─────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__visual {
+    animation: hero-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero__chart-svg {
+    animation: hero-wipe 1000ms cubic-bezier(0.16, 1, 0.3, 1) 220ms both;
+  }
+  .hero__dot {
+    animation: hero-fade 260ms ease-out 1080ms both;
+  }
+  .fw {
+    animation: hero-fade 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .fw--runway {
+    animation-delay: 560ms;
+  }
+  .fw--cash {
+    animation-delay: 700ms;
+  }
+  .fw--expense {
+    animation-delay: 840ms;
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* Cards keep their static rotation; only opacity animates (compositor-safe,
+   avoids clobbering the per-card `transform: rotate(...)`). */
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .hero__visual {
+    display: none;
+  }
+  .hero__statrow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+}

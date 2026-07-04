@@ -6,7 +6,9 @@ import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
 import { DEMO_WIDGET_IDS } from "~/components/marketing/demoWidgets";
 import { BOOKING_URL } from "~/components/marketing/config";
 import "~/components/dashboard/dashboard.css";
-import "~/components/marketing/marketing.css";
+import "~/components/marketing/marketing-tokens.css";
+import "~/components/marketing/marketing-shared.css";
+import "~/components/marketing/demo.css";
 
 // Separate from the real dashboard's storage key so demo edits (tab/layout
 // customization on sample data) never read from or clobber a real user's
@@ -25,14 +27,19 @@ function DemoPage() {
     <>
       <header className="mk demo-banner">
         <div>
-          <strong>Live demo</strong> — sample data, this is exactly what your
-          dashboard looks like once your bank is connected.
+          <strong>Live demo</strong> — sample data, same dashboard shell and
+          widgets you get once your accounts are connected.
         </div>
         <nav className="demo-banner__cta">
           <Link className="mk-btn mk-btn--ghost" to="/">
             ← Back
           </Link>
-          <a className="mk-btn mk-btn--primary" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
+          <a
+            className="mk-btn mk-btn--primary"
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Book a call
           </a>
         </nav>

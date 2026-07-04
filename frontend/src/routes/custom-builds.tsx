@@ -4,7 +4,12 @@ import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { MarketingHeader } from "~/components/marketing/MarketingHeader";
 import { MarketingFooter } from "~/components/marketing/MarketingFooter";
 import { ConciergeShowcase } from "~/components/marketing/ConciergeShowcase";
-import "~/components/marketing/marketing.css";
+import "~/components/marketing/marketing-tokens.css";
+import "~/components/marketing/marketing-shared.css";
+// Reuses `.steps__list` / `.step*` (HowItWorks.css) for its own 4-step
+// engagement list, widened via the `.cb-steps` override in custom-builds.css.
+import "~/components/marketing/HowItWorks.css";
+import "~/components/marketing/custom-builds.css";
 
 export const Route = createFileRoute("/custom-builds")({
   head: () => ({
@@ -13,7 +18,7 @@ export const Route = createFileRoute("/custom-builds")({
       {
         name: "description",
         content:
-          "Bespoke widgets, integrations, and AI infrastructure built on your live YouInc ledger by the person who built the product.",
+          "Bespoke widgets, integrations, and AI agents built on your live YouInc ledger by the person who built the product.",
       },
     ],
   }),
@@ -23,15 +28,15 @@ export const Route = createFileRoute("/custom-builds")({
 const BUILD_AREAS = [
   {
     title: "Custom widgets",
-    body: "Your dashboard is a grid of live widgets over a double-entry ledger — net worth, runway, cashflow, thirty-plus more. If the view you want doesn't exist — a mortgage payoff curve, a per-project P&L, a savings race against a date — I design it, build it, and it appears on your board.",
+    body: "Your dashboard is a grid of live widgets over a double-entry ledger. If the view you want doesn't exist — a mortgage payoff curve, a per-project P&L, a savings race against a date — I design it, build it, and add it to your board.",
   },
   {
     title: "Integrations",
-    body: "Every NZ bank already flows in live through Akahu. I wire in what banks can't see: KiwiSaver, portfolio balances, a spreadsheet you refuse to give up — anything with an export or an API, posted into your ledger as proper journal entries so it all still balances.",
+    body: "NZ bank feeds come through Akahu. I wire in what banks can't see: KiwiSaver, portfolio balances, or a spreadsheet you still rely on — anything with an export or an API, posted as journal entries so it still balances.",
   },
   {
     title: "AI infrastructure",
-    body: "Agents that read your board, not your inbox. A Monday-morning brief in plain English, anomaly detection that catches the subscription that quietly doubled, questions answered straight from your own ledger. If you can describe it, it can run on your numbers.",
+    body: "Agents that read your ledger, not your inbox. A Monday brief, anomaly detection, or plain-English answers from your own numbers — scoped to a real decision, not a chatbot bolted on top.",
   },
 ];
 
@@ -39,7 +44,7 @@ const ENGAGEMENT_STEPS = [
   {
     n: "01",
     title: "We talk",
-    body: "A short call. You tell me how you actually think about your money and what's missing — one sentence is usually enough to scope from.",
+    body: "A short call. You tell me how you think about your money and what the current product is missing.",
   },
   {
     n: "02",
@@ -49,7 +54,7 @@ const ENGAGEMENT_STEPS = [
   {
     n: "03",
     title: "I build on your live board",
-    body: "The work happens against your real ledger, not a mock-up. You watch the widget land on your dashboard with your numbers in it.",
+    body: "The work happens against your real ledger, not a mock-up. You see the widget or integration land with your numbers in it.",
   },
   {
     n: "04",
@@ -65,14 +70,17 @@ function CustomBuildsPage() {
       <MarketingHeader />
       <main>
         <section className="cb-hero" aria-labelledby="cb-heading">
-          <p className="mk-eyebrow">Concierge · bespoke work on your live ledger</p>
+          <p className="mk-eyebrow">
+            Concierge · bespoke work on your live ledger
+          </p>
           <h1 id="cb-heading" className="cb-hero__headline">
             Get your own <em>finance engineer.</em>
           </h1>
           <p className="cb-hero__sub">
-            I built YouInc — the ledger, the widgets, the AI. Concierge means I build the next
-            piece for you: the widget that doesn't exist yet, the integration your bank can't do,
-            the agent that watches your numbers so you don't have to.
+            I built YouInc — the ledger, the widgets, the AI layer. Concierge
+            means I build the next piece for you: the widget that doesn't exist
+            yet, the integration your bank can't do, or the agent that watches
+            the numbers you care about.
           </p>
           <div className="cb-hero__ctas">
             <a
@@ -139,10 +147,13 @@ function CustomBuildsPage() {
               <p className="cb-figure__label">{PRICING.concierge.name}</p>
               <p className="cb-figure__price">
                 <span className="num">{PRICING.concierge.price}</span>
-                <span className="cb-figure__cadence">{PRICING.concierge.cadence}</span>
+                <span className="cb-figure__cadence">
+                  {PRICING.concierge.cadence}
+                </span>
               </p>
               <p className="cb-figure__note">
-                Everything in Self-serve, plus ongoing bespoke work and a direct line.
+                Everything in Self-serve, plus ongoing bespoke work and a direct
+                line for questions.
               </p>
             </div>
           </div>
@@ -155,7 +166,8 @@ function CustomBuildsPage() {
             Book a call →
           </a>
           <p className="cb-pricing__foot">
-            The call costs nothing and scoping is free — you'll leave with a number either way.
+            The call costs nothing. If there is a fit, you leave with a clear
+            next step and a number.
           </p>
         </section>
       </main>

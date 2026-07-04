@@ -1,0 +1,59 @@
+/* frontend/src/components/marketing/Pricing.css
+ *
+ * Landing teaser only (design-direction spec C8/E4). Three brief tiers, a
+ * "Compare all plans" link out to the full /pricing route + comparison
+ * table. Test-pinned price strings render verbatim from PRICING; only the
+ * layout/elevation here is new.
+ */
+.pricing__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-grid, 1.5rem); }
+.tier {
+  position: relative;
+  background: var(--mk-surface-1, var(--mk-card));
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-xl, 16px);
+  padding: 1.8rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--duration-normal, 200ms) ease, box-shadow var(--duration-normal, 200ms) ease;
+}
+.tier:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.tier--featured { border-color: var(--mk-accent-line, var(--mk-ink)); box-shadow: var(--shadow-3); }
+.tier--featured:hover { transform: translateY(-2px); box-shadow: var(--shadow-3); }
+.tier__chip {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--mk-accent-tint, #e7f4ec);
+  color: var(--mk-accent-strong, var(--mk-accent));
+  font-family: var(--mk-sans);
+  font-size: var(--text-eyebrow, 0.7rem);
+  letter-spacing: var(--tracking-eyebrow, 0.08em);
+  text-transform: uppercase;
+}
+.tier__name { font-family: var(--mk-sans); font-size: 0.8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-soft); margin: 0; }
+.tier__price { font-family: var(--mk-serif); font-size: 2.2rem; margin: 0; }
+.tier__cadence { font-family: var(--mk-sans); font-size: 0.9rem; color: var(--mk-soft); }
+.tier__features { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; color: var(--mk-soft); font-size: 0.92rem; }
+.tier__features li::before { content: "✓ "; color: var(--mk-accent); font-weight: 700; }
+/* CTA (link, ghost link, or WaitlistForm) is always the last child of .tier —
+   push it to the bottom of the flex column so CTAs align across unequal-height cards. */
+.tier > :last-child { margin-top: auto; }
+.pricing__compare { margin: 1.75rem 0 0; text-align: center; font-family: var(--mk-sans); }
+.pricing__compare a {
+  color: var(--mk-ink);
+  border-bottom: 2px solid var(--mk-accent-line, var(--mk-line));
+  text-decoration: none;
+  padding-bottom: 0.1rem;
+  transition: border-color var(--duration-fast, 150ms) ease;
+}
+.pricing__compare a:hover,
+.pricing__compare a:focus-visible { border-color: var(--mk-ink); }
+.pricing__compare a:focus-visible { outline: 3px solid var(--mk-focus, #111); outline-offset: 2px; }
+@media (max-width: 900px) { .pricing__grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .tier, .tier--featured { transition: none; }
+  .tier:hover, .tier--featured:hover { transform: none; }
+}

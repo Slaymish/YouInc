@@ -1,0 +1,81 @@
+/* frontend/src/components/marketing/LiveProofStrip.css
+ * ─────────────────────────────────────────────────────────────
+ * Wispr-style scrolling trust banner — an infinite marquee of the
+ * "synced live" pill + connected-bank chips. Motion is compositor-safe
+ * (transform only), pausable on hover/focus, and fully static under
+ * prefers-reduced-motion (see bottom block).
+ * ───────────────────────────────────────────────────────────── */
+
+.proof {
+  border-block: 1px solid var(--mk-line);
+  padding-block: 1.2rem !important;
+}
+
+/* Viewport clips the two tracks; the marquee itself is exactly twice as
+   wide as one track so translateX(-50%) lines the duplicate up perfectly. */
+.proof__viewport {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+}
+
+.proof__marquee {
+  display: flex;
+  width: max-content;
+  animation: proof-scroll 32s linear infinite;
+}
+
+.proof:hover .proof__marquee,
+.proof:focus-within .proof__marquee {
+  animation-play-state: paused;
+}
+
+.proof__track {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1.2rem;
+  padding-inline-end: 2.4rem;
+  font-size: 0.85rem;
+  color: var(--mk-soft);
+  white-space: nowrap;
+}
+
+.proof__pill { flex: none; }
+
+@keyframes proof-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.proof__banks { display: flex; flex-wrap: nowrap; gap: 0.5rem; align-items: center; list-style: none; margin: 0; padding: 0; }
+.bank-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.78rem; font-weight: 600; color: var(--mk-ink);
+  border: 1px solid var(--mk-line); border-radius: var(--radius-pill); padding: 0.28rem 0.7rem 0.28rem 0.6rem;
+  background: var(--mk-card); box-shadow: var(--shadow-1);
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+.bank-chip:hover { border-color: var(--mk-soft); transform: translateY(-1px); }
+.bank-chip__dot { width: 7px; height: 7px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.06); }
+.bank-chip--more { color: var(--mk-soft); font-weight: 500; border-style: dashed; }
+
+/* Reduced motion: fall back to a single static, wrapped, centered row —
+   the pre-marquee behavior. The duplicate track exists only for the loop
+   illusion, so it is dropped entirely rather than shown twice. */
+@media (prefers-reduced-motion: reduce) {
+  .proof__viewport { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+  .proof__marquee {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .proof__track {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-inline-end: 0;
+    white-space: normal;
+  }
+  .proof__track[aria-hidden="true"] { display: none; }
+}

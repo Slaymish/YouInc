@@ -1,0 +1,31 @@
+/* frontend/src/components/marketing/custom-builds.css
+ * ─────────────────────────────────────────────────────────────
+ * Custom builds (/custom-builds) — cb- prefix
+ * ───────────────────────────────────────────────────────────── */
+.cb-hero { max-width: 900px; }
+.cb-hero__headline { font-family: var(--mk-serif); font-weight: 400; font-size: clamp(2.4rem, 5.5vw, 4rem); line-height: .98; letter-spacing: -.025em; margin: 0 0 1rem; }
+.cb-hero__headline em { font-style: italic; }
+.cb-hero__sub { font-size: 1.05rem; color: var(--mk-soft); line-height: 1.65; max-width: 36rem; margin: 0 0 1.8rem; }
+.cb-hero__ctas { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+
+.cb-what__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.cb-card { background: var(--mk-card); border: 1px solid var(--mk-line); border-radius: 12px; padding: 1.5rem 1.4rem; box-shadow: 0 16px 36px -26px rgba(40,40,30,.4); }
+.cb-card__title { font-family: var(--mk-serif); font-weight: 400; font-size: 1.35rem; letter-spacing: -.01em; margin: 0 0 0.7rem; }
+.cb-card__body { margin: 0; color: var(--mk-soft); line-height: 1.6; font-size: 0.95rem; }
+@media (max-width: 900px) { .cb-what__grid { grid-template-columns: 1fr; } }
+
+/* Four engagement steps reuse the landing's .steps__list (3-col, from
+   HowItWorks.css) — widen to 4. */
+.cb-steps .steps__list { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 980px) { .cb-steps .steps__list { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .cb-steps .steps__list { grid-template-columns: 1fr; } }
+
+.cb-pricing { text-align: center; }
+.cb-pricing__figures { display: grid; grid-template-columns: repeat(2, minmax(0, 22rem)); justify-content: center; gap: 1.5rem; margin: 0 auto 2rem; }
+.cb-figure { background: var(--mk-card); border: 1px solid var(--mk-line); border-radius: 14px; padding: 1.6rem 1.5rem; text-align: left; }
+.cb-figure__label { font-family: var(--mk-sans); font-size: 0.8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-soft); margin: 0 0 0.5rem; }
+.cb-figure__price { font-family: var(--mk-serif); font-size: 2rem; margin: 0 0 0.6rem; font-variant-numeric: tabular-nums; }
+.cb-figure__cadence { font-family: var(--mk-sans); font-size: 0.9rem; color: var(--mk-soft); }
+.cb-figure__note { margin: 0; color: var(--mk-soft); font-size: 0.92rem; line-height: 1.55; }
+.cb-pricing__foot { margin: 1.2rem 0 0; color: var(--mk-soft); font-size: 0.9rem; }
+@media (max-width: 700px) { .cb-pricing__figures { grid-template-columns: 1fr; } }

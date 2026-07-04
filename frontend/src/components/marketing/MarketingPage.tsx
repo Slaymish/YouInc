@@ -11,8 +11,13 @@ import { Pricing } from "./Pricing";
 import { WaitlistForm } from "./WaitlistForm";
 import { Faq } from "./Faq";
 import { MarketingFooter } from "./MarketingFooter";
-import "./marketing.css";
+import { FeedbackWidget } from "./FeedbackWidget";
+import { SupportChat } from "./SupportChat";
+import "./marketing-tokens.css";
+import "./marketing-shared.css";
 import "../dashboard/dashboard.css"; // widget styles for the showcase
+import "./FeedbackWidget.css";
+import "./SupportChat.css";
 
 export function MarketingPage() {
   useLightTheme();
@@ -34,6 +39,8 @@ export function MarketingPage() {
         <Faq />
       </main>
       <MarketingFooter />
+      <SupportChat />
+      <FeedbackWidget source="marketing" />
     </div>
   );
 }

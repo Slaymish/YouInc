@@ -1,0 +1,21 @@
+/* frontend/src/components/marketing/pricing-page.css
+ * ─────────────────────────────────────────────────────────────
+ * /pricing route — owns the intro section only; the comparison
+ * table itself is styled in PricingTable.css.
+ * ───────────────────────────────────────────────────────────── */
+.pricing-page__intro { max-width: var(--mk-maxw-narrow, 720px); }
+.pricing-page__headline {
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 1.3rem + 3.5vw, 3.4rem);
+  line-height: var(--leading-head, 1.08);
+  letter-spacing: var(--tracking-head, -0.025em);
+  margin: 0 0 1rem;
+}
+.pricing-page__sub {
+  font-size: var(--text-lead, 1.05rem);
+  color: var(--mk-soft);
+  line-height: var(--leading-body, 1.6);
+  margin: 0;
+}
+.pricing-page__table { padding-top: 0; }

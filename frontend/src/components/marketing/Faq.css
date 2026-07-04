@@ -1,0 +1,114 @@
+/* frontend/src/components/marketing/Faq.css */
+.faq__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4) var(--space-8);
+  align-items: start;
+}
+
+.faq__item {
+  background: var(--mk-surface-1);
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.faq__item:hover {
+  box-shadow: var(--shadow-2);
+  border-color: var(--mk-accent-line);
+}
+
+.faq__item[open] {
+  box-shadow: var(--shadow-2);
+}
+
+.faq__q {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: var(--text-h3);
+  line-height: var(--leading-head);
+  color: var(--mk-ink);
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 200ms ease;
+}
+
+.faq__q::-webkit-details-marker { display: none; }
+
+.faq__item:hover .faq__q {
+  text-decoration-color: var(--mk-accent-line);
+}
+
+.faq__item[open] .faq__q {
+  text-decoration-color: var(--mk-ink);
+}
+
+.faq__q:focus-visible {
+  outline: 3px solid var(--mk-focus);
+  outline-offset: 3px;
+}
+
+.faq__icon {
+  flex: none;
+  position: relative;
+  width: 0.85rem;
+  height: 0.85rem;
+  transition: transform 220ms ease;
+}
+
+.faq__icon::before,
+.faq__icon::after {
+  content: "";
+  position: absolute;
+  background: var(--mk-soft);
+  border-radius: var(--radius-pill);
+}
+
+.faq__icon::before { inset: 0.38rem 0 0.38rem 0; height: 2px; }
+.faq__icon::after { inset: 0 0.38rem 0 0.38rem; width: 2px; }
+
+.faq__item[open] .faq__icon {
+  transform: rotate(45deg);
+}
+
+.faq__item[open] .faq__icon::before,
+.faq__item[open] .faq__icon::after {
+  background: var(--mk-accent);
+}
+
+.faq__a {
+  margin: var(--space-3) 0 0;
+  max-width: var(--mk-maxw-narrow);
+  color: var(--mk-soft);
+  line-height: var(--leading-body);
+}
+
+.faq__a a { color: var(--mk-ink); text-decoration-color: var(--mk-line); text-underline-offset: 2px; }
+.faq__a a:hover { text-decoration-color: var(--mk-ink); }
+
+@media (max-width: 780px) {
+  .faq__list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq__icon,
+  .faq__q,
+  .faq__item {
+    transition: none;
+  }
+}
+
+/* Final CTA (rendered inline in MarketingPage.tsx, above <Faq />) */
+.final-cta { text-align: center; }
+.final-cta .waitlist-form { justify-content: center; }

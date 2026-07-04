@@ -1,0 +1,107 @@
+/* frontend/src/components/marketing/marketing-tokens.css
+ *
+ * Foundation design tokens for the `.mk` marketing scope. This file defines
+ * ONLY the `.mk { --mk-*: ...; }` custom-property block (design-direction
+ * spec section B) — no selectors, no component rules. Every other marketing
+ * CSS file consumes these variables; do not hardcode palette, type, spacing,
+ * radius, or shadow literals anywhere else.
+ *
+ * Self-hosted font faces (spec B2) — Fraunces 400 (display/serif) + Inter
+ * 400/600 (body/sans), both `font-display: swap` via @fontsource. No
+ * external font requests.
+ */
+@import "@fontsource/fraunces/latin-400.css";
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-600.css";
+
+.mk {
+  /* ── B5. Core palette (unchanged) ───────────────────────────────── */
+  --mk-paper: #fbfbf9;
+  --mk-ink: #111111;
+  --mk-soft: #55534d;
+  --mk-line: #e3e3dd;
+  --mk-accent: #12a150;
+  --mk-card: #ffffff;
+
+  /* ── B5. Semantic — collapse the two reds (#d4553f AND #c0492f) into ONE.
+     Coherence rule: every up/gain/positive pixel = --mk-positive; every
+     down/loss/negative pixel = --mk-negative. No other reds/greens anywhere. */
+  --mk-positive: var(--mk-accent);
+  --mk-negative: #c0492f;
+  --mk-negative-tint: #fbf1ee;
+  --mk-negative-line: #e2b3a8;
+
+  /* ── B5. Accent tints — highlights, hovers, active tabs, brand focus. */
+  --mk-accent-strong: #0e8a44;
+  --mk-accent-tint: #e7f4ec;
+  --mk-accent-line: #bfe3cd;
+
+  /* ── B5. Surface layers — depth via distinct surfaces, not just shadow. */
+  --mk-surface-0: var(--mk-paper);
+  --mk-surface-1: var(--mk-card);
+  --mk-surface-2: #f4f4f0;
+
+  /* ── B5. Focus ring — replaces the stray #6ea8fe blue with an on-brand
+     ink ring. Coherence rule: focus is always --mk-focus. */
+  --mk-focus: #111111;
+
+  /* ── B5. Data-viz palette — derived from --mk-accent, colorblind-safe,
+     light-mode. Charts pull series colors only from --mk-dv-*, structure
+     from --mk-dv-grid / --mk-dv-label. */
+  --mk-dv-1: #12a150; /* accent green — primary series (net worth, income) */
+  --mk-dv-2: #1f6f8b; /* teal-blue — secondary (assets vs liabilities) */
+  --mk-dv-3: #c98a2b; /* ochre — tertiary (housing/rent) */
+  --mk-dv-4: #7d5ba6; /* muted violet — quaternary (transport/other) */
+  --mk-dv-5: #b0aea6; /* warm grey — "other"/inactive */
+  --mk-dv-neg: var(--mk-negative); /* expenses / down */
+  --mk-dv-grid: var(--mk-line); /* gridlines, axes */
+  --mk-dv-label: var(--mk-soft); /* axis + data labels */
+
+  /* ── B1. Container width (Samsung "wider") ──────────────────────── */
+  --mk-maxw: 1280px; /* was 1200px — shared .mk section + nav + footer max-width */
+  --mk-maxw-narrow: 720px; /* prose measure: hero sub, faq answers, bespoke body, ledes */
+  --mk-maxw-frame: 1140px; /* DashboardFrame stage (was 1080) — scales with new width */
+
+  /* ── B2. Font pairing — self-hosted, Georgia/system are fallbacks only. */
+  --mk-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --mk-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ── B2. Type scale — replaces scattered literals across every file. */
+  --text-hero: clamp(2.8rem, 1.4rem + 6vw, 5rem); /* .hero__headline */
+  --text-h2: clamp(1.9rem, 1.2rem + 2.6vw, 2.8rem); /* .section-heading */
+  --text-h3: clamp(1.15rem, 1rem + 0.6vw, 1.35rem); /* step/card/tier titles */
+  --text-lead: clamp(1.05rem, 1rem + 0.4vw, 1.2rem); /* hero sub, section ledes */
+  --text-body: 1rem; /* default body */
+  --text-small: 0.85rem; /* meta, footer, captions */
+  --text-eyebrow: 0.7rem; /* mk-eyebrow, unchanged */
+
+  --leading-tight: 0.98; /* hero */
+  --leading-head: 1.08; /* h2/h3 */
+  --leading-body: 1.6; /* prose */
+  --tracking-head: -0.025em;
+  --tracking-eyebrow: 0.2em;
+
+  /* ── B3. Spacing scale — intentional rhythm, not uniform. ───────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-section: clamp(3.5rem, 3rem + 5vw, 7rem); /* section V-padding, was clamp(3,6vw,6) */
+  --gap-grid: 1.5rem; /* pricing/steps/faq column gap */
+
+  /* ── B4. Radius scale ────────────────────────────────────────────── */
+  --radius-sm: 6px; /* buttons, inputs, url pill */
+  --radius-md: 10px; /* chips, small cards */
+  --radius-lg: 12px; /* panels, artifacts, frame */
+  --radius-xl: 16px; /* pricing tiers (was 14) */
+  --radius-pill: 999px;
+
+  /* ── B4. Elevation (shadow) scale — 4 steps, systematized. ──────── */
+  --shadow-1: 0 1px 2px rgba(40, 40, 30, .06), 0 2px 6px -2px rgba(40, 40, 30, .08); /* resting card */
+  --shadow-2: 0 8px 20px -8px rgba(40, 40, 30, .14), 0 2px 6px -3px rgba(40, 40, 30, .10); /* hover / floating card */
+  --shadow-3: 0 20px 44px -22px rgba(40, 40, 30, .30), 0 6px 16px -8px rgba(40, 40, 30, .14); /* featured tier, artifacts */
+  --shadow-4: 0 30px 60px -24px rgba(40, 40, 30, .35), 0 8px 20px -8px rgba(40, 40, 30, .14); /* the DashboardFrame */
+}

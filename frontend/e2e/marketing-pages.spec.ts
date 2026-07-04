@@ -36,7 +36,7 @@ test("landing nav reaches both new pages", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
 
-test("pricing nav link scrolls to the landing pricing section from a subpage", async ({
+test("pricing nav link routes to the dedicated pricing comparison page from a subpage", async ({
   page,
 }) => {
   await page.goto("/custom-builds");
@@ -44,8 +44,10 @@ test("pricing nav link scrolls to the landing pricing section from a subpage", a
     .getByRole("navigation", { name: "Main navigation" })
     .getByRole("link", { name: "Pricing", exact: true })
     .click();
-  await expect(page).toHaveURL(/\/#pricing-heading$/);
-  await expect(page.locator("#pricing-heading")).toBeInViewport();
+  await expect(page).toHaveURL(/\/pricing$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: /every plan, every detail/i }),
+  ).toBeVisible();
 });
 
 test("session-gated widgets show placeholders, not live forms, on /widgets", async ({

@@ -1,7 +1,15 @@
 // frontend/src/components/marketing/Faq.tsx
+import "./Faq.css";
+
 const FAQS = [
-  { q: "Is my bank data safe?", a: "Connections are read-only and made through Akahu, New Zealand's regulated open-banking provider. YouInc never sees or stores your bank login, you approve exactly which accounts are shared, and you can revoke access at any time from your Akahu account." },
-  { q: "Where is my data stored?", a: "Your ledger lives in an isolated per-account store — nothing is pooled between users, and it's never sold or used for advertising. You can export the complete ledger at any time as plain-text accounting journals (hledger-compatible), so your history stays readable without YouInc." },
+  {
+    q: "Is my bank data safe?",
+    a: "Connections are read-only and made through Akahu, New Zealand's regulated open-banking provider. YouInc never sees or stores your bank login, you choose which accounts are shared, and you can revoke access anytime.",
+  },
+  {
+    q: "Where is my data stored?",
+    a: "Your ledger lives in an isolated per-account store — nothing is pooled between users, sold, or used for advertising. You can export the complete ledger anytime as plain-text accounting journals, so your history stays readable without YouInc.",
+  },
   {
     q: "What is Akahu?",
     a: (
@@ -9,29 +17,55 @@ const FAQS = [
         <a href="https://akahu.nz" target="_blank" rel="noopener noreferrer">
           Akahu
         </a>{" "}
-        is New Zealand's open-finance hub — it's the secure bridge that lets apps read your
-        transactions with your consent, without handing over passwords.
+        is New Zealand's open-finance hub — it's the secure bridge that lets
+        apps read your transactions with your consent, without handing over
+        passwords.
       </>
     ),
   },
-  { q: "What if my account isn't with a bank Akahu supports?", a: "You can still add it as a manual account and keep its balance current by hand — it shows up alongside your live-synced accounts everywhere in the dashboard." },
-  { q: "How is this different from PocketSmith or a budgeting app?", a: "Budgeting apps ask you to plan envelopes and track habits. YouInc is a personal ERP: it keeps a strict double-entry ledger of everything you own and owe — the bookkeeping standard businesses are audited against — and reports on it the way a CFO would: net worth, runway, burn, cashflow. If you've outgrown budgeting apps, this is the next step." },
-  { q: "Can I get a widget that doesn't exist yet?", a: "Yes — that's the Concierge tier. Book a call and tell me what you need: a custom widget, an integration, or an AI agent that emails you a weekly brief of your finances. I build it, you use it." },
-  { q: "What happens if I cancel?", a: "You keep your data. Export the full double-entry journal as plain text before you go — it works with open tools like hledger, so nothing about your history is locked in." },
+  {
+    q: "Can I try it before connecting my bank?",
+    a: "Yes. The live demo uses sample data but the same dashboard shell, widget system, and layout controls as a connected account.",
+  },
+  {
+    q: "Is this only for New Zealand accounts?",
+    a: "Live bank sync currently depends on Akahu, so YouInc is built around New Zealand-connected accounts. Anything Akahu cannot see can still be added manually or through a custom integration.",
+  },
+  {
+    q: "What if my account isn't with a bank Akahu supports?",
+    a: "You can add it as a manual account and keep its balance current by hand — it shows up alongside your live-synced accounts throughout the dashboard.",
+  },
+  {
+    q: "How is this different from PocketSmith or a budgeting app?",
+    a: "Budgeting apps help you plan envelopes and track habits. YouInc keeps a double-entry ledger of what you own, owe, earn, and spend, then reports on it like a CFO: net worth, runway, burn, cashflow, and the exceptions worth your attention.",
+  },
+  {
+    q: "Can I get a widget that doesn't exist yet?",
+    a: "Yes — that's Concierge. Book a call and tell me what you need: a custom widget, an integration, or an AI agent built around your ledger.",
+  },
+  {
+    q: "What happens if I cancel?",
+    a: "You keep your data. Export the full double-entry journal as plain text before you go — it works with open tools like hledger, so nothing about your history is locked in.",
+  },
 ];
 
 export function Faq() {
   return (
     <section className="faq" aria-labelledby="faq-heading">
-      <h2 id="faq-heading" className="section-heading">Questions</h2>
-      <dl className="faq__list">
-        {FAQS.map((f) => (
-          <div className="faq__item" key={f.q}>
-            <dt className="faq__q">{f.q}</dt>
-            <dd className="faq__a">{f.a}</dd>
-          </div>
+      <h2 id="faq-heading" className="section-heading">
+        Questions
+      </h2>
+      <div className="faq__list">
+        {FAQS.map((f, i) => (
+          <details className="faq__item" key={f.q} open={i === 0}>
+            <summary className="faq__q">
+              {f.q}
+              <span className="faq__icon" aria-hidden="true" />
+            </summary>
+            <div className="faq__a">{f.a}</div>
+          </details>
         ))}
-      </dl>
+      </div>
     </section>
   );
 }

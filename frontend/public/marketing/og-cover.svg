@@ -1,0 +1,72 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="YouInc — Run yourself like a company.">
+  <defs>
+    <linearGradient id="og-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12a150" />
+      <stop offset="100%" stop-color="#0e8a44" />
+    </linearGradient>
+    <linearGradient id="og-chart-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#12a150" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#12a150" stop-opacity="0" />
+    </linearGradient>
+    <pattern id="og-grid" patternUnits="userSpaceOnUse" width="34" height="34">
+      <path d="M34 0 H0 V34" fill="none" stroke="#e3e3dd" stroke-width="1" />
+    </pattern>
+    <filter id="og-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#28281e" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="#fbfbf9" />
+  <rect width="1200" height="630" fill="url(#og-grid)" opacity="0.45" />
+  <rect x="0" y="0" width="10" height="630" fill="url(#og-accent)" />
+
+  <!-- Wordmark -->
+  <text x="80" y="140" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="700" fill="#111111">YouInc</text>
+  <rect x="83" y="156" width="88" height="4" fill="#12a150" />
+
+  <!-- Headline -->
+  <text x="80" y="242" font-family="Georgia, 'Times New Roman', serif" font-size="46" fill="#111111">Run yourself like</text>
+  <text x="80" y="298" font-family="Georgia, 'Times New Roman', serif" font-size="46" fill="#111111">a company.</text>
+
+  <!-- Subline -->
+  <text x="80" y="352" font-family="system-ui, -apple-system, sans-serif" font-size="19" fill="#55534d">
+    <tspan x="80" dy="0">One live ledger from every bank account &#8212;</tspan>
+    <tspan x="80" dy="30">rendered as your executive dashboard.</tspan>
+  </text>
+
+  <!-- Eyebrow pill -->
+  <rect x="80" y="392" width="330" height="34" rx="17" fill="#e7f4ec" stroke="#bfe3cd" />
+  <circle cx="100" cy="409" r="4" fill="#12a150" />
+  <text x="112" y="414" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#0e8a44">Personal ERP &#183; Live via Akahu</text>
+
+  <!-- Mini dashboard artifact, right side -->
+  <g filter="url(#og-shadow)">
+    <rect x="700" y="120" width="424" height="380" rx="16" fill="#ffffff" stroke="#e3e3dd" />
+  </g>
+  <rect x="700" y="120" width="424" height="30" rx="16" fill="#f4f4f0" />
+  <rect x="700" y="134" width="424" height="16" fill="#f4f4f0" />
+  <circle cx="720" cy="135" r="4" fill="#d3d3cc" />
+  <circle cx="736" cy="135" r="4" fill="#d3d3cc" />
+  <circle cx="752" cy="135" r="4" fill="#d3d3cc" />
+
+  <text x="724" y="182" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#55534d">Net worth</text>
+  <text x="724" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="600" fill="#111111">$142,380</text>
+  <text x="724" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#0e8a44">&#8593; $3,220 &#183; 2.3%</text>
+
+  <rect x="890" y="168" width="200" height="70" rx="10" fill="#fbfbf9" stroke="#e3e3dd" />
+  <text x="906" y="190" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#55534d">Runway</text>
+  <text x="906" y="216" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="#111111">18 months</text>
+
+  <rect x="724" y="256" width="366" height="150" rx="10" fill="#fbfbf9" stroke="#e3e3dd" />
+  <polygon points="740,376 774,362 808,368 842,340 876,326 910,332 944,304 978,290 1012,296 1046,270 1046,392 740,392" fill="url(#og-chart-fill)" />
+  <polyline points="740,376 774,362 808,368 842,340 876,326 910,332 944,304 978,290 1012,296 1046,270" fill="none" stroke="#12a150" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="1046" cy="270" r="4.5" fill="#12a150" />
+
+  <rect x="724" y="422" width="176" height="56" rx="10" fill="#fbfbf9" stroke="#e3e3dd" />
+  <text x="738" y="444" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#55534d">Cashflow</text>
+  <text x="738" y="465" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#0e8a44">+$3,700</text>
+
+  <rect x="914" y="422" width="176" height="56" rx="10" fill="#fbfbf9" stroke="#e3e3dd" />
+  <text x="928" y="444" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#55534d">Status</text>
+  <text x="928" y="465" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#111111">Comfortable</text>
+</svg>
