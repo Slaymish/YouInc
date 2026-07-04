@@ -21,8 +21,25 @@ import { Client } from "pg";
  *    `transaction_date DESC, created_at DESC` to reproduce SQLite exactly.
  *  - journal_entries need no surrogate: every journal is a 2-leg debit/credit
  *    pair, so the read layer orders postings by side (debit first).
- *  - account_mappings is backfilled from config/rules.yaml (the same file the
- *    SQLite dashboard reads for credit facilities / source-account mapping).
+ *  - config/rules.yaml is backfilled into three tables: tenant defaults
+ *    (default_currency / suspense_account), account_mappings, nzfcc_mappings,
+ *    and classification_rules. Rule declaration order is captured as `seq` so
+ *    the (priority, seq) sort reproduces the Python/TS router's
+ *    (priority, declaration-index) tiebreak exactly.
+ *  - Waitlist leads are ported from the separate youinc-leads.sqlite3 when
+ *    `leadsSqlitePath` is given. They are tenant-independent (email-unique),
+ *    so they are upserted by email rather than wiped per tenant.
+ *
+ * Deliberately OUT of scope for this script (see docs/architecture/
+ * migration-strategy.md steps 5 & 7) — they are operational, not an idempotent
+ * data backfill:
+ *  - Akahu tokens → Vault + akahu_connections (step 5): moves LIVE banking
+ *    secrets, needs the Supabase Vault, and requires scrub+rotate of the raw
+ *    tokens. Must be run as a one-off operational step, not from a harness that
+ *    wipes/reinserts.
+ *  - Owner link (step 7): profiles + owner membership + akahu_connections.user_id
+ *    require a post-signup auth.users row, which does not exist until the owner
+ *    re-enrolls via Supabase Auth. Runs after first sign-in, not here.
  */
 
 export interface MigrateOptions {
@@ -30,6 +47,12 @@ export interface MigrateOptions {
   rulesPath: string;
   pgUrl: string;
   tenant: { slug: string; name: string; tier: "self-serve" | "concierge" };
+  /**
+   * Optional path to the separate waitlist SQLite DB (`youinc-leads.sqlite3`).
+   * Leads are tenant-independent (email-unique), so this is decoupled from the
+   * per-tenant ledger backfill; when omitted, the leads step is skipped.
+   */
+  leadsSqlitePath?: string;
 }
 
 export interface MigrationSummary {
@@ -41,6 +64,9 @@ export interface MigrationSummary {
   syncState: number;
   manualClassifications: number;
   accountMappings: number;
+  classificationRules: number;
+  nzfccMappings: number;
+  leads: number;
 }
 
 // Synthetic monotonic base for journal created_at (see file header). Fixed and
@@ -109,6 +135,45 @@ interface AccountMappingConfig {
   credit_limit_cents?: number | null;
 }
 
+interface LeadRow {
+  email: string;
+  name: string | null;
+  interest: string | null;
+  source: string | null;
+  user_agent: string | null;
+  created_at: number;
+}
+
+interface RuleMatchConfig {
+  description_regex?: string | null;
+  merchant_regex?: string | null;
+  account_ids?: string[] | null;
+  amount_greater_than?: number | null;
+  amount_abs_greater_than?: number | null;
+}
+
+interface ClassificationRuleConfig {
+  id: string;
+  priority?: number;
+  match?: RuleMatchConfig | null;
+  route: { target_account: string; memo?: string | null };
+}
+
+interface RulesConfig {
+  defaults: { currency: string; suspense_account: string };
+  accountMappings: Map<string, AccountMappingConfig>;
+  nzfccMappings: Map<string, string>;
+  rules: ClassificationRuleConfig[];
+}
+
+// Schema-level defaults, mirrored here so a rules.yaml without a `defaults`
+// block still produces the same tenant configuration the DDL would.
+const DEFAULT_CURRENCY = "NZD";
+const DEFAULT_SUSPENSE_ACCOUNT = "Expenses:Uncategorized:Suspense";
+// Router default when a rule omits `priority` (see rules_router: lower wins,
+// ties break on declaration order). Must match the classification_rules DDL.
+const DEFAULT_RULE_PRIORITY = 1000;
+
 /**
  * Insert rows as a single multi-row parameterized statement. Row counts here
  * are small (hundreds), so one statement per table stays well under Postgres's
@@ -134,19 +199,50 @@ async function insertRows(
   return rows.length;
 }
 
-function parseAccountMappings(rulesPath: string): Map<string, AccountMappingConfig> {
+/**
+ * Parse config/rules.yaml once into everything the backfill needs: tenant
+ * defaults, source-account mappings, nzfcc fallbacks, and the classification
+ * rules. Rule ORDER IS PRESERVED — the array index becomes each rule's `seq`,
+ * which (paired with `priority`) reproduces the Python/TS router's
+ * (priority, declaration-index) tiebreak exactly. js-yaml preserves mapping
+ * insertion order, so Object.entries/array order here is YAML declaration order.
+ */
+function loadRulesConfig(rulesPath: string): RulesConfig {
   const config = yaml.load(readFileSync(rulesPath, "utf-8")) as {
+    defaults?: { currency?: string; suspense_account?: string } | null;
     account_mappings?: Record<string, AccountMappingConfig> | null;
+    nzfcc_mappings?: Record<string, { target_account?: string }> | null;
+    rules?: ClassificationRuleConfig[] | null;
   } | null;
-  const mappings = new Map<string, AccountMappingConfig>();
+
+  const accountMappings = new Map<string, AccountMappingConfig>();
   for (const [accountId, raw] of Object.entries(config?.account_mappings ?? {})) {
-    if (raw && typeof raw === "object") mappings.set(accountId, raw);
+    if (raw && typeof raw === "object") accountMappings.set(accountId, raw);
   }
-  return mappings;
+
+  const nzfccMappings = new Map<string, string>();
+  for (const [code, raw] of Object.entries(config?.nzfcc_mappings ?? {})) {
+    if (raw && typeof raw === "object" && typeof raw.target_account === "string") {
+      nzfccMappings.set(code, raw.target_account);
+    }
+  }
+
+  return {
+    defaults: {
+      currency: config?.defaults?.currency ?? DEFAULT_CURRENCY,
+      suspense_account: config?.defaults?.suspense_account ?? DEFAULT_SUSPENSE_ACCOUNT,
+    },
+    accountMappings,
+    nzfccMappings,
+    rules: config?.rules ?? [],
+  };
 }
 
 export async function migrateLedger(options: MigrateOptions): Promise<MigrationSummary> {
   const sqlite = new Database(options.sqlitePath, { readonly: true, fileMustExist: true });
+  const leadsDb = options.leadsSqlitePath
+    ? new Database(options.leadsSqlitePath, { readonly: true, fileMustExist: true })
+    : null;
   const client = new Client({ connectionString: options.pgUrl });
 
   try {
@@ -164,7 +260,8 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
     const manualClassifications = sqlite
       .prepare("SELECT * FROM manual_classifications")
       .all() as ManualClassificationRow[];
-    const accountMappings = parseAccountMappings(options.rulesPath);
+    const rulesConfig = loadRulesConfig(options.rulesPath);
+    const leads = leadsDb ? (leadsDb.prepare("SELECT * FROM leads").all() as LeadRow[]) : [];
 
     // Map each SQLite journal integer id to a generated uuid so entries link
     // without round-trips, and to a synthetic monotonic created_at.
@@ -175,11 +272,22 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
       await client.query("BEGIN");
 
       const tenant = await client.query<{ id: string }>(
-        `INSERT INTO public.tenants (name, slug, tier)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (slug) DO UPDATE SET name = excluded.name, tier = excluded.tier, updated_at = now()
+        `INSERT INTO public.tenants (name, slug, tier, default_currency, suspense_account)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (slug) DO UPDATE SET
+           name = excluded.name,
+           tier = excluded.tier,
+           default_currency = excluded.default_currency,
+           suspense_account = excluded.suspense_account,
+           updated_at = now()
          RETURNING id`,
-        [options.tenant.name, options.tenant.slug, options.tenant.tier],
+        [
+          options.tenant.name,
+          options.tenant.slug,
+          options.tenant.tier,
+          rulesConfig.defaults.currency,
+          rulesConfig.defaults.suspense_account,
+        ],
       );
       const tenantId = tenant.rows[0].id;
 
@@ -189,6 +297,8 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
         "journal_entries",
         "journal_transactions",
         "raw_transactions",
+        "classification_rules",
+        "nzfcc_mappings",
         "manual_account_balances",
         "sync_state",
         "manual_classifications",
@@ -320,7 +430,7 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
         client,
         "account_mappings",
         ["tenant_id", "akahu_account_id", "ledger_account", "account_type", "credit_limit_cents"],
-        [...accountMappings.entries()].map(([accountId, mapping]) => [
+        [...rulesConfig.accountMappings.entries()].map(([accountId, mapping]) => [
           tenantId,
           accountId,
           mapping.ledger_account,
@@ -328,6 +438,79 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
           mapping.credit_limit_cents ?? null,
         ]),
       );
+
+      // Classification rules. The array index is the `seq` — pairing it with
+      // `priority` reproduces the router's (priority, declaration-index)
+      // tiebreak. match_account_ids is a Postgres text[]; node-pg maps a JS
+      // string[] parameter to it directly (null when the rule omits it).
+      const classificationRuleCount = await insertRows(
+        client,
+        "classification_rules",
+        [
+          "tenant_id",
+          "rule_key",
+          "seq",
+          "priority",
+          "match_description_regex",
+          "match_merchant_regex",
+          "match_account_ids",
+          "match_amount_greater_than",
+          "match_amount_abs_greater_than",
+          "route_target_account",
+          "route_memo",
+        ],
+        rulesConfig.rules.map((rule, seq) => [
+          tenantId,
+          rule.id,
+          seq,
+          rule.priority ?? DEFAULT_RULE_PRIORITY,
+          rule.match?.description_regex ?? null,
+          rule.match?.merchant_regex ?? null,
+          rule.match?.account_ids ?? null,
+          rule.match?.amount_greater_than ?? null,
+          rule.match?.amount_abs_greater_than ?? null,
+          rule.route.target_account,
+          rule.route.memo ?? null,
+        ]),
+      );
+
+      const nzfccMappingCount = await insertRows(
+        client,
+        "nzfcc_mappings",
+        ["tenant_id", "nzfcc_code", "target_account"],
+        [...rulesConfig.nzfccMappings.entries()].map(([code, targetAccount]) => [
+          tenantId,
+          code,
+          targetAccount,
+        ]),
+      );
+
+      // Waitlist leads are tenant-independent (email is globally unique), so
+      // they are NOT part of the per-tenant wipe above; upsert by email so a
+      // re-run converges without duplicating. Source created_at is an integer
+      // epoch in MILLISECONDS → timestamptz.
+      let leadCount = 0;
+      for (const lead of leads) {
+        await client.query(
+          `INSERT INTO public.leads (email, name, interest, source, user_agent, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT (email) DO UPDATE SET
+             name = excluded.name,
+             interest = excluded.interest,
+             source = excluded.source,
+             user_agent = excluded.user_agent,
+             created_at = excluded.created_at`,
+          [
+            lead.email,
+            lead.name,
+            lead.interest,
+            lead.source,
+            lead.user_agent,
+            new Date(lead.created_at).toISOString(),
+          ],
+        );
+        leadCount += 1;
+      }
 
       await client.query("COMMIT");
 
@@ -340,6 +523,9 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
         syncState: syncStateCount,
         manualClassifications: manualClassificationCount,
         accountMappings: accountMappingCount,
+        classificationRules: classificationRuleCount,
+        nzfccMappings: nzfccMappingCount,
+        leads: leadCount,
       };
     } catch (error: unknown) {
       await client.query("ROLLBACK");
@@ -348,5 +534,6 @@ export async function migrateLedger(options: MigrateOptions): Promise<MigrationS
   } finally {
     await client.end();
     sqlite.close();
+    leadsDb?.close();
   }
 }
