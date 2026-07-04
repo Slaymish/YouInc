@@ -36,7 +36,7 @@ export interface AccountMapping {
   creditLimitCents: number | null;
 }
 
-export type MatchedBy = "rule" | "nzfcc" | "suspense";
+export type MatchedBy = "rule" | "nzfcc" | "suspense" | "manual";
 
 export interface RouteDecision {
   targetAccount: string;
