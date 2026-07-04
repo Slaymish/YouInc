@@ -34,6 +34,20 @@ const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
   await signOutUser();
 });
 
+const loadSampleDataFn = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const { loadSampleData } = await import("~/server/sampleIngestion");
+    return loadSampleData();
+  },
+);
+
+const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
+  async (): Promise<WorkspaceLedgerSummary> => {
+    const { getWorkspaceLedger } = await import("~/server/workspaceLedger");
+    return getWorkspaceLedger();
+  },
+);
+
 export const Route = createFileRoute("/workspace")({
   loader: async () => {
     const data = await loadWorkspace();
@@ -67,6 +81,8 @@ function WorkspacePage() {
   const router = useRouter();
   useLightTheme();
   const [busy, setBusy] = useState(false);
+  const [sampleBusy, setSampleBusy] = useState(false);
+  const [sampleError, setSampleError] = useState<string | null>(null);
   const [ledger, setLedger] = useState(initialLedger);
   const tenant = account.tenant!;
 
@@ -82,6 +98,21 @@ function WorkspacePage() {
       await router.navigate({ to: "/" });
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function loadSample() {
+    setSampleBusy(true);
+    setSampleError(null);
+    try {
+      await loadSampleDataFn();
+      setLedger(await refreshLedgerFn());
+    } catch (err) {
+      setSampleError(
+        err instanceof Error ? err.message : "Could not load sample data.",
+      );
+    } finally {
+      setSampleBusy(false);
     }
   }
 
@@ -152,6 +183,50 @@ function WorkspacePage() {
           <ManualBalancesEditor summary={ledger} onChange={setLedger} />
         </section>
 
+        {ledger.hasJournalBalances ? (
+          <section className="ws-panel" aria-labelledby="ws-ledger-heading">
+            <div className="ws-panel__head">
+              <h2 id="ws-ledger-heading">Synced ledger</h2>
+            </div>
+            <div className="ws-ledger">
+              <p className="ws-ledger__note">
+                Balances below are derived from posted transactions in your
+                double-entry ledger. Manual accounts above take precedence where
+                they overlap.
+              </p>
+              <table className="mb-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th className="mb-numeric">Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ledger.balances
+                    .filter((b) => !b.isManual)
+                    .map((b) => (
+                      <tr key={b.account}>
+                        <td>
+                          <code className="mb-account">{b.account}</code>
+                          <span
+                            className={
+                              "mb-tag mb-tag--" + b.accountType.toLowerCase()
+                            }
+                          >
+                            {b.accountType}
+                          </span>
+                        </td>
+                        <td className="mb-numeric">
+                          {formatMoney(b.balanceCents)}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : null}
+
         <section className="ws-cards">
           <article className="ws-card">
             <h3>Connect a bank</h3>
@@ -162,9 +237,29 @@ function WorkspacePage() {
             <button className="auth-primary" type="button" disabled>
               Connect via Akahu (coming soon)
             </button>
-            <small className="ws-card__note">
-              Manual accounts work today; automatic sync is being rolled out.
-            </small>
+            <button
+              className="auth-secondary"
+              type="button"
+              onClick={loadSample}
+              disabled={sampleBusy}
+            >
+              {sampleBusy ? "Loading sample data…" : "Load sample transactions"}
+            </button>
+            {sampleError ? (
+              <small
+                className="ws-card__note"
+                role="alert"
+                style={{ color: "var(--danger, #c0492f)" }}
+              >
+                {sampleError}
+              </small>
+            ) : (
+              <small className="ws-card__note">
+                Manual accounts work today. Try “Load sample transactions” to
+                see a synced double-entry ledger in action before Akahu sync
+                ships.
+              </small>
+            )}
           </article>
           <article className="ws-card">
             <h3>See the full dashboard</h3>

@@ -652,6 +652,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         items: [
           "Opened self-service signup: create an account and your own workspace directly, with a short guided onboarding — the old waitlist is gone from the self-serve path.",
           "Your workspace now shows a live net-worth, assets, and liabilities summary, with a built-in editor to add, update, and remove accounts by hand.",
+          "Added a synced double-entry ledger: workspace balances can now be derived from posted transactions, with a 'Load sample transactions' option to see it in action before bank sync ships.",
           "Each workspace is fully isolated: your data is scoped to your own tenant and protected by row-level security.",
           "Added a 'check your email' confirmation step for new signups where email verification is required.",
         ],

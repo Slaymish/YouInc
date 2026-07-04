@@ -18,8 +18,14 @@
 // read here yet — a fresh self-serve tenant has none until sync lands.
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { accountType } from "./accountType";
+import {
+  combineBalances,
+  type AccountBalance,
+  type LedgerTotals,
+} from "./workspaceSummary";
 
 export { accountType };
+export type { AccountBalance, LedgerTotals };
 
 export interface WorkspaceManualBalance {
   account: string;
@@ -32,14 +38,13 @@ export interface WorkspaceManualBalance {
 export interface WorkspaceLedgerSummary {
   tenantId: string;
   currency: string;
+  /** Editable manual balances (the accounts a user maintains by hand). */
   manualBalances: WorkspaceManualBalance[];
-  totals: {
-    netWorthCents: number;
-    assetsCents: number;
-    liabilitiesCents: number;
-    assetLiabilityRatio: number | null;
-    accountCount: number;
-  };
+  /** Combined per-account balances: journal-derived + manual (manual wins). */
+  balances: AccountBalance[];
+  /** Whether any journal-derived (synced) balances contribute to the total. */
+  hasJournalBalances: boolean;
+  totals: LedgerTotals;
 }
 
 interface ManualBalanceDbRow {
@@ -47,6 +52,12 @@ interface ManualBalanceDbRow {
   balance_cents: number;
   as_of_date: string;
   updated_at: string;
+}
+
+interface JournalEntryDbRow {
+  account: string;
+  side: "debit" | "credit";
+  amount_cents: number;
 }
 
 interface TenantContext {
@@ -81,11 +92,28 @@ async function requireTenant(): Promise<TenantContext> {
   return { tenantId: row.id, currency: row.default_currency };
 }
 
+/** Aggregate journal entries into per-account balances: debit +, credit −. */
+function aggregateJournalBalances(
+  rows: JournalEntryDbRow[],
+): { account: string; balanceCents: number }[] {
+  const totals = new Map<string, number>();
+  for (const r of rows) {
+    const signed =
+      r.side === "debit" ? Number(r.amount_cents) : -Number(r.amount_cents);
+    totals.set(r.account, (totals.get(r.account) ?? 0) + signed);
+  }
+  return [...totals.entries()].map(([account, balanceCents]) => ({
+    account,
+    balanceCents,
+  }));
+}
+
 function summarize(
   tenant: TenantContext,
-  rows: ManualBalanceDbRow[],
+  manualRows: ManualBalanceDbRow[],
+  journalRows: JournalEntryDbRow[],
 ): WorkspaceLedgerSummary {
-  const manualBalances: WorkspaceManualBalance[] = rows
+  const manualBalances: WorkspaceManualBalance[] = manualRows
     .map((r) => ({
       account: r.account,
       accountType: accountType(r.account),
@@ -95,53 +123,56 @@ function summarize(
     }))
     .sort((a, b) => a.account.localeCompare(b.account));
 
-  const totalsByType = manualBalances.reduce<Record<string, number>>(
-    (totals, row) => {
-      totals[row.accountType] =
-        (totals[row.accountType] ?? 0) + row.balanceCents;
-      return totals;
-    },
-    {},
+  const journalBalances = aggregateJournalBalances(journalRows);
+  const { balances, totals } = combineBalances(
+    journalBalances,
+    manualBalances.map((m) => ({
+      account: m.account,
+      balanceCents: m.balanceCents,
+    })),
   );
-
-  const assetsCents = totalsByType.Assets ?? 0;
-  // Liabilities are stored negative; surface them as a positive magnitude.
-  const liabilitiesCents = totalsByType.Liabilities
-    ? -totalsByType.Liabilities
-    : 0;
-  const netWorthCents = assetsCents - liabilitiesCents;
-  const assetLiabilityRatio =
-    liabilitiesCents !== 0 ? assetsCents / liabilitiesCents : null;
 
   return {
     tenantId: tenant.tenantId,
     currency: tenant.currency,
     manualBalances,
-    totals: {
-      netWorthCents,
-      assetsCents,
-      liabilitiesCents,
-      assetLiabilityRatio,
-      accountCount: manualBalances.length,
-    },
+    balances,
+    hasJournalBalances: journalBalances.length > 0,
+    totals,
   };
 }
 
-/** The caller's tenant ledger summary (manual balances only, this slice). */
+/** The caller's tenant ledger summary: journal-derived + manual balances. */
 export async function getWorkspaceLedger(): Promise<WorkspaceLedgerSummary> {
   const tenant = await requireTenant();
   const supabase = getSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("manual_account_balances")
-    .select("account, balance_cents, as_of_date, updated_at")
-    .eq("tenant_id", tenant.tenantId)
-    .order("account", { ascending: true });
-  if (error) {
-    throw new Response(error.message || "Could not load balances.", {
+
+  const [manualRes, journalRes] = await Promise.all([
+    supabase
+      .from("manual_account_balances")
+      .select("account, balance_cents, as_of_date, updated_at")
+      .eq("tenant_id", tenant.tenantId)
+      .order("account", { ascending: true }),
+    supabase
+      .from("journal_entries")
+      .select("account, side, amount_cents")
+      .eq("tenant_id", tenant.tenantId),
+  ]);
+  if (manualRes.error) {
+    throw new Response(manualRes.error.message || "Could not load balances.", {
       status: 400,
     });
   }
-  return summarize(tenant, (data ?? []) as ManualBalanceDbRow[]);
+  if (journalRes.error) {
+    throw new Response(journalRes.error.message || "Could not load ledger.", {
+      status: 400,
+    });
+  }
+  return summarize(
+    tenant,
+    (manualRes.data ?? []) as ManualBalanceDbRow[],
+    (journalRes.data ?? []) as JournalEntryDbRow[],
+  );
 }
 
 export interface UpsertWorkspaceBalanceInput {

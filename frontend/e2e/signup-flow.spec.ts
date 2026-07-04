@@ -111,5 +111,50 @@ test.describe(
         "$12,500.00",
       );
     });
+
+    test("sample ingestion posts a double-entry ledger to the tenant (idempotent)", async ({
+      page,
+    }) => {
+      const email = `e2e-ingest-${Date.now()}@example.com`;
+      const password = "supersecret123";
+
+      await page.goto("/signup");
+      await page.waitForLoadState("networkidle");
+      await page.getByLabel("Email").fill(email);
+      await page.getByLabel("Password").fill(password);
+      await page.getByRole("button", { name: /create account/i }).click();
+      await expect(page).toHaveURL(/\/onboarding$/);
+      await page.getByRole("button", { name: /let's go/i }).click();
+      await page.getByLabel("Workspace name").fill("Ingest Co");
+      await page.getByRole("button", { name: /create workspace/i }).click();
+      await page.getByRole("button", { name: /go to my workspace/i }).click();
+      await expect(page).toHaveURL(/\/workspace$/);
+
+      // Run the ported pipeline over the built-in sample Akahu batch.
+      await page
+        .getByRole("button", { name: /load sample transactions/i })
+        .click();
+      await expect(
+        page.getByRole("heading", { name: "Synced ledger" }),
+      ).toBeVisible();
+
+      // Settlement-dated settled txns post; the PENDING one is skipped.
+      //   +5000 (salary) -1800 (rent) -89.99 (spark) -152.40 (groceries) = 2957.61
+      const ledgerPanel = page.locator(".ws-panel:has(#ws-ledger-heading)");
+      await expect(
+        ledgerPanel.getByRole("row", { name: /Assets:Bank:Everyday/ }),
+      ).toContainText("$2,957.61");
+      await expect(page.locator(".ws-metric__value").first()).toHaveText(
+        "$2,957.61",
+      );
+
+      // Idempotent: re-running does not double-count.
+      await page
+        .getByRole("button", { name: /load sample transactions/i })
+        .click();
+      await expect(page.locator(".ws-metric__value").first()).toHaveText(
+        "$2,957.61",
+      );
+    });
   },
 );

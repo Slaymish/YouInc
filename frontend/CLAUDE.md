@@ -76,8 +76,17 @@ The self-service flow lets anyone create an account and their own tenant. `src/l
 
 `src/server/workspaceLedger.ts` is the **tenant-scoped Postgres DAL** for the self-service `/workspace`. It reads/writes `manual_account_balances` through the request-cookie Supabase client (the user's RLS context — never service_role), always filtering/​setting `tenant_id` explicitly. `getWorkspaceLedger` summarizes into net worth / assets / liabilities using the SAME conventions as the SQLite dashboard (assets positive, liabilities negative, net worth = assets − liabilities; account "type" = first `:`-segment via `server/accountType.ts`). `upsertWorkspaceBalance` / `deleteWorkspaceBalance` are the mutations, surfaced by `components/workspace/ManualBalancesEditor.tsx`.
 
-- The pure `accountType` helper lives in its own `server/accountType.ts` so `workspaceLedger.test.ts` can unit-test it without dragging the Supabase client through the plugin-free vitest config.
-- **Still deferred (rest of P2):** journal-derived balances (Akahu ingestion → Postgres) are NOT read here yet — a fresh self-serve tenant only has the manual balances it enters. This is deliberately the honest self-service loop that needs no bank connection. The owner's rich SQLite `/dashboard` remains separate and single-tenant.
+- Pure helpers live in their own plugin-free modules so vitest can unit-test them without dragging in the Supabase client: `server/accountType.ts` and `server/workspaceSummary.ts` (`combineBalances` — the journal+manual merge with the manual-supersedes-parent rule and net-worth math).
+
+### Tenant ingestion (Phase 2, second slice)
+
+`src/server/tenantIngestion.ts` is the **WRITE half** of the multi-tenant ledger: it turns Akahu payloads into per-tenant `raw_transactions` + double-entry `journal_transactions`/`journal_entries` using the SAME ported engine the golden tests pin (`LedgerPipeline` + `RulesRouter`), persisted under the caller's RLS context.
+
+- The engine is synchronous but Supabase is async, so `ingestTenantPayloads` (1) preloads the tenant's existing raw hashes + journal external_ids + manual classifications, (2) runs the pure pipeline in-memory via a `CapturingLedgerStore` to compute exactly which rows are NEW, then (3) bulk-persists the deltas. Dedup on `idempotency_hash` / `external_id` makes re-runs converge (idempotent), matching the SQLite path.
+- `loadTenantRules` rebuilds the `RulesConfig` from the tenant's `classification_rules` / `account_mappings` / `nzfcc_mappings` rows (the DB form of the old `rules.yaml`), ordered by `(priority, seq)`.
+- `src/server/sampleIngestion.ts` (`loadSampleData`) seeds a starter account mapping + rules and ingests a built-in sample Akahu batch — the “Load sample transactions” button on `/workspace`. It's the demonstrable synced-ledger loop before Akahu OAuth ships.
+- `getWorkspaceLedger` now reads `journal_entries` (debit +, credit −) and merges them with manual balances via `combineBalances`; `/workspace` shows a “Synced ledger” panel when journal balances exist.
+- **Still deferred (rest of P2):** real Akahu OAuth connect + Vault token storage per `akahu_connections`, and growing `/workspace` toward the full widget dashboard. The owner's rich SQLite `/dashboard` remains separate and single-tenant.
 
 **Session gate (`start.ts`).** Uses a **protected-prefix** model, not an allowlist: only paths under `PROTECTED_PREFIXES` (`/dashboard`) require a passkey session; everything else (marketing, static, demo, and the Supabase auth flow) is public by default. **Adding a new public page needs no change here.** As defense in depth, every data/mutating server function still calls `requireSession()` (passkey) or checks the Supabase user itself, so data never leaves the server without auth even though the gate lets serverFn requests through.
 
