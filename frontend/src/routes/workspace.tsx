@@ -9,9 +9,11 @@ import { useState } from "react";
 import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { PRODUCT } from "~/components/marketing/config";
 import { ManualBalancesEditor } from "~/components/workspace/ManualBalancesEditor";
+import { AkahuConnectPanel } from "~/components/workspace/AkahuConnectPanel";
 import { formatMoney } from "~/components/widgets/format";
 import type { AccountState } from "~/server/accounts";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
+import type { AkahuConnectionStatus } from "~/server/akahuConnection";
 import "~/styles/auth.css";
 import "~/styles/workspace.css";
 
@@ -19,13 +21,20 @@ const loadWorkspace = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
     account: AccountState | null;
     ledger: WorkspaceLedgerSummary | null;
+    akahu: AkahuConnectionStatus | null;
   }> => {
     const { getAccountState } = await import("~/server/accounts");
     const account = await getAccountState();
-    if (!account || !account.tenant) return { account, ledger: null };
+    if (!account || !account.tenant)
+      return { account, ledger: null, akahu: null };
     const { getWorkspaceLedger } = await import("~/server/workspaceLedger");
-    const ledger = await getWorkspaceLedger();
-    return { account, ledger };
+    const { getAkahuConnectionStatus } =
+      await import("~/server/akahuConnection");
+    const [ledger, akahu] = await Promise.all([
+      getWorkspaceLedger(),
+      getAkahuConnectionStatus(),
+    ]);
+    return { account, ledger, akahu };
   },
 );
 
@@ -53,7 +62,11 @@ export const Route = createFileRoute("/workspace")({
     const data = await loadWorkspace();
     if (!data.account) throw redirect({ to: "/signin" });
     if (!data.account.tenant) throw redirect({ to: "/onboarding" });
-    return data as { account: AccountState; ledger: WorkspaceLedgerSummary };
+    return data as {
+      account: AccountState;
+      ledger: WorkspaceLedgerSummary;
+      akahu: AkahuConnectionStatus;
+    };
   },
   component: WorkspacePage,
 });
@@ -77,7 +90,7 @@ function Metric({
 }
 
 function WorkspacePage() {
-  const { account, ledger: initialLedger } = Route.useLoaderData();
+  const { account, ledger: initialLedger, akahu } = Route.useLoaderData();
   const router = useRouter();
   useLightTheme();
   const [busy, setBusy] = useState(false);
@@ -227,16 +240,22 @@ function WorkspacePage() {
           </section>
         ) : null}
 
+        <section className="ws-panel" aria-labelledby="ws-akahu-heading">
+          <div className="ws-panel__head">
+            <h2 id="ws-akahu-heading">Connect your bank</h2>
+          </div>
+          <div style={{ padding: "1.25rem" }}>
+            <AkahuConnectPanel status={akahu} onLedgerChange={setLedger} />
+          </div>
+        </section>
+
         <section className="ws-cards">
           <article className="ws-card">
-            <h3>Connect a bank</h3>
+            <h3>Try it with sample data</h3>
             <p>
-              Securely link your accounts through Akahu, New Zealand's
-              open-finance provider, to keep balances current automatically.
+              No bank connected yet? Load a sample transaction batch to see a
+              synced double-entry ledger in action.
             </p>
-            <button className="auth-primary" type="button" disabled>
-              Connect via Akahu (coming soon)
-            </button>
             <button
               className="auth-secondary"
               type="button"
@@ -253,13 +272,7 @@ function WorkspacePage() {
               >
                 {sampleError}
               </small>
-            ) : (
-              <small className="ws-card__note">
-                Manual accounts work today. Try “Load sample transactions” to
-                see a synced double-entry ledger in action before Akahu sync
-                ships.
-              </small>
-            )}
+            ) : null}
           </article>
           <article className="ws-card">
             <h3>See the full dashboard</h3>

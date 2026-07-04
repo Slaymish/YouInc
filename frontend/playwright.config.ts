@@ -10,6 +10,12 @@ export default defineConfig({
     url: "http://localhost:3000/",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    env: { YOUINC_LEADS_DB_PATH: "./.e2e-leads.sqlite3" },
+    env: {
+      YOUINC_LEADS_DB_PATH: "./.e2e-leads.sqlite3",
+      // Point the app at the mock Akahu server the signup-flow spec starts on
+      // :59999. Harmless when the Akahu test is skipped (no server listening).
+      AKAHU_APP_TOKEN: "app_token_e2e",
+      AKAHU_BASE_URL: "http://127.0.0.1:59999",
+    },
   },
 });

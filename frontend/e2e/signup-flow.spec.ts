@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import http from "node:http";
+import type { Server } from "node:http";
 
 // End-to-end self-service signup → onboarding → workspace flow. This exercises
 // the real Supabase Auth + create_tenant RPC path, so it needs a running local
@@ -155,6 +157,111 @@ test.describe(
       await expect(page.locator(".ws-metric__value").first()).toHaveText(
         "$2,957.61",
       );
+    });
+
+    test("connect Akahu (Vault), list accounts, sync, and disconnect", async ({
+      page,
+    }) => {
+      // Mock the Akahu API on the port the dev server's AKAHU_BASE_URL points at
+      // (see playwright.config.ts). Serves one account and two settled txns.
+      const mock: Server = http.createServer((req, res) => {
+        res.setHeader("content-type", "application/json");
+        const url = req.url ?? "";
+        if (url.startsWith("/accounts/") && url.includes("/transactions")) {
+          res.end(
+            JSON.stringify({
+              items: [
+                {
+                  _id: "akx_1",
+                  _account: "acc_mock_1",
+                  status: "SETTLED",
+                  date: "2026-06-01",
+                  settlement_date: "2026-06-01",
+                  amount: 4200.0,
+                  currency: "NZD",
+                  description: "PAYROLL",
+                  merchant: { name: "Employer" },
+                },
+                {
+                  _id: "akx_2",
+                  _account: "acc_mock_1",
+                  status: "SETTLED",
+                  date: "2026-06-02",
+                  settlement_date: "2026-06-02",
+                  amount: -60.0,
+                  currency: "NZD",
+                  description: "GROCERIES",
+                  merchant: { name: "Countdown" },
+                },
+              ],
+            }),
+          );
+        } else if (url.startsWith("/accounts")) {
+          res.end(
+            JSON.stringify({
+              items: [
+                { _id: "acc_mock_1", name: "Mock Everyday", status: "ACTIVE" },
+              ],
+            }),
+          );
+        } else {
+          res.statusCode = 404;
+          res.end("{}");
+        }
+      });
+      await new Promise<void>((resolve) => mock.listen(59999, resolve));
+
+      try {
+        const email = `e2e-akahu-${Date.now()}@example.com`;
+        await page.goto("/signup");
+        await page.waitForLoadState("networkidle");
+        await page.getByLabel("Email").fill(email);
+        await page.getByLabel("Password").fill("supersecret123");
+        await page.getByRole("button", { name: /create account/i }).click();
+        await expect(page).toHaveURL(/\/onboarding$/);
+        await page.getByRole("button", { name: /let's go/i }).click();
+        await page.getByLabel("Workspace name").fill("Akahu Co");
+        await page.getByRole("button", { name: /create workspace/i }).click();
+        await page.getByRole("button", { name: /go to my workspace/i }).click();
+        await expect(page).toHaveURL(/\/workspace$/);
+
+        // Connect: token is stored encrypted in Vault via the connect_akahu RPC.
+        await page.getByLabel("Akahu user token").fill("user_token_mock_abc");
+        await page.getByRole("button", { name: /connect akahu/i }).click();
+        await expect(page.getByText(/connected to akahu/i)).toBeVisible();
+
+        // List the authorized accounts (hits the mock /accounts).
+        await page.getByRole("button", { name: /load my accounts/i }).click();
+        await expect(page.getByText("Mock Everyday")).toBeVisible();
+
+        // Sync pulls txns → ingests to Postgres. Bank balance = 4200 - 60 = 4140.
+        await page
+          .getByRole("listitem")
+          .filter({ hasText: "Mock Everyday" })
+          .getByRole("button", { name: "Sync" })
+          .click();
+        await expect(page.getByText(/synced 2 transactions/i)).toBeVisible();
+        await expect(
+          page.getByRole("heading", { name: "Synced ledger" }),
+        ).toBeVisible();
+        await expect(page.locator(".ws-metric__value").first()).toHaveText(
+          "$4,140.00",
+        );
+
+        // Idempotent re-sync.
+        await page
+          .getByRole("listitem")
+          .filter({ hasText: "Mock Everyday" })
+          .getByRole("button", { name: "Sync" })
+          .click();
+        await expect(page.getByText(/2 already seen/i)).toBeVisible();
+
+        // Disconnect removes the Vault secret and revokes the connection.
+        await page.getByRole("button", { name: /disconnect/i }).click();
+        await expect(page.getByText(/akahu disconnected/i)).toBeVisible();
+      } finally {
+        await new Promise<void>((resolve) => mock.close(() => resolve()));
+      }
     });
   },
 );

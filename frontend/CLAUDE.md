@@ -86,7 +86,14 @@ The self-service flow lets anyone create an account and their own tenant. `src/l
 - `loadTenantRules` rebuilds the `RulesConfig` from the tenant's `classification_rules` / `account_mappings` / `nzfcc_mappings` rows (the DB form of the old `rules.yaml`), ordered by `(priority, seq)`.
 - `src/server/sampleIngestion.ts` (`loadSampleData`) seeds a starter account mapping + rules and ingests a built-in sample Akahu batch — the “Load sample transactions” button on `/workspace`. It's the demonstrable synced-ledger loop before Akahu OAuth ships.
 - `getWorkspaceLedger` now reads `journal_entries` (debit +, credit −) and merges them with manual balances via `combineBalances`; `/workspace` shows a “Synced ledger” panel when journal balances exist.
-- **Still deferred (rest of P2):** real Akahu OAuth connect + Vault token storage per `akahu_connections`, and growing `/workspace` toward the full widget dashboard. The owner's rich SQLite `/dashboard` remains separate and single-tenant.
+### Akahu connect + live sync (Phase 2, third slice)
+
+Self-service tenants connect their own bank via Akahu:
+- **Auth model:** the Akahu APP token is a server-wide secret (`AKAHU_APP_TOKEN` env, never in the client bundle); each user supplies their enduring USER token via the `/workspace` connect form. The user token is stored **encrypted in Supabase Vault** through `SECURITY DEFINER` RPCs (`connect_akahu` / `get_akahu_user_token` / `disconnect_akahu`, migration `20260704120006`) — only the secret uuid lands on `akahu_connections`, and the token is read server-side only, never returned to the browser.
+- `src/server/akahuClient.ts` — a TS port of the Python `AkahuClient` (same headers, cursor pagination, error messages) using `fetch`.
+- `src/server/akahuConnection.ts` — orchestration: `connectAkahu` / `disconnectAkahu` / `getAkahuConnectionStatus` / `listConnectedAccounts` / `syncAkahuAccount` (pulls txns → `ingestTenantPayloads` → Postgres, updates `last_synced_at`, idempotent).
+- `src/components/workspace/AkahuConnectPanel.tsx` — the connect/list/sync/disconnect UI on `/workspace`. When no app token is configured it degrades to a “not enabled” note (manual accounts + sample data still work).
+- **Still deferred (rest of P2):** growing `/workspace` toward the full widget dashboard; per-tenant rules/classification editing UI; scheduled/background sync (currently on-demand per account). The owner's rich SQLite `/dashboard` remains separate and single-tenant.
 
 **Session gate (`start.ts`).** Uses a **protected-prefix** model, not an allowlist: only paths under `PROTECTED_PREFIXES` (`/dashboard`) require a passkey session; everything else (marketing, static, demo, and the Supabase auth flow) is public by default. **Adding a new public page needs no change here.** As defense in depth, every data/mutating server function still calls `requireSession()` (passkey) or checks the Supabase user itself, so data never leaves the server without auth even though the gate lets serverFn requests through.
 

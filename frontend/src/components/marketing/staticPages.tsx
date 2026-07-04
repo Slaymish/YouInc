@@ -652,7 +652,8 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         items: [
           "Opened self-service signup: create an account and your own workspace directly, with a short guided onboarding — the old waitlist is gone from the self-serve path.",
           "Your workspace now shows a live net-worth, assets, and liabilities summary, with a built-in editor to add, update, and remove accounts by hand.",
-          "Added a synced double-entry ledger: workspace balances can now be derived from posted transactions, with a 'Load sample transactions' option to see it in action before bank sync ships.",
+          "Added live bank sync: connect your bank through Akahu from your workspace and pull transactions into a synced double-entry ledger. Your Akahu token is stored encrypted and never shown again, and disconnecting removes it.",
+          "Added a synced double-entry ledger with a 'Load sample transactions' option to see it in action before you connect a bank.",
           "Each workspace is fully isolated: your data is scoped to your own tenant and protected by row-level security.",
           "Added a 'check your email' confirmation step for new signups where email verification is required.",
         ],
@@ -694,7 +695,8 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       {
         title: "Now",
         items: [
-          "Self-service signup and onboarding: create your own workspace and start tracking net worth from manual accounts today.",
+          "Self-service signup and onboarding: create your own workspace and start tracking net worth today.",
+          "Live bank sync via Akahu for self-serve workspaces: connect your account and pull transactions into a synced ledger.",
           "Public demo, pricing comparison, widget library, and custom-build explanation.",
           "V1 privacy, terms, security, data controls, docs, and support pages.",
         ],
@@ -702,10 +704,10 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       {
         title: "Next",
         items: [
-          "Automatic bank sync via Akahu for self-serve workspaces, so balances stay current without manual updates.",
-          "Grow the workspace into the full widget dashboard once live transactions post to your ledger.",
-          "Clearer onboarding docs for Akahu connection, manual accounts, exports, and dashboard customization.",
-          "More export examples and ledger troubleshooting guides.",
+          "Scheduled/background bank sync so balances stay current without manual refreshes.",
+          "Grow the workspace into the full widget dashboard once more report views are ported.",
+          "Per-tenant classification rules editing so you can re-route transactions.",
+          "Clearer onboarding docs for Akahu connection, manual accounts, exports, and customization.",
         ],
       },
       {

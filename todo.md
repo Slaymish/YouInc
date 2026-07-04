@@ -48,10 +48,18 @@ Done:
   `journal_transactions`/`journal_entries` under RLS, idempotently. `getWorkspaceLedger` now merges
   journal + manual balances (`combineBalances`), and `/workspace` has a “Load sample transactions”
   action + a “Synced ledger” panel. E2E-covered (posts, skips pending, idempotent).
-- [ ] Self-service follow-ups (rest of Phase 2): (a) real Akahu connect flow for self-serve tenants
-  (OAuth + Vault token storage per `akahu_connections`), replacing the sample-data button with a
-  live sync; (b) grow `/workspace` toward the full widget dashboard (reuse DashboardGrid on the
-  per-tenant `LedgerDashboardData` once the remaining read aggregates are ported); (c) per-tenant
-  rules/classification editing UI so users can re-route transactions.
+- [x] Akahu connect + live sync (Phase 2, third slice): migration
+  `20260704120006` adds Vault-backed `SECURITY DEFINER` token RPCs (verified by
+  `supabase/tests/akahu_connection.sql`). Frontend TS Akahu client
+  (`server/akahuClient.ts`), connect/list/sync/disconnect orchestration
+  (`server/akahuConnection.ts`), and the `/workspace` `AkahuConnectPanel`. Users
+  paste their Akahu user token (stored encrypted in Vault, never returned to the
+  browser), list accounts, and sync transactions into their per-tenant ledger.
+  E2E-covered against a mock Akahu API (connect → list → sync → idempotent →
+  disconnect).
+- [ ] Self-service follow-ups (rest of Phase 2): (a) grow `/workspace` toward the full widget
+  dashboard (reuse DashboardGrid on the per-tenant `LedgerDashboardData` once the remaining read
+  aggregates are ported); (b) per-tenant rules/classification editing UI so users can re-route
+  transactions; (c) scheduled/background Akahu sync (currently on-demand per account).
 - [ ] Maybe work on infra: How this is all hosted and secure. (untracked supabase/ migrations + docs/architecture/ + tests/golden/ from separate work exist in the repo — not part of the marketing revamp branch)
 - [ ] Optional polish (from review): demo opens with the red "books not decision-grade" exception from 50 sample suspense items — honest but alarming as a first impression; consider a calmer sample backlog. Action Center widget is tall/sparse at its default size.
