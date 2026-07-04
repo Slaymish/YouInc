@@ -9,11 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WidgetsRouteImport } from './routes/widgets'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CustomBuildsRouteImport } from './routes/custom-builds'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WidgetsRoute = WidgetsRouteImport.update({
+  id: '/widgets',
+  path: '/widgets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -29,6 +36,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomBuildsRoute = CustomBuildsRouteImport.update({
+  id: '/custom-builds',
+  path: '/custom-builds',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,40 +49,68 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/custom-builds': typeof CustomBuildsRoute
   '/dashboard': typeof DashboardRoute
   '/demo': typeof DemoRoute
   '/login': typeof LoginRoute
+  '/widgets': typeof WidgetsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/custom-builds': typeof CustomBuildsRoute
   '/dashboard': typeof DashboardRoute
   '/demo': typeof DemoRoute
   '/login': typeof LoginRoute
+  '/widgets': typeof WidgetsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/custom-builds': typeof CustomBuildsRoute
   '/dashboard': typeof DashboardRoute
   '/demo': typeof DemoRoute
   '/login': typeof LoginRoute
+  '/widgets': typeof WidgetsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/demo' | '/login'
+  fullPaths:
+    | '/'
+    | '/custom-builds'
+    | '/dashboard'
+    | '/demo'
+    | '/login'
+    | '/widgets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/demo' | '/login'
-  id: '__root__' | '/' | '/dashboard' | '/demo' | '/login'
+  to: '/' | '/custom-builds' | '/dashboard' | '/demo' | '/login' | '/widgets'
+  id:
+    | '__root__'
+    | '/'
+    | '/custom-builds'
+    | '/dashboard'
+    | '/demo'
+    | '/login'
+    | '/widgets'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CustomBuildsRoute: typeof CustomBuildsRoute
   DashboardRoute: typeof DashboardRoute
   DemoRoute: typeof DemoRoute
   LoginRoute: typeof LoginRoute
+  WidgetsRoute: typeof WidgetsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/widgets': {
+      id: '/widgets'
+      path: '/widgets'
+      fullPath: '/widgets'
+      preLoaderRoute: typeof WidgetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -92,6 +132,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/custom-builds': {
+      id: '/custom-builds'
+      path: '/custom-builds'
+      fullPath: '/custom-builds'
+      preLoaderRoute: typeof CustomBuildsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,9 +151,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CustomBuildsRoute: CustomBuildsRoute,
   DashboardRoute: DashboardRoute,
   DemoRoute: DemoRoute,
   LoginRoute: LoginRoute,
+  WidgetsRoute: WidgetsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

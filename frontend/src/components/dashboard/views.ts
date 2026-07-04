@@ -113,10 +113,23 @@ const VIEW_BLUEPRINTS: ViewBlueprint[] = [
   },
 ];
 
-export function defaultViews(): DashboardView[] {
+/**
+ * Builds the curated default tabs. When `allowedWidgetIds` is given (e.g. the
+ * public /demo route), each blueprint's widget list is filtered down to the
+ * allowlist first, and any blueprint left with zero widgets is dropped
+ * entirely rather than rendered as an empty tab.
+ */
+export function defaultViews(allowedWidgetIds?: WidgetId[]): DashboardView[] {
+  const allowed = allowedWidgetIds ? new Set(allowedWidgetIds) : null;
   return VIEW_BLUEPRINTS.map((blueprint) => ({
     id: blueprint.id,
     name: blueprint.name,
-    layout: packLayout(blueprint.ids),
-  }));
+    ids: allowed ? blueprint.ids.filter((id) => allowed.has(id)) : blueprint.ids,
+  }))
+    .filter((blueprint) => blueprint.ids.length > 0)
+    .map((blueprint) => ({
+      id: blueprint.id,
+      name: blueprint.name,
+      layout: packLayout(blueprint.ids),
+    }));
 }

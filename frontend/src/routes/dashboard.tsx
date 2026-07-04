@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { LedgerDashboardData } from "~/server/ledger";
 import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
 import { useTheme } from "~/hooks/useTheme";
+import { formatDateTime } from "~/components/widgets/format";
 import "~/components/dashboard/dashboard.css";
 
 const getLedgerDashboard = createServerFn({ method: "GET" }).handler(async () => {
@@ -21,13 +22,6 @@ export const Route = createFileRoute("/dashboard")({
   loader: async () => getLedgerDashboard(),
   component: DashboardPage,
 });
-
-function formatDateTime(value: string | null) {
-  if (!value) return "n/a";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-NZ", { dateStyle: "medium", timeStyle: "short" }).format(date);
-}
 
 function EmptyLedgerState({ dashboard }: { dashboard: LedgerDashboardData }) {
   return (

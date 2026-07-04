@@ -11,7 +11,7 @@ Local-first Personal ERP and Akahu/BNZ Open Finance ledger engine.
 - Exports hledger-compatible plain text accounting journals.
 - Provides a local Streamlit BI dashboard for balance sheet and P&L reporting.
 
-See `docs/architecture_design.md` for the Phase 1 architecture design and `docs/persona_frontend_information_design.md` for the persona-led frontend, information model, and ingestion design.
+See `docs/architecture_design.md` for the Phase 1 architecture design, `docs/persona_frontend_information_design.md` for the persona-led frontend, information model, and ingestion design, and `docs/research_competitors.md` for the competitor landscape, positioning, and pricing research.
 
 ## Quick start
 
@@ -62,6 +62,12 @@ python -m streamlit run src/youinc_ledger/bi_reporting/dashboard.py
 
 A React frontend lives in `frontend/` and reads the same local SQLite ledger through TanStack Start server functions. It also exposes local live-ingestion controls and source-account mapping edits backed by `config/rules.yaml`. The frontend uses [pnpm](https://pnpm.io/).
 
+The same app serves the public marketing site: the landing page at `/`, a live demo at
+`/demo` (the real dashboard UI running on sample data — layout edits persist under a separate
+localStorage key and never touch your real board), the bespoke-service page at
+`/custom-builds`, and a live widget catalogue at `/widgets`. Everything else is
+passkey-gated (see "Publishing the frontend publicly" below).
+
 The simplest way to run it is `./youinc frontend` from the repo root. To run it directly:
 
 ```sh
@@ -87,8 +93,9 @@ AKAHU_CA_BUNDLE=/absolute/path/to/network-or-corporate-ca.pem
 
 ### Publishing the frontend publicly
 
-This dashboard reads your real financial ledger, so it is gated behind a
-**passkey (WebAuthn)** login — the whole app redirects to `/login` until you
+The dashboard reads your real financial ledger, so it is gated behind a
+**passkey (WebAuthn)** login — every route except the public marketing pages
+(`/`, `/demo`, `/custom-builds`, `/widgets`) redirects to `/login` until you
 authenticate. To enrol your first passkey, set `YOUINC_ENROLLMENT_TOKEN` (in
 `frontend/.env` or your host's env settings), open `/login`, use "Enrol a new
 passkey", then unset the token to disable further registration. After that,

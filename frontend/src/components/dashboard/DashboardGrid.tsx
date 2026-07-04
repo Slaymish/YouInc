@@ -21,9 +21,21 @@ const ROW_HEIGHT = 80;
 
 interface DashboardGridProps {
   dashboard: LedgerDashboardData;
+  /**
+   * localStorage key to persist the layout under. Defaults to the real
+   * dashboard's key; pass a distinct key (e.g. on the public /demo route) so
+   * edits to sample data never read from or clobber a real user's layout.
+   */
+  storageKey?: string;
+  /**
+   * When set, restricts the widget picker and default views to this set of
+   * widget ids. Used by the public /demo route to keep session-gated,
+   * mutation-triggering widgets off a page rendered without a session.
+   */
+  allowedWidgetIds?: WidgetId[];
 }
 
-export function DashboardGrid({ dashboard }: DashboardGridProps) {
+export function DashboardGrid({ dashboard, storageKey, allowedWidgetIds }: DashboardGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
   const [replacingId, setReplacingId] = useState<string | null>(null);
@@ -51,7 +63,7 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
     addWidget,
     removeWidget,
     replaceWidget,
-  } = useDashboardLayout();
+  } = useDashboardLayout({ storageKey, allowedWidgetIds });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -208,6 +220,7 @@ export function DashboardGrid({ dashboard }: DashboardGridProps) {
         <WidgetPicker
           layout={layout}
           replacingId={replacingId ?? undefined}
+          allowedWidgetIds={allowedWidgetIds}
           onAdd={(id) => {
             if (replacingId) {
               replaceWidget(replacingId, id);

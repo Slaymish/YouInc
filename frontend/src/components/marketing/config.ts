@@ -14,10 +14,10 @@ export const BOOKING_URL: string = resolveBookingUrl(
 
 export const PRODUCT = {
   name: "YouInc",
-  heroEyebrow: "Personal ERP · Live open banking",
+  heroEyebrow: "Personal ERP · Live via Akahu open banking",
   heroHeadline: "Run yourself like a company.",
   heroSub:
-    "Connect your bank, watch it sync live, and get a dashboard built exactly for how you think about money. Need a widget that doesn't exist yet? I build it for you.",
+    "You already have revenue, burn rate, and runway — you just can't see them. YouInc pulls every account into one live double-entry ledger and turns it into your executive dashboard. And when the widget you need doesn't exist, I build it for you.",
 } as const;
 
 export const PRICING = {
@@ -36,6 +36,7 @@ export const PRICING = {
       "Your bank, live via Akahu",
       "All pre-built widgets",
       "Customize order & layout",
+      "Export your full ledger anytime — plain-text journals, no lock-in",
       "Email support",
     ],
   },
@@ -46,7 +47,8 @@ export const PRICING = {
     cta: "Book a call",
     features: [
       "Everything in Self-serve",
-      "Bespoke widgets & integrations, built for you",
+      "Bespoke widgets, integrations & AI agents, built for you",
+      "Scoped one-off builds from NZD $1,500",
       "Direct line — book a call anytime",
     ],
   },

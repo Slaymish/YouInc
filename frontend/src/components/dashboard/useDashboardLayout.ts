@@ -8,55 +8,12 @@ import {
 import type { WidgetPlacement } from "./grid";
 import { WIDGET_MAP } from "./widgets";
 import type { WidgetId } from "./widgets";
-import { defaultViews, type DashboardView } from "./views";
-
-// Bumped to v2 for the journey-based default tabs (This Week / Cash Flow /
-// Wealth / Books). The v1 layout would otherwise shadow the new defaults.
-const STORAGE_KEY = "youinc-dashboard-views-v2";
-
-interface DashboardState {
-  views: DashboardView[];
-  activeId: string;
-}
-
-function loadState(): DashboardState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (
-        parsed &&
-        Array.isArray(parsed.views) &&
-        parsed.views.length > 0 &&
-        parsed.views.every(
-          (v: unknown): v is DashboardView =>
-            !!v &&
-            typeof (v as DashboardView).id === "string" &&
-            Array.isArray((v as DashboardView).layout),
-        )
-      ) {
-        const activeId = parsed.views.some(
-          (v: DashboardView) => v.id === parsed.activeId,
-        )
-          ? parsed.activeId
-          : parsed.views[0].id;
-        return { views: parsed.views, activeId };
-      }
-    }
-  } catch {
-    // fall through to defaults
-  }
-  const views = defaultViews();
-  return { views, activeId: views[0].id };
-}
-
-function persist(state: DashboardState) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // ignore quota/availability errors
-  }
-}
+import {
+  DEFAULT_DASHBOARD_STORAGE_KEY,
+  loadDashboardState,
+  persistDashboardState,
+  type DashboardState,
+} from "./dashboardStorage";
 
 function newViewId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -70,10 +27,35 @@ export interface DashboardViewMeta {
   name: string;
 }
 
-export function useDashboardLayout() {
-  const [state, setState] = useState<DashboardState>(loadState);
+export interface UseDashboardLayoutOptions {
+  /**
+   * localStorage key to persist under. Defaults to the real dashboard's key.
+   * Callers that render sample data on a public page (e.g. /demo) must pass
+   * a distinct key so demo edits never read from or clobber a real user's
+   * saved layout.
+   */
+  storageKey?: string;
+  /**
+   * When set, restricts default views, persisted layouts, and widget
+   * additions/replacements to this set of widget ids. Used by the public
+   * /demo route to keep session-gated, mutation-triggering widgets off a
+   * page that has no session.
+   */
+  allowedWidgetIds?: WidgetId[];
+}
+
+export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
+  const { storageKey = DEFAULT_DASHBOARD_STORAGE_KEY, allowedWidgetIds } = options;
+  const [state, setState] = useState<DashboardState>(() =>
+    loadDashboardState(storageKey, allowedWidgetIds),
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [snapshot, setSnapshot] = useState<WidgetPlacement[] | null>(null);
+
+  const isWidgetAllowed = useCallback(
+    (id: WidgetId) => !allowedWidgetIds || allowedWidgetIds.includes(id),
+    [allowedWidgetIds],
+  );
 
   const activeView =
     state.views.find((view) => view.id === state.activeId) ?? state.views[0];
@@ -103,12 +85,12 @@ export function useDashboardLayout() {
 
   const saveEdits = useCallback(() => {
     setState((prev) => {
-      persist(prev);
+      persistDashboardState(storageKey, prev);
       return prev;
     });
     setSnapshot(null);
     setIsEditing(false);
-  }, []);
+  }, [storageKey]);
 
   const cancelEdits = useCallback(() => {
     if (snapshot) {
@@ -160,6 +142,7 @@ export function useDashboardLayout() {
 
   const addWidget = useCallback(
     (id: WidgetId) => {
+      if (!isWidgetAllowed(id)) return;
       updateActiveLayout((prev) => {
         if (prev.find((w) => w.id === id)) return prev;
         const def = WIDGET_MAP.get(id);
@@ -175,7 +158,7 @@ export function useDashboardLayout() {
         return compact([...prev, placement]);
       });
     },
-    [updateActiveLayout],
+    [updateActiveLayout, isWidgetAllowed],
   );
 
   const removeWidget = useCallback(
@@ -187,13 +170,14 @@ export function useDashboardLayout() {
 
   const replaceWidget = useCallback(
     (oldId: string, newId: WidgetId) => {
+      if (!isWidgetAllowed(newId)) return;
       updateActiveLayout((prev) => {
         if (!prev.find((w) => w.id === oldId)) return prev;
         if (prev.find((w) => w.id === newId)) return prev;
         return prev.map((w) => (w.id === oldId ? { ...w, id: newId } : w));
       });
     },
-    [updateActiveLayout],
+    [updateActiveLayout, isWidgetAllowed],
   );
 
   // ── View (tab) management ──
@@ -219,11 +203,11 @@ export function useDashboardLayout() {
       setState((prev) => {
         if (!prev.views.some((view) => view.id === id)) return prev;
         const next = { ...prev, activeId: id };
-        persist(next);
+        persistDashboardState(storageKey, next);
         return next;
       });
     },
-    [discardEdit],
+    [discardEdit, storageKey],
   );
 
   const addView = useCallback(() => {
@@ -235,42 +219,48 @@ export function useDashboardLayout() {
         views: [...prev.views, { id, name, layout: [] }],
         activeId: id,
       };
-      persist(next);
+      persistDashboardState(storageKey, next);
       return next;
     });
     setIsEditing(true);
     setSnapshot([]);
-  }, [discardEdit]);
+  }, [discardEdit, storageKey]);
 
-  const renameView = useCallback((id: string, name: string) => {
-    setState((prev) => {
-      const next = {
-        ...prev,
-        views: prev.views.map((view) =>
-          view.id === id ? { ...view, name } : view,
-        ),
-      };
-      persist(next);
-      return next;
-    });
-  }, []);
+  const renameView = useCallback(
+    (id: string, name: string) => {
+      setState((prev) => {
+        const next = {
+          ...prev,
+          views: prev.views.map((view) =>
+            view.id === id ? { ...view, name } : view,
+          ),
+        };
+        persistDashboardState(storageKey, next);
+        return next;
+      });
+    },
+    [storageKey],
+  );
 
-  const deleteView = useCallback((id: string) => {
-    setSnapshot(null);
-    setIsEditing(false);
-    setState((prev) => {
-      if (prev.views.length <= 1) return prev;
-      const index = prev.views.findIndex((view) => view.id === id);
-      const views = prev.views.filter((view) => view.id !== id);
-      const activeId =
-        prev.activeId === id
-          ? views[Math.max(0, index - 1)].id
-          : prev.activeId;
-      const next = { views, activeId };
-      persist(next);
-      return next;
-    });
-  }, []);
+  const deleteView = useCallback(
+    (id: string) => {
+      setSnapshot(null);
+      setIsEditing(false);
+      setState((prev) => {
+        if (prev.views.length <= 1) return prev;
+        const index = prev.views.findIndex((view) => view.id === id);
+        const views = prev.views.filter((view) => view.id !== id);
+        const activeId =
+          prev.activeId === id
+            ? views[Math.max(0, index - 1)].id
+            : prev.activeId;
+        const next = { views, activeId };
+        persistDashboardState(storageKey, next);
+        return next;
+      });
+    },
+    [storageKey],
+  );
 
   const views: DashboardViewMeta[] = state.views.map((view) => ({
     id: view.id,

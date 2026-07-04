@@ -12,14 +12,25 @@ interface WidgetPickerProps {
   onAdd: (id: WidgetId) => void;
   onClose: () => void;
   replacingId?: string;
+  /** When set, only these widget ids are offered (e.g. the public /demo route). */
+  allowedWidgetIds?: WidgetId[];
 }
 
-export function WidgetPicker({ layout, onAdd, onClose, replacingId }: WidgetPickerProps) {
+export function WidgetPicker({
+  layout,
+  onAdd,
+  onClose,
+  replacingId,
+  allowedWidgetIds,
+}: WidgetPickerProps) {
   const activeIds = new Set(layout.map((w) => w.id).filter((id) => id !== replacingId));
+  const allowed = allowedWidgetIds ? new Set(allowedWidgetIds) : null;
 
   const byCategory = CATEGORY_ORDER.reduce<Record<WidgetCategory, typeof WIDGET_REGISTRY>>(
     (acc, cat) => {
-      acc[cat] = WIDGET_REGISTRY.filter((w) => w.category === cat && !activeIds.has(w.id));
+      acc[cat] = WIDGET_REGISTRY.filter(
+        (w) => w.category === cat && !activeIds.has(w.id) && (!allowed || allowed.has(w.id)),
+      );
       return acc;
     },
     {} as Record<WidgetCategory, typeof WIDGET_REGISTRY>,
