@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pytest
 
+from read_model_support import capture_read_model
 from youinc_ledger.cli import cmd_sync
 from youinc_ledger.ledger_pipeline.pipeline import LedgerPipeline
 from youinc_ledger.models import RawTransaction
@@ -209,7 +210,27 @@ def test_journal_balancing_golden(case: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
-# 5. sync-state cursor (last_sync:{account_id})
+# 5. read-DAL: balances / income statement / journal rows / hledger export
+# ---------------------------------------------------------------------------
+
+READ_MODEL_CASES = _load("read_model.json")["cases"]
+
+
+@pytest.mark.parametrize("case", READ_MODEL_CASES, ids=_case_id)
+def test_read_model_golden(case: dict) -> None:
+    """Pins the read side of LedgerDatabase over the journal_balancing corpus:
+    fetch_balances (debit-positive signed sum, grouped by account+currency),
+    fetch_income_statement (credit-positive, Income:/Expenses: only, by month),
+    fetch_journal_rows (one row per posting in transaction_date/insertion
+    order), and ledger_exporter.export_hledger's exact text formatting. These
+    were previously listed as "not pinned" in README.md and are the read-model
+    parity contract for the TypeScript port."""
+    outcome = capture_read_model(case["input"])
+    assert outcome == case["expected"]
+
+
+# ---------------------------------------------------------------------------
+# 6. sync-state cursor (last_sync:{account_id})
 # ---------------------------------------------------------------------------
 
 SYNC_STATE_FIXTURE = _load("sync_state.json")

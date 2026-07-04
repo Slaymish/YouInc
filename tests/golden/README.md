@@ -51,6 +51,7 @@ compare, sidestepping the need to reproduce Python's `str()` formatting.
 | Source-account -> ledger-account mapping, unmapped-account-id sanitization | `youinc_ledger.rules_router.rules.RulesRouter.account_mapping_for` | `fixtures/account_mapping.json` |
 | Double-entry balancing, sign->debit/credit convention, manual-classification override precedence, duplicate/pending/zero-amount handling, `PipelineResult` counters | `youinc_ledger.ledger_pipeline.pipeline.LedgerPipeline.process_payloads` (+ `youinc_ledger.models.JournalTransaction.validate_balanced`) | `fixtures/journal_balancing.json` |
 | Sync cursor key format and advancement logic | `youinc_ledger.cli.cmd_sync` (`last_sync:{account_id}` via `youinc_ledger.persistence_layer.db.LedgerDatabase.get_sync_state`/`set_sync_state`) | `fixtures/sync_state.json` + `fixtures/sync_state_mock_batch1.json` |
+| Read-DAL: balances (debit-positive signed sum, grouped by account+currency), income statement (credit-positive, `Income:`/`Expenses:` only, by month), journal rows (one row per posting, `transaction_date`/insertion order), and hledger export text formatting | `youinc_ledger.persistence_layer.db.LedgerDatabase.fetch_balances`/`fetch_income_statement`/`fetch_journal_rows`, `youinc_ledger.persistence_layer.ledger_exporter.export_hledger` | `fixtures/read_model.json` |
 
 Runner: `test_golden_fixtures.py` (pytest). It imports the real engine,
 re-derives outputs from each fixture's `input`, and asserts equality against
@@ -148,13 +149,18 @@ simultaneously with its own parity fixtures.
 
 ## Coverage gaps / not pinned here
 
-- **`ledger_exporter.py` (hledger export)**, **`bi_reporting/dashboard.py`**
-  (Streamlit UI), **`rules_editor.py`**'s YAML-file-mutation formatting, and
-  **`akahu_client.py`**'s live HTTP behavior (pagination, rate limiting,
-  auth) are out of scope for this phase -- they are not in the "silent
-  divergence risk" list and are not pure functions in the same sense. Flag
-  for a follow-up phase if the TS port needs parity on hledger export
-  formatting specifically.
+- **`ledger_exporter.py` (hledger export)** and the read-DAL query methods
+  (`fetch_balances`/`fetch_income_statement`/`fetch_journal_rows`) are **now
+  pinned** in `fixtures/read_model.json` (added after the Phase 0.5 baseline;
+  captured via `generate_read_model_fixture.py`, which replays the
+  `journal_balancing` corpus through the pipeline and reads the four surfaces
+  back out). The TS port proves parity in
+  `frontend/src/server/ledger-engine/readModel.golden.test.ts`.
+- **`bi_reporting/dashboard.py`** (Streamlit UI), **`rules_editor.py`**'s
+  YAML-file-mutation formatting, and **`akahu_client.py`**'s live HTTP behavior
+  (pagination, rate limiting, auth) remain out of scope for this phase -- they
+  are not in the "silent divergence risk" list and are not pure functions in
+  the same sense.
 - **`reclassify_existing_journals`** (bulk rebuild path) is not separately
   pinned; it shares `_build_journal_transaction` with `process_payloads`,
   which is fully covered.
