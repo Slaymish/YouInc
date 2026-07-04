@@ -769,6 +769,27 @@
         "matched_by": "suspense",
         "memo": null
       }
+    },
+    {
+      "case_id": "synthetic_nzfcc_mapping_fallback",
+      "source": "synthetic",
+      "note": "No rule matches the description, but the txn carries an nzfcc code the nzfcc_mappings know -> routes via the nzfcc fallback (matched_by 'nzfcc', rule_id 'nzfcc:{code}', memo null). This is the ONLY case that exercises route()'s second branch; every 'real' case has category {} (Python-falsy) so txn.nzfcc is null. expected derived by running the real Python RulesRouter against rules_snapshot.yaml.",
+      "input": {
+        "_id": "txn_nzfcc_1",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "date": "2026-03-01",
+        "description": "ZZQQ UNLISTED VENDOR NONSENSE",
+        "amount": -42.5,
+        "category": {
+          "nzfcc": "software"
+        }
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:Subscriptions",
+        "rule_id": "nzfcc:software",
+        "matched_by": "nzfcc",
+        "memo": null
+      }
     }
   ]
 }

@@ -34,7 +34,7 @@ export interface RawTransaction {
 type Json = unknown;
 
 /** Python truthiness: None/""/0/[]/{}/false are falsy; everything else truthy. */
-function pyTruthy(v: Json): boolean {
+export function pyTruthy(v: Json): boolean {
   if (v === null || v === undefined) return false;
   if (typeof v === "string") return v.length > 0;
   if (typeof v === "number") return v !== 0;
