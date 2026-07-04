@@ -2,10 +2,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import yaml from "js-yaml";
 import { describe, expect, it } from "vitest";
-import type { RawTransaction } from "./rawTransaction";
 import { RulesRouter, type RulesConfig } from "./rulesRouter";
-import { validateBalanced, type JournalTransaction } from "./journal";
-import { LedgerPipeline, type LedgerStore } from "./pipeline";
+import { LedgerPipeline } from "./pipeline";
+import { InMemoryLedgerStore } from "./inMemoryLedgerStore";
 
 /**
  * Cross-language golden parity for the double-entry pipeline. The TS port must
@@ -25,65 +24,6 @@ const goldenDir = path.resolve(process.cwd(), "../tests/golden/fixtures");
 const snapshotConfig = yaml.load(
   readFileSync(path.join(goldenDir, "rules_snapshot.yaml"), "utf-8"),
 ) as RulesConfig;
-
-interface StoredJournal {
-  seq: number;
-  journal: JournalTransaction;
-}
-
-/**
- * In-memory stand-in for LedgerDatabase, faithful to the SQLite semantics the
- * fixture pins: raw upsert reports newly-inserted, journals dedupe on
- * external_id and preserve insertion order, manual classifications override.
- */
-class InMemoryLedgerStore implements LedgerStore {
-  private readonly rawHashes = new Set<string>();
-  private readonly journals = new Map<string, StoredJournal>();
-  private readonly manual = new Map<string, [string, string | null]>();
-  private nextSeq = 0;
-
-  setManualClassification(externalId: string, targetAccount: string, memo: string | null): void {
-    this.manual.set(externalId, [targetAccount, memo]);
-  }
-
-  upsertRawTransaction(transaction: RawTransaction): boolean {
-    const isNew = !this.rawHashes.has(transaction.idempotencyHash);
-    this.rawHashes.add(transaction.idempotencyHash);
-    return isNew;
-  }
-
-  markRawSkipped(): void {
-    // No-op: skipped_reason is not part of the pinned outcome.
-  }
-
-  journalExists(externalId: string): boolean {
-    return this.journals.has(externalId);
-  }
-
-  insertJournalTransaction(transaction: JournalTransaction): boolean {
-    validateBalanced(transaction); // Mirrors LedgerDatabase.insert_journal_transaction.
-    if (this.journals.has(transaction.externalId)) return false;
-    this.journals.set(transaction.externalId, { seq: this.nextSeq++, journal: transaction });
-    return true;
-  }
-
-  getManualClassification(externalId: string): [string, string | null] | null {
-    return this.manual.get(externalId) ?? null;
-  }
-
-  /** Journals ordered by (transaction_date, insertion seq), postings in
-   *  insertion order — matches the golden runner's ORDER BY. */
-  orderedJournals(): JournalTransaction[] {
-    return [...this.journals.values()]
-      .sort((a, b) => {
-        if (a.journal.transactionDate !== b.journal.transactionDate) {
-          return a.journal.transactionDate < b.journal.transactionDate ? -1 : 1;
-        }
-        return a.seq - b.seq;
-      })
-      .map((stored) => stored.journal);
-  }
-}
 
 interface ManualClassificationInput {
   external_id: string;
