@@ -130,7 +130,11 @@ export function FeedbackWidget({ source = "marketing" }: FeedbackWidgetProps) {
   if (status === "hidden") return null;
 
   return (
-    <aside className="fb-widget" role="complementary" aria-label="Page feedback">
+    <aside
+      className="fb-widget"
+      role="complementary"
+      aria-label="Page feedback"
+    >
       <div className="fb-panel">
         {status !== "done" ? (
           <button
@@ -186,7 +190,10 @@ export function FeedbackWidget({ source = "marketing" }: FeedbackWidgetProps) {
                   value={note}
                   onChange={(event) => setNote(event.target.value)}
                 />
-                <button className="mk-btn mk-btn--primary fb-note-submit" type="submit" disabled={status === "sending"}>
+                <button
+                  className="mk-btn mk-btn--primary fb-note-submit"
+                  type="submit"
+                >
                   Send feedback
                 </button>
               </form>

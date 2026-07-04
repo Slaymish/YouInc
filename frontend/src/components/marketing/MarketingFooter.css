@@ -14,7 +14,7 @@
 
 .mk-footer__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.4fr) repeat(4, minmax(0, 0.9fr));
   gap: var(--space-8) var(--space-6);
   max-width: var(--mk-maxw);
   margin: 0 auto;
@@ -58,7 +58,11 @@
   color: var(--mk-soft);
   background: var(--mk-surface-1);
   border: 1px solid var(--mk-line);
-  transition: color 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .mk-footer__social-link:hover {
@@ -100,7 +104,9 @@
 .mk-footer__col a {
   color: var(--mk-soft);
   text-decoration: none;
-  transition: color 150ms ease, transform 150ms ease;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
   display: inline-block;
 }
 
@@ -133,34 +139,8 @@
 }
 
 .mk-footer__credit {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
   color: var(--mk-soft);
-  text-decoration: none;
   opacity: 0.85;
-  transition: opacity 150ms ease, color 150ms ease;
-}
-
-.mk-footer__credit:hover {
-  opacity: 1;
-  color: var(--mk-ink);
-}
-
-.mk-footer__credit img {
-  display: block;
-  filter: grayscale(1);
-  opacity: 0.7;
-}
-
-.mk-footer__credit:hover img {
-  opacity: 1;
-}
-
-.mk-footer__credit:focus-visible {
-  outline: 3px solid var(--mk-focus);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
 }
 
 @media (max-width: 780px) {

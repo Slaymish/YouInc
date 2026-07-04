@@ -81,12 +81,55 @@ export function MarketingFooter() {
               <Link to="/widgets">Widget library</Link>
             </li>
             <li>
+              <Link to="/pricing">Pricing</Link>
+            </li>
+            <li>
               <Link to="/custom-builds">Custom builds</Link>
             </li>
             <li>
-              <Link to="/" hash="pricing-heading">
-                Pricing
-              </Link>
+              <Link to="/integrations">Integrations</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <nav className="mk-footer__col" aria-label="Resources">
+          <h2 className="mk-footer__heading">Resources</h2>
+          <ul>
+            <li>
+              <Link to="/docs">Docs</Link>
+            </li>
+            <li>
+              <Link to="/help">Help</Link>
+            </li>
+            <li>
+              <Link to="/changelog">Changelog</Link>
+            </li>
+            <li>
+              <Link to="/roadmap">Roadmap</Link>
+            </li>
+            <li>
+              <Link to="/compare">Compare</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <nav className="mk-footer__col" aria-label="Trust">
+          <h2 className="mk-footer__heading">Trust</h2>
+          <ul>
+            <li>
+              <Link to="/security">Security</Link>
+            </li>
+            <li>
+              <Link to="/privacy">Privacy</Link>
+            </li>
+            <li>
+              <Link to="/terms">Terms</Link>
+            </li>
+            <li>
+              <Link to="/data-deletion">Data deletion</Link>
+            </li>
+            <li>
+              <Link to="/status">Status</Link>
             </li>
           </ul>
         </nav>
@@ -94,6 +137,15 @@ export function MarketingFooter() {
         <nav className="mk-footer__col" aria-label="Company">
           <h2 className="mk-footer__heading">Company</h2>
           <ul>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/use-cases">Use cases</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
             <li>
               <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
                 Book a call
@@ -110,21 +162,9 @@ export function MarketingFooter() {
         <span className="mk-footer__copyright">
           &copy; {YEAR} {PRODUCT.name}
         </span>
-        <a
-          className="mk-footer__credit"
-          href="https://hamishburke.dev"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="/HB_logo.svg"
-            alt=""
-            width="16"
-            height="16"
-            aria-hidden="true"
-          />
-          Built by Hamish Burke
-        </a>
+        <span className="mk-footer__credit">
+          Founder-led. Built and operated in New Zealand.
+        </span>
       </div>
     </footer>
   );

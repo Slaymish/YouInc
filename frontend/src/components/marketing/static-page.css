@@ -1,0 +1,100 @@
+/* Shared layout for v1 trust, resource, legal, and company pages. */
+
+.static-page {
+  padding-bottom: var(--space-section);
+}
+
+.static-page__hero {
+  padding-bottom: var(--space-8) !important;
+}
+
+.static-page__heading {
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: var(--text-hero);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-head);
+  max-width: 13ch;
+  margin: 0 0 var(--space-5);
+}
+
+.static-page__subheading {
+  max-width: var(--mk-maxw-narrow);
+  margin: 0;
+  color: var(--mk-soft);
+  font-size: var(--text-lead);
+  line-height: var(--leading-body);
+}
+
+.static-page__updated {
+  margin: var(--space-5) 0 0;
+  color: var(--mk-soft);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.static-page__content {
+  display: grid;
+  gap: var(--space-5);
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.static-page__section {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.45fr) minmax(0, 1fr);
+  gap: var(--space-5) var(--space-8);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--mk-line);
+}
+
+.static-page__section h2 {
+  margin: 0;
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: var(--text-h3);
+  line-height: var(--leading-head);
+  letter-spacing: var(--tracking-head);
+}
+
+.static-page__section p,
+.static-page__section ul {
+  grid-column: 2;
+  margin: 0;
+  max-width: var(--mk-maxw-narrow);
+  color: var(--mk-soft);
+  line-height: var(--leading-body);
+}
+
+.static-page__section ul {
+  display: grid;
+  gap: var(--space-3);
+  padding-left: 1.1rem;
+}
+
+.static-page__section a {
+  color: var(--mk-ink);
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.static-page__cta {
+  padding-top: var(--space-8) !important;
+}
+
+@media (max-width: 780px) {
+  .static-page__heading {
+    max-width: 11ch;
+  }
+
+  .static-page__section {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .static-page__section p,
+  .static-page__section ul {
+    grid-column: 1;
+  }
+}

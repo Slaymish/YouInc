@@ -17,6 +17,8 @@ export function MarketingHeader() {
       <nav className="mk-nav__links" aria-label="Main navigation">
         <Link to="/widgets">Widgets</Link>
         <Link to="/pricing">Pricing</Link>
+        <Link to="/docs">Docs</Link>
+        <Link to="/security">Security</Link>
         <Link to="/custom-builds">Custom builds</Link>
         <Link className="mk-nav__signin" to="/login">
           Sign in
