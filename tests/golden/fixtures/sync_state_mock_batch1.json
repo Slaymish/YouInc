@@ -1,0 +1,28 @@
+[
+  {
+    "_id": "sync_txn_1",
+    "_account": "acc_sync_example",
+    "date": "2026-04-01",
+    "settlement_date": "2026-04-01",
+    "description": "FIRST BATCH TXN A",
+    "amount": -10.0,
+    "status": "SETTLED"
+  },
+  {
+    "_id": "sync_txn_2",
+    "_account": "acc_sync_example",
+    "date": "2026-04-03",
+    "settlement_date": "2026-04-05",
+    "description": "FIRST BATCH TXN B",
+    "amount": -20.0,
+    "status": "SETTLED"
+  },
+  {
+    "_id": "sync_txn_3",
+    "_account": "acc_sync_example",
+    "date": "2026-04-02",
+    "description": "FIRST BATCH TXN C NO SETTLEMENT DATE",
+    "amount": -5.0,
+    "status": "SETTLED"
+  }
+]

@@ -1,0 +1,1355 @@
+{
+  "cases": [
+    {
+      "case_id": "real_0009",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=9 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "description": "NEBULA SUBSCRIPTION",
+        "amount": -10.73,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pczs13tb02kz1ufycyl5",
+        "category": {},
+        "date": "2026-06-21T10:31:22.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Nebula"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "19f61e7879ecd501c2fe784bec1b39f0812f121700da6de338b8c567be24c19f",
+        "amount_cents": -1073,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-21",
+        "settlement_date": null,
+        "description": "NEBULA SUBSCRIPTION",
+        "merchant_name": "Nebula",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pczs13tb02kz1ufycyl5\",\"amount\":-10.73,\"category\":{},\"created_at\":\"2026-06-22T11:25:22.829Z\",\"date\":\"2026-06-21T10:31:22.000Z\",\"description\":\"NEBULA SUBSCRIPTION\",\"merchant\":{\"name\":\"Nebula\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0011",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=11 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "description": "BURKE BA & WE Utube premiu",
+        "amount": 13.99,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pczs13t902kz5mav3e22",
+        "date": "2026-06-20T21:10:07.000Z",
+        "type": "STANDING ORDER"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "788ed0716a0900c37dc4b26c513520a28f67c099d9dda52d8014ee8a2824c77b",
+        "amount_cents": 1399,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "STANDING ORDER",
+        "transaction_date": "2026-06-20",
+        "settlement_date": null,
+        "description": "BURKE BA & WE Utube premiu",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pczs13t902kz5mav3e22\",\"amount\":13.99,\"created_at\":\"2026-06-22T11:25:22.829Z\",\"date\":\"2026-06-20T21:10:07.000Z\",\"description\":\"BURKE BA & WE Utube premiu\",\"type\":\"STANDING ORDER\"}"
+      }
+    },
+    {
+      "case_id": "real_0019",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=19 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "description": "WITHDRAWAL 553025568699 Woolworths N 0499191805",
+        "amount": -50,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepj01fu02l502th729k",
+        "date": "2026-06-19T06:05:46.000Z",
+        "type": "ATM"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "149d3cc51bec497afb7d80da94f2f6a5a9c4b3c9acb1085a8ab364b881dd4822",
+        "amount_cents": -5000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "ATM",
+        "transaction_date": "2026-06-19",
+        "settlement_date": null,
+        "description": "WITHDRAWAL 553025568699 Woolworths N 0499191805",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepj01fu02l502th729k\",\"amount\":-50,\"created_at\":\"2026-06-22T11:25:09.175Z\",\"date\":\"2026-06-19T06:05:46.000Z\",\"description\":\"WITHDRAWAL 553025568699 Woolworths N 0499191805\",\"type\":\"ATM\"}"
+      }
+    },
+    {
+      "case_id": "real_0023",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=23 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "description": "BlossomApp Pty Ltd akp150104cxh",
+        "amount": -100,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepj01fq02l51dwtcckb",
+        "category": {},
+        "date": "2026-06-18T12:45:08.518Z",
+        "type": "PAYMENT",
+        "merchant": {
+          "name": "Blossom"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "2da31ee88b015c711f487e5ec34173f722354c74ec91e6cc489e0255d61af4b6",
+        "amount_cents": -10000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "PAYMENT",
+        "transaction_date": "2026-06-18",
+        "settlement_date": null,
+        "description": "BlossomApp Pty Ltd akp150104cxh",
+        "merchant_name": "Blossom",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepj01fq02l51dwtcckb\",\"amount\":-100,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.175Z\",\"date\":\"2026-06-18T12:45:08.518Z\",\"description\":\"BlossomApp Pty Ltd akp150104cxh\",\"merchant\":{\"name\":\"Blossom\"},\"type\":\"PAYMENT\"}"
+      }
+    },
+    {
+      "case_id": "real_0030",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=30 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "description": "LES MILLS LES MILLS BILLING DD0018697723",
+        "amount": -56,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepi01fj02l50r0j0sjk",
+        "category": {},
+        "date": "2026-06-17T22:46:34.394Z",
+        "type": "DIRECT DEBIT",
+        "merchant": {
+          "name": "Les Mills"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "12232e3a93d299591912e8529429e22cf931d71dadb8f3c8123ca506e398a893",
+        "amount_cents": -5600,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "DIRECT DEBIT",
+        "transaction_date": "2026-06-17",
+        "settlement_date": null,
+        "description": "LES MILLS LES MILLS BILLING DD0018697723",
+        "merchant_name": "Les Mills",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepi01fj02l50r0j0sjk\",\"amount\":-56,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.174Z\",\"date\":\"2026-06-17T22:46:34.394Z\",\"description\":\"LES MILLS LES MILLS BILLING DD0018697723\",\"merchant\":{\"name\":\"Les Mills\"},\"type\":\"DIRECT DEBIT\"}"
+      }
+    },
+    {
+      "case_id": "real_0033",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=33 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "description": "Alphero Limited Alhpero salary",
+        "amount": 1830.82,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepi01fg02l5cnovbe0d",
+        "date": "2026-06-17T18:00:34.822Z",
+        "type": "CREDIT"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "e7c9673cf2c9ff4ee04a00989f99ad94b47eac08a88dce63cd65b5c906c5e495",
+        "amount_cents": 183082,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "CREDIT",
+        "transaction_date": "2026-06-17",
+        "settlement_date": null,
+        "description": "Alphero Limited Alhpero salary",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepi01fg02l5cnovbe0d\",\"amount\":1830.82,\"created_at\":\"2026-06-22T11:25:09.174Z\",\"date\":\"2026-06-17T18:00:34.822Z\",\"description\":\"Alphero Limited Alhpero salary\",\"type\":\"CREDIT\"}"
+      }
+    },
+    {
+      "case_id": "real_0043",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=43 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "description": "Twisted Frequency INTERNET XFR",
+        "amount": 20,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepi01f602l56psacw63",
+        "date": "2026-06-10T20:38:28.145Z",
+        "type": "TRANSFER"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "1d412e9976ea9a6b0ba2cc47dfe6f0014a146d5be3bd4deeeef80c66b94278bb",
+        "amount_cents": 2000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "TRANSFER",
+        "transaction_date": "2026-06-10",
+        "settlement_date": null,
+        "description": "Twisted Frequency INTERNET XFR",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepi01f602l56psacw63\",\"amount\":20,\"created_at\":\"2026-06-22T11:25:09.174Z\",\"date\":\"2026-06-10T20:38:28.145Z\",\"description\":\"Twisted Frequency INTERNET XFR\",\"type\":\"TRANSFER\"}"
+      }
+    },
+    {
+      "case_id": "real_0664",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=664 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-26T11:18:24.381Z",
+        "description": "10820473 10820473",
+        "amount": 150,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmquu83bm0a8z02l12og082kc",
+        "date": "2026-06-26T01:33:19.000Z",
+        "type": "DIRECT CREDIT"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "b4348690637555075bb7da62459f518c808275636313c1853fe4efd81c72a295",
+        "amount_cents": 15000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "DIRECT CREDIT",
+        "transaction_date": "2026-06-26",
+        "settlement_date": null,
+        "description": "10820473 10820473",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmquu83bm0a8z02l12og082kc\",\"amount\":150,\"created_at\":\"2026-06-26T11:18:24.381Z\",\"date\":\"2026-06-26T01:33:19.000Z\",\"description\":\"10820473 10820473\",\"type\":\"DIRECT CREDIT\"}"
+      }
+    },
+    {
+      "case_id": "real_0698",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=698 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-07-02T01:53:20.755Z",
+        "description": "Transfer from Wallet",
+        "amount": 0.7,
+        "_account": "acc_cmoxiaqsd005n02juf9vi6sww",
+        "_id": "trans_cmr2uojb20qg702l51miccako",
+        "date": "2026-06-15T00:40:47.653Z",
+        "type": "TRANSFER"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "93ba7579e35337efc7fd45e2cfdf8a8827850f146714079a493052c60881553d",
+        "amount_cents": 70,
+        "account_id": "acc_cmoxiaqsd005n02juf9vi6sww",
+        "status": "TRANSFER",
+        "transaction_date": "2026-06-15",
+        "settlement_date": null,
+        "description": "Transfer from Wallet",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmoxiaqsd005n02juf9vi6sww\",\"_id\":\"trans_cmr2uojb20qg702l51miccako\",\"amount\":0.7,\"created_at\":\"2026-07-02T01:53:20.755Z\",\"date\":\"2026-06-15T00:40:47.653Z\",\"description\":\"Transfer from Wallet\",\"type\":\"TRANSFER\"}"
+      }
+    },
+    {
+      "case_id": "real_0015",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=15 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "description": "YR Door Mart",
+        "amount": -4.5,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pczs13t502kzh1hi3w0f",
+        "category": {},
+        "date": "2026-06-20T05:12:45.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Yr Door Mart"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "e3e95578282ebdd3b8796780a235a511146cf95bff8a28f0896bd53620c24bb2",
+        "amount_cents": -450,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-20",
+        "settlement_date": null,
+        "description": "YR Door Mart",
+        "merchant_name": "Yr Door Mart",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pczs13t502kzh1hi3w0f\",\"amount\":-4.5,\"category\":{},\"created_at\":\"2026-06-22T11:25:22.829Z\",\"date\":\"2026-06-20T05:12:45.000Z\",\"description\":\"YR Door Mart\",\"merchant\":{\"name\":\"Yr Door Mart\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0021",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=21 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549191251",
+        "amount": -8.1,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepj01fs02l5ao4rhwo4",
+        "category": {},
+        "date": "2026-06-19T00:51:50.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "7 Mart"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "7cc6eeea668c5ff5f4323e155f96df8203aefa60e8d5effdad4fc07c0672e09a",
+        "amount_cents": -810,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-19",
+        "settlement_date": null,
+        "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549191251",
+        "merchant_name": "7 Mart",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepj01fs02l5ao4rhwo4\",\"amount\":-8.1,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.175Z\",\"date\":\"2026-06-19T00:51:50.000Z\",\"description\":\"7 Mart - 19 Dixon St 8699 Te Aro 420549191251\",\"merchant\":{\"name\":\"7 Mart\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0027",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=27 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "description": "Cole Bills and Rent rent 18/25 Jun",
+        "amount": -480,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepj01fm02l53ynd4a2y",
+        "date": "2026-06-18T03:34:58.357Z",
+        "type": "PAYMENT"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "50a208826d08fbe2e4346fbbc7dfd87b75c45eae8f8ce7ce5d36f710d09e5c75",
+        "amount_cents": -48000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "PAYMENT",
+        "transaction_date": "2026-06-18",
+        "settlement_date": null,
+        "description": "Cole Bills and Rent rent 18/25 Jun",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepj01fm02l53ynd4a2y\",\"amount\":-480,\"created_at\":\"2026-06-22T11:25:09.175Z\",\"date\":\"2026-06-18T03:34:58.357Z\",\"description\":\"Cole Bills and Rent rent 18/25 Jun\",\"type\":\"PAYMENT\"}"
+      }
+    },
+    {
+      "case_id": "real_0039",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=39 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466131212",
+        "amount": -17.6,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepi01fa02l5ez41bfjk",
+        "date": "2026-06-13T07:43:32.000Z",
+        "type": "EFTPOS"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "b8e15f2f49e671e38737f66806206ac639969df969fdc081cbd20923de9a6c2c",
+        "amount_cents": -1760,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-13",
+        "settlement_date": null,
+        "description": "AMP CODE 8699 AMPCODE.COM 406466131212",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepi01fa02l5ez41bfjk\",\"amount\":-17.6,\"created_at\":\"2026-06-22T11:25:09.174Z\",\"date\":\"2026-06-13T07:43:32.000Z\",\"description\":\"AMP CODE 8699 AMPCODE.COM 406466131212\",\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0045",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=45 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466100314",
+        "amount": -17.64,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepi01f402l56g7m7hr9",
+        "date": "2026-06-10T12:03:35.000Z",
+        "type": "EFTPOS"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "8d51e76c7ed6936beaa1934c25fe80ce00449b734201cf9646cbd22a1ceaf5ef",
+        "amount_cents": -1764,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-10",
+        "settlement_date": null,
+        "description": "AMP CODE 8699 AMPCODE.COM 406466100314",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepi01f402l56g7m7hr9\",\"amount\":-17.64,\"created_at\":\"2026-06-22T11:25:09.174Z\",\"date\":\"2026-06-10T12:03:35.000Z\",\"description\":\"AMP CODE 8699 AMPCODE.COM 406466100314\",\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0051",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=51 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046101206",
+        "amount": -19.9,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pepi01ey02l5f6ric26k",
+        "category": {},
+        "date": "2026-06-10T02:45:45.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "TJ Katsu"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "1bf1a89b66899abef12ec68126ad8d9c5c70f1286f8b5a194088776e281f6a92",
+        "amount_cents": -1990,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-10",
+        "settlement_date": null,
+        "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046101206",
+        "merchant_name": "TJ Katsu",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pepi01ey02l5f6ric26k\",\"amount\":-19.9,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.174Z\",\"date\":\"2026-06-10T02:45:45.000Z\",\"description\":\"TJ KATSU AND UDON 8699 WELLINGTON 455046101206\",\"merchant\":{\"name\":\"TJ Katsu\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0057",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=57 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.173Z",
+        "description": "Euro trip INTERNET XFR",
+        "amount": 150,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4peph01es02l51ptj3sts",
+        "date": "2026-06-09T12:29:11.316Z",
+        "type": "TRANSFER"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "49fb1b663577e2019a4cd9809490cdf46374147a093294a69787042b6384cc39",
+        "amount_cents": 15000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "TRANSFER",
+        "transaction_date": "2026-06-09",
+        "settlement_date": null,
+        "description": "Euro trip INTERNET XFR",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4peph01es02l51ptj3sts\",\"amount\":150,\"created_at\":\"2026-06-22T11:25:09.173Z\",\"date\":\"2026-06-09T12:29:11.316Z\",\"description\":\"Euro trip INTERNET XFR\",\"type\":\"TRANSFER\"}"
+      }
+    },
+    {
+      "case_id": "real_0063",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=63 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046091601",
+        "amount": -19.9,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep701em02l544aifhxi",
+        "category": {},
+        "date": "2026-06-09T00:24:06.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "TJ Katsu"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "b60e9c1f0b53b736c7b57eaee85ba3445e866421d74bfb594518d68cd65c4f25",
+        "amount_cents": -1990,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-09",
+        "settlement_date": null,
+        "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046091601",
+        "merchant_name": "TJ Katsu",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep701em02l544aifhxi\",\"amount\":-19.9,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.163Z\",\"date\":\"2026-06-09T00:24:06.000Z\",\"description\":\"TJ KATSU AND UDON 8699 WELLINGTON 455046091601\",\"merchant\":{\"name\":\"TJ Katsu\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0069",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=69 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "description": "BREZELMANIA EGMONTST 8699 WELLINGTON 434667081056",
+        "amount": -16.66,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep701eg02l5hub5e9ol",
+        "category": {},
+        "date": "2026-06-07T21:36:36.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Brezelmania"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "22a1367a9f9e4f5c60819750c51c15bcf24e547d92b5910159aa52cfd18883df",
+        "amount_cents": -1666,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-07",
+        "settlement_date": null,
+        "description": "BREZELMANIA EGMONTST 8699 WELLINGTON 434667081056",
+        "merchant_name": "Brezelmania",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep701eg02l5hub5e9ol\",\"amount\":-16.66,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.163Z\",\"date\":\"2026-06-07T21:36:36.000Z\",\"description\":\"BREZELMANIA EGMONTST 8699 WELLINGTON 434667081056\",\"merchant\":{\"name\":\"Brezelmania\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0075",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=75 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466071148",
+        "amount": -17.67,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep701ea02l5f4ps09j4",
+        "date": "2026-06-07T12:42:00.000Z",
+        "type": "EFTPOS"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "a12bbabdc95414cdb2a1f237cd841f959ceb1ff883c773250aeb433f511c8fe0",
+        "amount_cents": -1767,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-07",
+        "settlement_date": null,
+        "description": "AMP CODE 8699 AMPCODE.COM 406466071148",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep701ea02l5f4ps09j4\",\"amount\":-17.67,\"created_at\":\"2026-06-22T11:25:09.163Z\",\"date\":\"2026-06-07T12:42:00.000Z\",\"description\":\"AMP CODE 8699 AMPCODE.COM 406466071148\",\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0081",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=81 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466070535",
+        "amount": -17.67,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep701e402l5ffce2l1k",
+        "date": "2026-06-07T04:52:19.000Z",
+        "type": "EFTPOS"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "1e691c9f8823647ce48161cb2bbd0cbd7fa84e7f1f2f097a96b8ba5ff563483b",
+        "amount_cents": -1767,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-07",
+        "settlement_date": null,
+        "description": "AMP CODE 8699 AMPCODE.COM 406466070535",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep701e402l5ffce2l1k\",\"amount\":-17.67,\"created_at\":\"2026-06-22T11:25:09.163Z\",\"date\":\"2026-06-07T04:52:19.000Z\",\"description\":\"AMP CODE 8699 AMPCODE.COM 406466070535\",\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0087",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=87 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "description": "Shelly Bay Baker Lim 8699 Wellington 420549061201",
+        "amount": -27.54,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep601dy02l57xtqezti",
+        "category": {},
+        "date": "2026-06-06T00:01:20.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Shelly Bay Baker"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "edfd8d119a6f93a15500d076a9240b1290329dfa687ad1005e0978908af7e48d",
+        "amount_cents": -2754,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-06",
+        "settlement_date": null,
+        "description": "Shelly Bay Baker Lim 8699 Wellington 420549061201",
+        "merchant_name": "Shelly Bay Baker",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep601dy02l57xtqezti\",\"amount\":-27.54,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.162Z\",\"date\":\"2026-06-06T00:01:20.000Z\",\"description\":\"Shelly Bay Baker Lim 8699 Wellington 420549061201\",\"merchant\":{\"name\":\"Shelly Bay Baker\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0093",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=93 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "description": "Cole Bills and Rent 4/11 june rent",
+        "amount": -480,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep601ds02l5gaidau9t",
+        "date": "2026-06-05T02:15:19.363Z",
+        "type": "PAYMENT"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "8cfd061b9c978b3a9b2ecd63a064e3cbcb3261348c75e71b2e9f842d1d36324c",
+        "amount_cents": -48000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "PAYMENT",
+        "transaction_date": "2026-06-05",
+        "settlement_date": null,
+        "description": "Cole Bills and Rent 4/11 june rent",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep601ds02l5gaidau9t\",\"amount\":-480,\"created_at\":\"2026-06-22T11:25:09.162Z\",\"date\":\"2026-06-05T02:15:19.363Z\",\"description\":\"Cole Bills and Rent 4/11 june rent\",\"type\":\"PAYMENT\"}"
+      }
+    },
+    {
+      "case_id": "real_0099",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=99 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549041336",
+        "amount": -11.07,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep601dm02l5d42x59u1",
+        "category": {},
+        "date": "2026-06-04T01:36:36.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "7 Mart"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "0b782a37263bbe4d189856dc0e713f08151600f051605f1c16f8692f8b3ab783",
+        "amount_cents": -1107,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-04",
+        "settlement_date": null,
+        "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549041336",
+        "merchant_name": "7 Mart",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep601dm02l5d42x59u1\",\"amount\":-11.07,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.162Z\",\"date\":\"2026-06-04T01:36:36.000Z\",\"description\":\"7 Mart - 19 Dixon St 8699 Te Aro 420549041336\",\"merchant\":{\"name\":\"7 Mart\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0105",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=105 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "description": "Euro trip Euro trip",
+        "amount": -150,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep601dg02l59b7xdyvq",
+        "date": "2026-06-03T21:56:05.401Z",
+        "type": "STANDING ORDER"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "1dbae9f41886142bca0bf2468ca6c8392be77cc58f40248eb5509f6ffaeb7ea6",
+        "amount_cents": -15000,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "STANDING ORDER",
+        "transaction_date": "2026-06-03",
+        "settlement_date": null,
+        "description": "Euro trip Euro trip",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep601dg02l59b7xdyvq\",\"amount\":-150,\"created_at\":\"2026-06-22T11:25:09.162Z\",\"date\":\"2026-06-03T21:56:05.401Z\",\"description\":\"Euro trip Euro trip\",\"type\":\"STANDING ORDER\"}"
+      }
+    },
+    {
+      "case_id": "real_0111",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=111 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "description": "SNAPPER SERVICES 8699 WELLINGTON 434667031028",
+        "amount": -5.08,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqp4pep601da02l53bk36oda",
+        "category": {},
+        "date": "2026-06-03T05:40:32.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Snapper"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "4cd19f8b84f3e05438f455c234de026d219d60a8c4404afa018da06fa8bd7729",
+        "amount_cents": -508,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-03",
+        "settlement_date": null,
+        "description": "SNAPPER SERVICES 8699 WELLINGTON 434667031028",
+        "merchant_name": "Snapper",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqp4pep601da02l53bk36oda\",\"amount\":-5.08,\"category\":{},\"created_at\":\"2026-06-22T11:25:09.162Z\",\"date\":\"2026-06-03T05:40:32.000Z\",\"description\":\"SNAPPER SERVICES 8699 WELLINGTON 434667031028\",\"merchant\":{\"name\":\"Snapper\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0661",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=661 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-28T11:18:32.643Z",
+        "description": "WOOLWORTHS NZ/3 JOHN",
+        "amount": -57.52,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqxp3z2t0skz02l44w28hacw",
+        "category": {},
+        "date": "2026-06-28T01:45:36.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Woolworths"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "80c2f3c872bf8d8148732eb13c1a9243708151983a003c5597b80b6e35a62a5a",
+        "amount_cents": -5752,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-28",
+        "settlement_date": null,
+        "description": "WOOLWORTHS NZ/3 JOHN",
+        "merchant_name": "Woolworths",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqxp3z2t0skz02l44w28hacw\",\"amount\":-57.52,\"category\":{},\"created_at\":\"2026-06-28T11:18:32.643Z\",\"date\":\"2026-06-28T01:45:36.000Z\",\"description\":\"WOOLWORTHS NZ/3 JOHN\",\"merchant\":{\"name\":\"Woolworths\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "real_0667",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=667 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-25T11:17:44.711Z",
+        "description": "PAYCHASE LIMITED",
+        "amount": -11.62,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqtere0p0yib02i8gwks9w5n",
+        "date": "2026-06-25T09:18:43.000Z",
+        "type": "TRANSFER"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "7ed50eca6840463d581492e834895770f2cd1b5a155bfe39045213000ca9025c",
+        "amount_cents": -1162,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "TRANSFER",
+        "transaction_date": "2026-06-25",
+        "settlement_date": null,
+        "description": "PAYCHASE LIMITED",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqtere0p0yib02i8gwks9w5n\",\"amount\":-11.62,\"created_at\":\"2026-06-25T11:17:44.711Z\",\"date\":\"2026-06-25T09:18:43.000Z\",\"description\":\"PAYCHASE LIMITED\",\"type\":\"TRANSFER\"}"
+      }
+    },
+    {
+      "case_id": "real_0673",
+      "source": "real",
+      "note": "whitelisted fields from data/youinc-ledger.sqlite3 raw_transactions.id=673 (account numbers/card suffixes/balances stripped, not read by the engine)",
+      "input": {
+        "created_at": "2026-06-24T11:31:31.387Z",
+        "description": "WOOLWORTHS NZ/3 JOHN",
+        "amount": -10.56,
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "_id": "trans_cmqrzt9pr035y02l5b24wfzkb",
+        "category": {},
+        "date": "2026-06-24T06:24:24.000Z",
+        "type": "EFTPOS",
+        "merchant": {
+          "name": "Woolworths"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "8b40459a12270092493f6552be017030c01d9d09366e4a8d6ecc146d6e21551c",
+        "amount_cents": -1056,
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+        "status": "EFTPOS",
+        "transaction_date": "2026-06-24",
+        "settlement_date": null,
+        "description": "WOOLWORTHS NZ/3 JOHN",
+        "merchant_name": "Woolworths",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_cmqp4p4gx00ev02k09dbja392\",\"_id\":\"trans_cmqrzt9pr035y02l5b24wfzkb\",\"amount\":-10.56,\"category\":{},\"created_at\":\"2026-06-24T11:31:31.387Z\",\"date\":\"2026-06-24T06:24:24.000Z\",\"description\":\"WOOLWORTHS NZ/3 JOHN\",\"merchant\":{\"name\":\"Woolworths\"},\"type\":\"EFTPOS\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_hash_with_id_amount_10_0",
+      "source": "synthetic",
+      "note": "hash keys off akahu id only when _id present",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": "10.0",
+        "_id": "txn_trailing_zero_a"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "13281046caf81f91c08e55e57a15a27ccbf1926566b23816b4f0a94a6681ecf2",
+        "amount_cents": 1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_trailing_zero_a\",\"amount\":\"10.0\",\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_hash_with_id_amount_10_00",
+      "source": "synthetic",
+      "note": "same _id-driven hash path, different amount string",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": "10.00",
+        "_id": "txn_trailing_zero_a"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "13281046caf81f91c08e55e57a15a27ccbf1926566b23816b4f0a94a6681ecf2",
+        "amount_cents": 1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_trailing_zero_a\",\"amount\":\"10.00\",\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_hash_no_id_amount_10_0",
+      "source": "synthetic",
+      "note": "no _id: fallback hash embeds raw amount string '10.0'",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "NO ID CASE",
+        "merchant": {
+          "name": "Test Merchant"
+        },
+        "amount": "10.0"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "f7609d4a84ce0ce3f9d17e68f77948ab7350c902051849dc9e2412266239e0d0",
+        "amount_cents": 1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "NO ID CASE",
+        "merchant_name": "Test Merchant",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"amount\":\"10.0\",\"date\":\"2026-03-15\",\"description\":\"NO ID CASE\",\"merchant\":{\"name\":\"Test Merchant\"}}",
+        "hash_input": "acc_synth_001|2026-03-15|10.0|NO ID CASE|Test Merchant"
+      }
+    },
+    {
+      "case_id": "synthetic_hash_no_id_amount_10_00",
+      "source": "synthetic",
+      "note": "no _id: fallback hash embeds raw amount string '10.00' (DIFFERENT hash than '10.0')",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "NO ID CASE",
+        "merchant": {
+          "name": "Test Merchant"
+        },
+        "amount": "10.00"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "559c78f7bf000f820fc227fad4e50e2507dd008a65ab17323936798fae7b3d0d",
+        "amount_cents": 1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "NO ID CASE",
+        "merchant_name": "Test Merchant",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"amount\":\"10.00\",\"date\":\"2026-03-15\",\"description\":\"NO ID CASE\",\"merchant\":{\"name\":\"Test Merchant\"}}",
+        "hash_input": "acc_synth_001|2026-03-15|10.00|NO ID CASE|Test Merchant"
+      }
+    },
+    {
+      "case_id": "synthetic_hash_no_id_amount_numeric_10",
+      "source": "synthetic",
+      "note": "no _id: numeric (not string) amount 10 -> str(10) == '10' (portable: JSON.parse+String() agrees)",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "NO ID CASE",
+        "merchant": {
+          "name": "Test Merchant"
+        },
+        "amount": 10
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "3d2221d843b52d291b74c4c785b204cd7b4d1f6e40011622edaeba350187264c",
+        "amount_cents": 1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "NO ID CASE",
+        "merchant_name": "Test Merchant",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"amount\":10,\"date\":\"2026-03-15\",\"description\":\"NO ID CASE\",\"merchant\":{\"name\":\"Test Merchant\"}}",
+        "hash_input": "acc_synth_001|2026-03-15|10|NO ID CASE|Test Merchant"
+      }
+    },
+    {
+      "case_id": "synthetic_negative_amount",
+      "source": "synthetic",
+      "note": "typical spend: negative amount",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": -89.99,
+        "_id": "txn_neg_1"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "6f881760b8b9191258c9df436ce53bfa35f0dc70d0312fda234323ed95d6aa07",
+        "amount_cents": -8999,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_neg_1\",\"amount\":-89.99,\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_negative_zero_string",
+      "source": "synthetic",
+      "note": "amount '-0.00' collapses to 0 cents but string differs from '0.00'",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "NEG ZERO CASE",
+        "amount": "-0.00"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "e6798ebd972a465729169c34dd366f88276135d6d17a769bbe3e5e15f081f10b",
+        "amount_cents": 0,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "NEG ZERO CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"amount\":\"-0.00\",\"date\":\"2026-03-15\",\"description\":\"NEG ZERO CASE\"}",
+        "hash_input": "acc_synth_001|2026-03-15|-0.00|NEG ZERO CASE|"
+      }
+    },
+    {
+      "case_id": "synthetic_zero_amount",
+      "source": "synthetic",
+      "note": "zero-amount transaction (pipeline should skip these)",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": 0,
+        "_id": "txn_zero_1"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "ddfd71db1cfe75aca5e7c102afa7b3817e080fe49618f5e2453a526c8e1df672",
+        "amount_cents": 0,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_zero_1\",\"amount\":0,\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_unicode_merchant",
+      "source": "synthetic",
+      "note": "unicode merchant name (macron) must round-trip through stable_json with ensure_ascii=False",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "PĀKŪRANGA CAFÉ",
+        "amount": -5.5,
+        "_id": "txn_unicode_1",
+        "merchant": {
+          "name": "Ōtaki Café"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "14d8036d095a4eabaa402803a81667c7a37eee6b7e8a7dfd515fd215a5956391",
+        "amount_cents": -550,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "PĀKŪRANGA CAFÉ",
+        "merchant_name": "Ōtaki Café",
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_unicode_1\",\"amount\":-5.5,\"date\":\"2026-03-15\",\"description\":\"PĀKŪRANGA CAFÉ\",\"merchant\":{\"name\":\"Ōtaki Café\"}}"
+      }
+    },
+    {
+      "case_id": "synthetic_unicode_emoji",
+      "source": "synthetic",
+      "note": "emoji in description",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "COFFEE ☕ STOP",
+        "amount": -4.2,
+        "_id": "txn_unicode_2"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "04eb0989f452c1fb6a553dc674c2000f1cf343c916b433ffd5a5401aa9c5963b",
+        "amount_cents": -420,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "COFFEE ☕ STOP",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_unicode_2\",\"amount\":-4.2,\"date\":\"2026-03-15\",\"description\":\"COFFEE ☕ STOP\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_large_amount",
+      "source": "synthetic",
+      "note": "very large amount (property/investment scale)",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": 999999999.99,
+        "_id": "txn_large_1"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "facfefdaf7a20e7dc5c6ba1444132a7938883c94e1ec7cac139066bcd97589f0",
+        "amount_cents": 99999999999,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_large_1\",\"amount\":999999999.99,\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_round_half_up_positive",
+      "source": "synthetic",
+      "note": "0.005 rounds UP to 0.01 under ROUND_HALF_UP (Python round() would go to even/down)",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": 10.005,
+        "_id": "txn_round_1"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "0aa74e4b8b677d30379b91aa62ccd60ef04a81a28873a5ef6d73fad6d18f376f",
+        "amount_cents": 1001,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_round_1\",\"amount\":10.005,\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_round_half_up_negative",
+      "source": "synthetic",
+      "note": "-10.005 rounds to -10.01 under ROUND_HALF_UP on the absolute value semantics of Decimal quantize",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": -10.005,
+        "_id": "txn_round_2"
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "f9a5f35438e6a3f67f01059fb5f92fa7cf8c955b19479604e2ead50898b0240c",
+        "amount_cents": -1001,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_round_2\",\"amount\":-10.005,\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_missing_merchant",
+      "source": "synthetic",
+      "note": "no merchant field at all",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "NO MERCHANT",
+        "_id": "txn_no_merchant",
+        "amount": -1.0
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "1241d6b7469496b9cd7409b30b9ace784c0fd65aec4194215bdc8b7910123c96",
+        "amount_cents": -100,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "NO MERCHANT",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_no_merchant\",\"amount\":-1.0,\"date\":\"2026-03-15\",\"description\":\"NO MERCHANT\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_missing_account",
+      "source": "synthetic",
+      "note": "missing account id raises ValueError",
+      "input": {
+        "date": "2026-03-15",
+        "description": "X",
+        "amount": -1.0
+      },
+      "expect_error": true,
+      "error_contains": "missing account identifier"
+    },
+    {
+      "case_id": "synthetic_missing_date",
+      "source": "synthetic",
+      "note": "missing transaction date raises ValueError",
+      "input": {
+        "_account": "acc_synth_001",
+        "description": "X",
+        "amount": -1.0
+      },
+      "expect_error": true,
+      "error_contains": "missing transaction date"
+    },
+    {
+      "case_id": "synthetic_missing_description",
+      "source": "synthetic",
+      "note": "missing description raises ValueError",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "amount": -1.0
+      },
+      "expect_error": true,
+      "error_contains": "missing description"
+    },
+    {
+      "case_id": "synthetic_category_real_shape_no_nzfcc",
+      "source": "synthetic",
+      "note": "real Akahu category shape (_id/name/groups) does NOT satisfy extract_nzfcc -> nzfcc stays None",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": -10.0,
+        "_id": "txn_cat_1",
+        "category": {
+          "_id": "nzfcc_abc",
+          "name": "Groceries"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "bc9a64b558757c4ea972946dc1d2618d98d24c823efa123b7797e4107c9c5a76",
+        "amount_cents": -1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": null,
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_cat_1\",\"amount\":-10.0,\"category\":{\"_id\":\"nzfcc_abc\",\"name\":\"Groceries\"},\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    },
+    {
+      "case_id": "synthetic_category_expected_shape_has_nzfcc",
+      "source": "synthetic",
+      "note": "category shape extract_nzfcc actually expects: {'nzfcc': ...} or {'code': ...}",
+      "input": {
+        "_account": "acc_synth_001",
+        "date": "2026-03-15",
+        "description": "SYNTH BASE CASE",
+        "amount": -10.0,
+        "_id": "txn_cat_2",
+        "category": {
+          "nzfcc": "groceries"
+        }
+      },
+      "expect_error": false,
+      "expected": {
+        "idempotency_hash": "4fa09dc71888dc4278b7c9c319404e6adc493b05c001699e09e338c5996eea29",
+        "amount_cents": -1000,
+        "account_id": "acc_synth_001",
+        "status": "SETTLED",
+        "transaction_date": "2026-03-15",
+        "settlement_date": null,
+        "description": "SYNTH BASE CASE",
+        "merchant_name": null,
+        "nzfcc": "groceries",
+        "currency": "NZD",
+        "is_pending": false,
+        "raw_json": "{\"_account\":\"acc_synth_001\",\"_id\":\"txn_cat_2\",\"amount\":-10.0,\"category\":{\"nzfcc\":\"groceries\"},\"date\":\"2026-03-15\",\"description\":\"SYNTH BASE CASE\"}"
+      }
+    }
+  ]
+}

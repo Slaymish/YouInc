@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "case_id": "sync_key_format",
+      "source": "synthetic",
+      "note": "sync_state key format is the literal string 'last_sync:{account_id}'",
+      "expected": {
+        "key": "last_sync:acc_sync_example"
+      }
+    },
+    {
+      "case_id": "sync_marker_defaults_to_latest_payload_settlement_or_date",
+      "source": "synthetic",
+      "note": "With no --end-date, the cursor advances to the max of (settlement_date or settled_at or date)[:10] across the batch: batch has settlement dates 2026-04-01, 2026-04-05, and txn_3 which has NO settlement_date so falls back to its own 'date' 2026-04-02 for this max() -- note this is comparing heterogeneous date sources, a real quirk to preserve.",
+      "input": {
+        "payloads": [
+          {
+            "_id": "sync_txn_1",
+            "_account": "acc_sync_example",
+            "date": "2026-04-01",
+            "settlement_date": "2026-04-01",
+            "description": "FIRST BATCH TXN A",
+            "amount": -10.0,
+            "status": "SETTLED"
+          },
+          {
+            "_id": "sync_txn_2",
+            "_account": "acc_sync_example",
+            "date": "2026-04-03",
+            "settlement_date": "2026-04-05",
+            "description": "FIRST BATCH TXN B",
+            "amount": -20.0,
+            "status": "SETTLED"
+          },
+          {
+            "_id": "sync_txn_3",
+            "_account": "acc_sync_example",
+            "date": "2026-04-02",
+            "description": "FIRST BATCH TXN C NO SETTLEMENT DATE",
+            "amount": -5.0,
+            "status": "SETTLED"
+          }
+        ],
+        "account_id": "acc_sync_example",
+        "end_date": null
+      },
+      "expected": {
+        "exit_code": 0,
+        "sync_state_value": "2026-04-05"
+      }
+    },
+    {
+      "case_id": "sync_marker_prefers_explicit_end_date",
+      "source": "synthetic",
+      "note": "When --end-date is provided it wins outright over the latest payload date.",
+      "input": {
+        "payloads": [
+          {
+            "_id": "sync_txn_4",
+            "_account": "acc_sync_example",
+            "date": "2026-04-10",
+            "settlement_date": "2026-04-10",
+            "description": "SECOND BATCH TXN",
+            "amount": -3.0,
+            "status": "SETTLED"
+          }
+        ],
+        "account_id": "acc_sync_example",
+        "end_date": "2026-04-15"
+      },
+      "expected": {
+        "exit_code": 0,
+        "sync_state_value": "2026-04-15"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1108 @@
+{
+  "cases": [
+    {
+      "case_id": "real_batch_diverse_sample",
+      "source": "real",
+      "note": "25 whitelisted real transactions replayed through a fresh in-memory-equivalent DB against the frozen rules_snapshot.yaml",
+      "input": {
+        "payloads": [
+          {
+            "amount": -10.73,
+            "date": "2026-06-21T10:31:22.000Z",
+            "created_at": "2026-06-22T11:25:22.829Z",
+            "_id": "trans_cmqp4pczs13tb02kz1ufycyl5",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Nebula"
+            },
+            "description": "NEBULA SUBSCRIPTION",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": 13.99,
+            "date": "2026-06-20T21:10:07.000Z",
+            "created_at": "2026-06-22T11:25:22.829Z",
+            "_id": "trans_cmqp4pczs13t902kz5mav3e22",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "BURKE BA & WE Utube premiu",
+            "type": "STANDING ORDER"
+          },
+          {
+            "amount": -50,
+            "date": "2026-06-19T06:05:46.000Z",
+            "created_at": "2026-06-22T11:25:09.175Z",
+            "_id": "trans_cmqp4pepj01fu02l502th729k",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "WITHDRAWAL 553025568699 Woolworths N 0499191805",
+            "type": "ATM"
+          },
+          {
+            "amount": -100,
+            "date": "2026-06-18T12:45:08.518Z",
+            "created_at": "2026-06-22T11:25:09.175Z",
+            "_id": "trans_cmqp4pepj01fq02l51dwtcckb",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Blossom"
+            },
+            "description": "BlossomApp Pty Ltd akp150104cxh",
+            "category": {},
+            "type": "PAYMENT"
+          },
+          {
+            "amount": -56,
+            "date": "2026-06-17T22:46:34.394Z",
+            "created_at": "2026-06-22T11:25:09.174Z",
+            "_id": "trans_cmqp4pepi01fj02l50r0j0sjk",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Les Mills"
+            },
+            "description": "LES MILLS LES MILLS BILLING DD0018697723",
+            "category": {},
+            "type": "DIRECT DEBIT"
+          },
+          {
+            "amount": 1830.82,
+            "date": "2026-06-17T18:00:34.822Z",
+            "created_at": "2026-06-22T11:25:09.174Z",
+            "_id": "trans_cmqp4pepi01fg02l5cnovbe0d",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "Alphero Limited Alhpero salary",
+            "type": "CREDIT"
+          },
+          {
+            "amount": 20,
+            "date": "2026-06-10T20:38:28.145Z",
+            "created_at": "2026-06-22T11:25:09.174Z",
+            "_id": "trans_cmqp4pepi01f602l56psacw63",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "Twisted Frequency INTERNET XFR",
+            "type": "TRANSFER"
+          },
+          {
+            "amount": 150,
+            "date": "2026-06-26T01:33:19.000Z",
+            "created_at": "2026-06-26T11:18:24.381Z",
+            "_id": "trans_cmquu83bm0a8z02l12og082kc",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "10820473 10820473",
+            "type": "DIRECT CREDIT"
+          },
+          {
+            "amount": -4.5,
+            "date": "2026-06-20T05:12:45.000Z",
+            "created_at": "2026-06-22T11:25:22.829Z",
+            "_id": "trans_cmqp4pczs13t502kzh1hi3w0f",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Yr Door Mart"
+            },
+            "description": "YR Door Mart",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -8.1,
+            "date": "2026-06-19T00:51:50.000Z",
+            "created_at": "2026-06-22T11:25:09.175Z",
+            "_id": "trans_cmqp4pepj01fs02l5ao4rhwo4",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "7 Mart"
+            },
+            "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549191251",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -480,
+            "date": "2026-06-18T03:34:58.357Z",
+            "created_at": "2026-06-22T11:25:09.175Z",
+            "_id": "trans_cmqp4pepj01fm02l53ynd4a2y",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "Cole Bills and Rent rent 18/25 Jun",
+            "type": "PAYMENT"
+          },
+          {
+            "amount": -17.6,
+            "date": "2026-06-13T07:43:32.000Z",
+            "created_at": "2026-06-22T11:25:09.174Z",
+            "_id": "trans_cmqp4pepi01fa02l5ez41bfjk",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466131212",
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -17.64,
+            "date": "2026-06-10T12:03:35.000Z",
+            "created_at": "2026-06-22T11:25:09.174Z",
+            "_id": "trans_cmqp4pepi01f402l56g7m7hr9",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466100314",
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -19.9,
+            "date": "2026-06-10T02:45:45.000Z",
+            "created_at": "2026-06-22T11:25:09.174Z",
+            "_id": "trans_cmqp4pepi01ey02l5f6ric26k",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "TJ Katsu"
+            },
+            "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046101206",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": 150,
+            "date": "2026-06-09T12:29:11.316Z",
+            "created_at": "2026-06-22T11:25:09.173Z",
+            "_id": "trans_cmqp4peph01es02l51ptj3sts",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "Euro trip INTERNET XFR",
+            "type": "TRANSFER"
+          },
+          {
+            "amount": -19.9,
+            "date": "2026-06-09T00:24:06.000Z",
+            "created_at": "2026-06-22T11:25:09.163Z",
+            "_id": "trans_cmqp4pep701em02l544aifhxi",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "TJ Katsu"
+            },
+            "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046091601",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -16.66,
+            "date": "2026-06-07T21:36:36.000Z",
+            "created_at": "2026-06-22T11:25:09.163Z",
+            "_id": "trans_cmqp4pep701eg02l5hub5e9ol",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Brezelmania"
+            },
+            "description": "BREZELMANIA EGMONTST 8699 WELLINGTON 434667081056",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -17.67,
+            "date": "2026-06-07T12:42:00.000Z",
+            "created_at": "2026-06-22T11:25:09.163Z",
+            "_id": "trans_cmqp4pep701ea02l5f4ps09j4",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466071148",
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -17.67,
+            "date": "2026-06-07T04:52:19.000Z",
+            "created_at": "2026-06-22T11:25:09.163Z",
+            "_id": "trans_cmqp4pep701e402l5ffce2l1k",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466070535",
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -27.54,
+            "date": "2026-06-06T00:01:20.000Z",
+            "created_at": "2026-06-22T11:25:09.162Z",
+            "_id": "trans_cmqp4pep601dy02l57xtqezti",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Shelly Bay Baker"
+            },
+            "description": "Shelly Bay Baker Lim 8699 Wellington 420549061201",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -480,
+            "date": "2026-06-05T02:15:19.363Z",
+            "created_at": "2026-06-22T11:25:09.162Z",
+            "_id": "trans_cmqp4pep601ds02l5gaidau9t",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "Cole Bills and Rent 4/11 june rent",
+            "type": "PAYMENT"
+          },
+          {
+            "amount": -11.07,
+            "date": "2026-06-04T01:36:36.000Z",
+            "created_at": "2026-06-22T11:25:09.162Z",
+            "_id": "trans_cmqp4pep601dm02l5d42x59u1",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "7 Mart"
+            },
+            "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549041336",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -150,
+            "date": "2026-06-03T21:56:05.401Z",
+            "created_at": "2026-06-22T11:25:09.162Z",
+            "_id": "trans_cmqp4pep601dg02l59b7xdyvq",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "description": "Euro trip Euro trip",
+            "type": "STANDING ORDER"
+          },
+          {
+            "amount": -5.08,
+            "date": "2026-06-03T05:40:32.000Z",
+            "created_at": "2026-06-22T11:25:09.162Z",
+            "_id": "trans_cmqp4pep601da02l53bk36oda",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Snapper"
+            },
+            "description": "SNAPPER SERVICES 8699 WELLINGTON 434667031028",
+            "category": {},
+            "type": "EFTPOS"
+          },
+          {
+            "amount": -57.52,
+            "date": "2026-06-28T01:45:36.000Z",
+            "created_at": "2026-06-28T11:18:32.643Z",
+            "_id": "trans_cmqxp3z2t0skz02l44w28hacw",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "merchant": {
+              "name": "Woolworths"
+            },
+            "description": "WOOLWORTHS NZ/3 JOHN",
+            "category": {},
+            "type": "EFTPOS"
+          }
+        ],
+        "rules_file": "rules_snapshot.yaml"
+      },
+      "expected": {
+        "result": {
+          "seen": 25,
+          "raw_inserted": 25,
+          "posted": 25,
+          "skipped_pending": 0,
+          "skipped_duplicate": 0,
+          "skipped_zero_amount": 0,
+          "errors": []
+        },
+        "journal_transactions": [
+          {
+            "external_id": "1dbae9f41886142bca0bf2468ca6c8392be77cc58f40248eb5509f6ffaeb7ea6",
+            "transaction_date": "2026-06-03",
+            "description": "Euro trip Euro trip",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "STANDING ORDER",
+            "rule_id": "transfer_travel_reserve",
+            "postings": [
+              {
+                "account": "Assets:Treasury:TravelReserve",
+                "side": "debit",
+                "amount_cents": 15000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 15000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "4cd19f8b84f3e05438f455c234de026d219d60a8c4404afa018da06fa8bd7729",
+            "transaction_date": "2026-06-03",
+            "description": "SNAPPER SERVICES 8699 WELLINGTON 434667031028",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "transport_public_and_micro",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Transport",
+                "side": "debit",
+                "amount_cents": 508,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 508,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "0b782a37263bbe4d189856dc0e713f08151600f051605f1c16f8692f8b3ab783",
+            "transaction_date": "2026-06-04",
+            "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549041336",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 1107,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1107,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "8cfd061b9c978b3a9b2ecd63a064e3cbcb3261348c75e71b2e9f842d1d36324c",
+            "transaction_date": "2026-06-05",
+            "description": "Cole Bills and Rent 4/11 june rent",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "PAYMENT",
+            "rule_id": "facilities_rent",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Facilities:Rent",
+                "side": "debit",
+                "amount_cents": 48000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 48000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "edfd8d119a6f93a15500d076a9240b1290329dfa687ad1005e0978908af7e48d",
+            "transaction_date": "2026-06-06",
+            "description": "Shelly Bay Baker Lim 8699 Wellington 420549061201",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 2754,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 2754,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "22a1367a9f9e4f5c60819750c51c15bcf24e547d92b5910159aa52cfd18883df",
+            "transaction_date": "2026-06-07",
+            "description": "BREZELMANIA EGMONTST 8699 WELLINGTON 434667081056",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 1666,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1666,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "a12bbabdc95414cdb2a1f237cd841f959ceb1ff883c773250aeb433f511c8fe0",
+            "transaction_date": "2026-06-07",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466071148",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "ai_and_coding_tools",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Software:AIAndTools",
+                "side": "debit",
+                "amount_cents": 1767,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1767,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "1e691c9f8823647ce48161cb2bbd0cbd7fa84e7f1f2f097a96b8ba5ff563483b",
+            "transaction_date": "2026-06-07",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466070535",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "ai_and_coding_tools",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Software:AIAndTools",
+                "side": "debit",
+                "amount_cents": 1767,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1767,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "49fb1b663577e2019a4cd9809490cdf46374147a093294a69787042b6384cc39",
+            "transaction_date": "2026-06-09",
+            "description": "Euro trip INTERNET XFR",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "TRANSFER",
+            "rule_id": "transfer_travel_reserve",
+            "postings": [
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "debit",
+                "amount_cents": 15000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Treasury:TravelReserve",
+                "side": "credit",
+                "amount_cents": 15000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "b60e9c1f0b53b736c7b57eaee85ba3445e866421d74bfb594518d68cd65c4f25",
+            "transaction_date": "2026-06-09",
+            "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046091601",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 1990,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1990,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "1d412e9976ea9a6b0ba2cc47dfe6f0014a146d5be3bd4deeeef80c66b94278bb",
+            "transaction_date": "2026-06-10",
+            "description": "Twisted Frequency INTERNET XFR",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "TRANSFER",
+            "rule_id": "transfer_twisted_frequency",
+            "postings": [
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "debit",
+                "amount_cents": 2000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Investments:Blossom:TwistedFrequency",
+                "side": "credit",
+                "amount_cents": 2000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "8d51e76c7ed6936beaa1934c25fe80ce00449b734201cf9646cbd22a1ceaf5ef",
+            "transaction_date": "2026-06-10",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466100314",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "ai_and_coding_tools",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Software:AIAndTools",
+                "side": "debit",
+                "amount_cents": 1764,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1764,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "1bf1a89b66899abef12ec68126ad8d9c5c70f1286f8b5a194088776e281f6a92",
+            "transaction_date": "2026-06-10",
+            "description": "TJ KATSU AND UDON 8699 WELLINGTON 455046101206",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 1990,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1990,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "b8e15f2f49e671e38737f66806206ac639969df969fdc081cbd20923de9a6c2c",
+            "transaction_date": "2026-06-13",
+            "description": "AMP CODE 8699 AMPCODE.COM 406466131212",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "ai_and_coding_tools",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Software:AIAndTools",
+                "side": "debit",
+                "amount_cents": 1760,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1760,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "12232e3a93d299591912e8529429e22cf931d71dadb8f3c8123ca506e398a893",
+            "transaction_date": "2026-06-17",
+            "description": "LES MILLS LES MILLS BILLING DD0018697723",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "DIRECT DEBIT",
+            "rule_id": "founder_performance_health",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:FounderPerformance",
+                "side": "debit",
+                "amount_cents": 5600,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 5600,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "e7c9673cf2c9ff4ee04a00989f99ad94b47eac08a88dce63cd65b5c906c5e495",
+            "transaction_date": "2026-06-17",
+            "description": "Alphero Limited Alhpero salary",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "CREDIT",
+            "rule_id": "revenue_employment_services",
+            "postings": [
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "debit",
+                "amount_cents": 183082,
+                "currency": "NZD"
+              },
+              {
+                "account": "Income:Operating:EmploymentServices",
+                "side": "credit",
+                "amount_cents": 183082,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "2da31ee88b015c711f487e5ec34173f722354c74ec91e6cc489e0255d61af4b6",
+            "transaction_date": "2026-06-18",
+            "description": "BlossomApp Pty Ltd akp150104cxh",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "PAYMENT",
+            "rule_id": "investment_blossom",
+            "postings": [
+              {
+                "account": "Assets:Investments:Blossom",
+                "side": "debit",
+                "amount_cents": 10000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 10000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "50a208826d08fbe2e4346fbbc7dfd87b75c45eae8f8ce7ce5d36f710d09e5c75",
+            "transaction_date": "2026-06-18",
+            "description": "Cole Bills and Rent rent 18/25 Jun",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "PAYMENT",
+            "rule_id": "facilities_rent",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Facilities:Rent",
+                "side": "debit",
+                "amount_cents": 48000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 48000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "149d3cc51bec497afb7d80da94f2f6a5a9c4b3c9acb1085a8ab364b881dd4822",
+            "transaction_date": "2026-06-19",
+            "description": "WITHDRAWAL 553025568699 Woolworths N 0499191805",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "ATM",
+            "rule_id": "owner_drawings_cash",
+            "postings": [
+              {
+                "account": "Equity:Owner:Drawings",
+                "side": "debit",
+                "amount_cents": 5000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 5000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "7cc6eeea668c5ff5f4323e155f96df8203aefa60e8d5effdad4fc07c0672e09a",
+            "transaction_date": "2026-06-19",
+            "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549191251",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 810,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 810,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "788ed0716a0900c37dc4b26c513520a28f67c099d9dda52d8014ee8a2824c77b",
+            "transaction_date": "2026-06-20",
+            "description": "BURKE BA & WE Utube premiu",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "STANDING ORDER",
+            "rule_id": "contra_ai_software_reimbursement",
+            "postings": [
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "debit",
+                "amount_cents": 1399,
+                "currency": "NZD"
+              },
+              {
+                "account": "Expenses:OpEx:Software:AIAndTools",
+                "side": "credit",
+                "amount_cents": 1399,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "e3e95578282ebdd3b8796780a235a511146cf95bff8a28f0896bd53620c24bb2",
+            "transaction_date": "2026-06-20",
+            "description": "YR Door Mart",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 450,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 450,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "19f61e7879ecd501c2fe784bec1b39f0812f121700da6de338b8c567be24c19f",
+            "transaction_date": "2026-06-21",
+            "description": "NEBULA SUBSCRIPTION",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "ai_and_coding_tools",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:Software:AIAndTools",
+                "side": "debit",
+                "amount_cents": 1073,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1073,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "b4348690637555075bb7da62459f518c808275636313c1853fe4efd81c72a295",
+            "transaction_date": "2026-06-26",
+            "description": "10820473 10820473",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "DIRECT CREDIT",
+            "rule_id": "manual_10820473_10820473",
+            "postings": [
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "debit",
+                "amount_cents": 15000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Income:Personal:Gifts",
+                "side": "credit",
+                "amount_cents": 15000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "80c2f3c872bf8d8148732eb13c1a9243708151983a003c5597b80b6e35a62a5a",
+            "transaction_date": "2026-06-28",
+            "description": "WOOLWORTHS NZ/3 JOHN",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "EFTPOS",
+            "rule_id": "meals_and_provisions",
+            "postings": [
+              {
+                "account": "Expenses:OpEx:MealsAndProvisions",
+                "side": "debit",
+                "amount_cents": 5752,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 5752,
+                "currency": "NZD"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "synthetic_sign_convention_debit_credit",
+      "source": "synthetic",
+      "note": "Positive amount (money IN): source ledger account is DEBITed, target account is CREDITed. Negative amount (money OUT): target account is DEBITed, source ledger account is CREDITed. Both postings always use abs(amount_cents).",
+      "input": {
+        "payloads": [
+          {
+            "_id": "txn_sign_pos",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "description": "INCOMING ALPHERO PAYROLL",
+            "amount": 100.0
+          },
+          {
+            "_id": "txn_sign_neg",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "description": "UNKNOWN OUTGOING SPEND",
+            "amount": -100.0
+          }
+        ],
+        "rules_file": "rules_snapshot.yaml"
+      },
+      "expected": {
+        "result": {
+          "seen": 2,
+          "raw_inserted": 2,
+          "posted": 2,
+          "skipped_pending": 0,
+          "skipped_duplicate": 0,
+          "skipped_zero_amount": 0,
+          "errors": []
+        },
+        "journal_transactions": [
+          {
+            "external_id": "092c9ab3f7d4ddcab50b61a67681532da025096f000703c4008b6be7ec1883e2",
+            "transaction_date": "2026-03-01",
+            "description": "INCOMING ALPHERO PAYROLL",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "SETTLED",
+            "rule_id": "revenue_employment_services",
+            "postings": [
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "debit",
+                "amount_cents": 10000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Income:Operating:EmploymentServices",
+                "side": "credit",
+                "amount_cents": 10000,
+                "currency": "NZD"
+              }
+            ]
+          },
+          {
+            "external_id": "cb4f82b2e6d0b00cfa87d47de5bdd33f816cbd94e57e5801a5fb32bf031b6c27",
+            "transaction_date": "2026-03-01",
+            "description": "UNKNOWN OUTGOING SPEND",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "SETTLED",
+            "rule_id": null,
+            "postings": [
+              {
+                "account": "Expenses:Uncategorized:Suspense",
+                "side": "debit",
+                "amount_cents": 10000,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 10000,
+                "currency": "NZD"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "synthetic_manual_classification_overrides_rule",
+      "source": "synthetic",
+      "note": "A manual_classifications row for this idempotency_hash wins over the rule engine; rule_id becomes the literal string 'manual:override'.",
+      "input": {
+        "payloads": [
+          {
+            "_id": "txn_override_1",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "description": "would normally hit meals_and_provisions woolworths",
+            "amount": -25.0
+          }
+        ],
+        "rules_file": "rules_snapshot.yaml",
+        "manual_classifications": [
+          {
+            "external_id": "77b24b775e949744887e7daa7882939f716b735673a14e8bb338c1ebe6e46b13",
+            "target_account": "Expenses:Personal:ManualOverrideTarget",
+            "memo": "test memo"
+          }
+        ]
+      },
+      "expected": {
+        "result": {
+          "seen": 1,
+          "raw_inserted": 1,
+          "posted": 1,
+          "skipped_pending": 0,
+          "skipped_duplicate": 0,
+          "skipped_zero_amount": 0,
+          "errors": []
+        },
+        "journal_transactions": [
+          {
+            "external_id": "77b24b775e949744887e7daa7882939f716b735673a14e8bb338c1ebe6e46b13",
+            "transaction_date": "2026-03-01",
+            "description": "would normally hit meals_and_provisions woolworths",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "SETTLED",
+            "rule_id": "manual:override",
+            "postings": [
+              {
+                "account": "Expenses:Personal:ManualOverrideTarget",
+                "side": "debit",
+                "amount_cents": 2500,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 2500,
+                "currency": "NZD"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "synthetic_duplicate_payload_is_idempotent",
+      "source": "synthetic",
+      "note": "Processing the identical payload twice in one batch posts exactly one journal transaction; the second occurrence is skipped_duplicate.",
+      "input": {
+        "payloads": [
+          {
+            "_id": "txn_dup_1",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "description": "DUPLICATE TEST TXN",
+            "amount": -15.0
+          },
+          {
+            "_id": "txn_dup_1",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "description": "DUPLICATE TEST TXN",
+            "amount": -15.0
+          }
+        ],
+        "rules_file": "rules_snapshot.yaml"
+      },
+      "expected": {
+        "result": {
+          "seen": 2,
+          "raw_inserted": 1,
+          "posted": 1,
+          "skipped_pending": 0,
+          "skipped_duplicate": 1,
+          "skipped_zero_amount": 0,
+          "errors": []
+        },
+        "journal_transactions": [
+          {
+            "external_id": "80344106bff9a78e20111d5355d3a38b631a0ae5a3760e73502bfc4cdf6d4544",
+            "transaction_date": "2026-03-01",
+            "description": "DUPLICATE TEST TXN",
+            "source_account_id": "acc_cmqp4p4gx00ev02k09dbja392",
+            "status": "SETTLED",
+            "rule_id": null,
+            "postings": [
+              {
+                "account": "Expenses:Uncategorized:Suspense",
+                "side": "debit",
+                "amount_cents": 1500,
+                "currency": "NZD"
+              },
+              {
+                "account": "Assets:Bank:BNZ:Operating",
+                "side": "credit",
+                "amount_cents": 1500,
+                "currency": "NZD"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "synthetic_pending_transaction_discarded",
+      "source": "synthetic",
+      "note": "PENDING/AUTHORISED/AUTHORIZED/HELD statuses are raw_inserted but never posted as journal transactions (discard_pending=True).",
+      "input": {
+        "payloads": [
+          {
+            "_id": "txn_pending_synth_1",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "status": "PENDING",
+            "description": "PENDING TXN",
+            "amount": -8.0
+          }
+        ],
+        "rules_file": "rules_snapshot.yaml"
+      },
+      "expected": {
+        "result": {
+          "seen": 1,
+          "raw_inserted": 1,
+          "posted": 0,
+          "skipped_pending": 1,
+          "skipped_duplicate": 0,
+          "skipped_zero_amount": 0,
+          "errors": []
+        },
+        "journal_transactions": []
+      }
+    },
+    {
+      "case_id": "synthetic_zero_amount_transaction_skipped",
+      "source": "synthetic",
+      "note": "Zero-amount transactions are raw_inserted but never posted (no valid debit/credit pair).",
+      "input": {
+        "payloads": [
+          {
+            "_id": "txn_zero_synth_1",
+            "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+            "date": "2026-03-01",
+            "description": "ZERO AMOUNT TXN",
+            "amount": 0
+          }
+        ],
+        "rules_file": "rules_snapshot.yaml"
+      },
+      "expected": {
+        "result": {
+          "seen": 1,
+          "raw_inserted": 1,
+          "posted": 0,
+          "skipped_pending": 0,
+          "skipped_duplicate": 0,
+          "skipped_zero_amount": 1,
+          "errors": []
+        },
+        "journal_transactions": []
+      }
+    }
+  ]
+}

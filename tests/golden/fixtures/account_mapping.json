@@ -1,0 +1,102 @@
+{
+  "cases": [
+    {
+      "case_id": "known_acc_cmqp4p4gx00ev02k09dbja392",
+      "source": "real",
+      "input": {
+        "account_id": "acc_cmqp4p4gx00ev02k09dbja392"
+      },
+      "expected": {
+        "ledger_account": "Assets:Bank:BNZ:Operating",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "known_acc_cmqp4p4h500ex02k0btl0g6fs",
+      "source": "real",
+      "input": {
+        "account_id": "acc_cmqp4p4h500ex02k0btl0g6fs"
+      },
+      "expected": {
+        "ledger_account": "Assets:Treasury:SlushFund",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "known_acc_cmoxiaqsd005n02juf9vi6sww",
+      "source": "real",
+      "input": {
+        "account_id": "acc_cmoxiaqsd005n02juf9vi6sww"
+      },
+      "expected": {
+        "ledger_account": "Assets:Investments:Sharesies:Spend",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "known_acc_cmoxiaqse005p02ju9jww3sb0",
+      "source": "real",
+      "input": {
+        "account_id": "acc_cmoxiaqse005p02ju9jww3sb0"
+      },
+      "expected": {
+        "ledger_account": "Assets:Investments:Sharesies:Growth",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "known_acc_cmoxiaqse005o02ju4a01hudz",
+      "source": "real",
+      "input": {
+        "account_id": "acc_cmoxiaqse005o02ju4a01hudz"
+      },
+      "expected": {
+        "ledger_account": "Assets:Investments:Sharesies:Emergencies",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "known_acc_cmoxiaqru005m02ju4x9a0srj",
+      "source": "real",
+      "input": {
+        "account_id": "acc_cmoxiaqru005m02ju4x9a0srj"
+      },
+      "expected": {
+        "ledger_account": "Assets:Investments:Sharesies:KiwiSaver",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "synthetic_unknown_account_falls_back_to_unmapped_asset",
+      "source": "synthetic",
+      "note": "Unknown account ids fall back to Assets:Unmapped:{sanitized_id} as type asset",
+      "input": {
+        "account_id": "acc_totally_unmapped_example"
+      },
+      "expected": {
+        "ledger_account": "Assets:Unmapped:acc_totally_unmapped_example",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    },
+    {
+      "case_id": "synthetic_unknown_account_id_sanitization",
+      "source": "synthetic",
+      "note": "Non [A-Za-z0-9_:-] characters in an unmapped account id are replaced with '_'",
+      "input": {
+        "account_id": "acc/weird id!!with$$chars"
+      },
+      "expected": {
+        "ledger_account": "Assets:Unmapped:acc_weird_id__with__chars",
+        "account_type": "asset",
+        "credit_limit_cents": null
+      }
+    }
+  ]
+}

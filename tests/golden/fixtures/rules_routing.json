@@ -1,0 +1,774 @@
+{
+  "cases": [
+    {
+      "case_id": "real_0009",
+      "source": "real",
+      "input": {
+        "amount": -10.73,
+        "date": "2026-06-21T10:31:22.000Z",
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "_id": "trans_cmqp4pczs13tb02kz1ufycyl5",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Nebula"
+        },
+        "description": "NEBULA SUBSCRIPTION",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "ai_and_coding_tools",
+        "matched_by": "rule",
+        "memo": "AI/coding tools for You Inc. operating leverage"
+      }
+    },
+    {
+      "case_id": "real_0011",
+      "source": "real",
+      "input": {
+        "amount": 13.99,
+        "date": "2026-06-20T21:10:07.000Z",
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "_id": "trans_cmqp4pczs13t902kz5mav3e22",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "BURKE BA & WE Utube premiu",
+        "type": "STANDING ORDER"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "contra_ai_software_reimbursement",
+        "matched_by": "rule",
+        "memo": "Reimbursement/contra expense for software subscription"
+      }
+    },
+    {
+      "case_id": "real_0019",
+      "source": "real",
+      "input": {
+        "amount": -50,
+        "date": "2026-06-19T06:05:46.000Z",
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "_id": "trans_cmqp4pepj01fu02l502th729k",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "WITHDRAWAL 553025568699 Woolworths N 0499191805",
+        "type": "ATM"
+      },
+      "expected": {
+        "target_account": "Equity:Owner:Drawings",
+        "rule_id": "owner_drawings_cash",
+        "matched_by": "rule",
+        "memo": "Cash movement requiring board-level review"
+      }
+    },
+    {
+      "case_id": "real_0023",
+      "source": "real",
+      "input": {
+        "amount": -100,
+        "date": "2026-06-18T12:45:08.518Z",
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "_id": "trans_cmqp4pepj01fq02l51dwtcckb",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Blossom"
+        },
+        "description": "BlossomApp Pty Ltd akp150104cxh",
+        "category": {},
+        "type": "PAYMENT"
+      },
+      "expected": {
+        "target_account": "Assets:Investments:Blossom",
+        "rule_id": "investment_blossom",
+        "matched_by": "rule",
+        "memo": "Treasury investment allocation"
+      }
+    },
+    {
+      "case_id": "real_0030",
+      "source": "real",
+      "input": {
+        "amount": -56,
+        "date": "2026-06-17T22:46:34.394Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01fj02l50r0j0sjk",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Les Mills"
+        },
+        "description": "LES MILLS LES MILLS BILLING DD0018697723",
+        "category": {},
+        "type": "DIRECT DEBIT"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:FounderPerformance",
+        "rule_id": "founder_performance_health",
+        "matched_by": "rule",
+        "memo": "Founder health/performance capability"
+      }
+    },
+    {
+      "case_id": "real_0033",
+      "source": "real",
+      "input": {
+        "amount": 1830.82,
+        "date": "2026-06-17T18:00:34.822Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01fg02l5cnovbe0d",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "Alphero Limited Alhpero salary",
+        "type": "CREDIT"
+      },
+      "expected": {
+        "target_account": "Income:Operating:EmploymentServices",
+        "rule_id": "revenue_employment_services",
+        "matched_by": "rule",
+        "memo": "Operating income from employment/services"
+      }
+    },
+    {
+      "case_id": "real_0043",
+      "source": "real",
+      "input": {
+        "amount": 20,
+        "date": "2026-06-10T20:38:28.145Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01f602l56psacw63",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "Twisted Frequency INTERNET XFR",
+        "type": "TRANSFER"
+      },
+      "expected": {
+        "target_account": "Assets:Investments:Blossom:TwistedFrequency",
+        "rule_id": "transfer_twisted_frequency",
+        "matched_by": "rule",
+        "memo": "Transfer to Blossom Twisted Frequency pot (tracked via manual balance, not Akahu)"
+      }
+    },
+    {
+      "case_id": "real_0664",
+      "source": "real",
+      "input": {
+        "amount": 150,
+        "date": "2026-06-26T01:33:19.000Z",
+        "created_at": "2026-06-26T11:18:24.381Z",
+        "_id": "trans_cmquu83bm0a8z02l12og082kc",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "10820473 10820473",
+        "type": "DIRECT CREDIT"
+      },
+      "expected": {
+        "target_account": "Income:Personal:Gifts",
+        "rule_id": "manual_10820473_10820473",
+        "matched_by": "rule",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "real_0014",
+      "source": "real",
+      "input": {
+        "amount": -29.96,
+        "date": "2026-06-20T06:40:55.000Z",
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "_id": "trans_cmqp4pczs13t602kz4uga5qck",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "KFC"
+        },
+        "description": "KFC COURTENAY PLACE",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:MealsAndProvisions",
+        "rule_id": "meals_and_provisions",
+        "matched_by": "rule",
+        "memo": "Operating sustenance/provisions for You Inc."
+      }
+    },
+    {
+      "case_id": "real_0024",
+      "source": "real",
+      "input": {
+        "amount": -160,
+        "date": "2026-06-18T12:27:07.359Z",
+        "created_at": "2026-06-22T11:25:09.175Z",
+        "_id": "trans_cmqp4pepj01fp02l59wkl01fc",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Blossom"
+        },
+        "description": "BlossomApp Pty Ltd akp2z0u092ki",
+        "category": {},
+        "type": "PAYMENT"
+      },
+      "expected": {
+        "target_account": "Assets:Investments:Blossom",
+        "rule_id": "investment_blossom",
+        "matched_by": "rule",
+        "memo": "Treasury investment allocation"
+      }
+    },
+    {
+      "case_id": "real_0029",
+      "source": "real",
+      "input": {
+        "amount": -14.5,
+        "date": "2026-06-18T00:38:28.000Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01fk02l57z99ex0t",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Subway"
+        },
+        "description": "SUBWAY DIXON STREET 8699 WELLINGTON 434667181028",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:MealsAndProvisions",
+        "rule_id": "meals_and_provisions",
+        "matched_by": "rule",
+        "memo": "Operating sustenance/provisions for You Inc."
+      }
+    },
+    {
+      "case_id": "real_0034",
+      "source": "real",
+      "input": {
+        "amount": -10.15,
+        "date": "2026-06-17T11:38:03.000Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01ff02l5fr7a4kls",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "OpenAI"
+        },
+        "description": "OPENAI 8699 OPENAI.COM 449216170313",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "ai_and_coding_tools",
+        "matched_by": "rule",
+        "memo": "AI/coding tools for You Inc. operating leverage"
+      }
+    },
+    {
+      "case_id": "real_0039",
+      "source": "real",
+      "input": {
+        "amount": -17.6,
+        "date": "2026-06-13T07:43:32.000Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01fa02l5ez41bfjk",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466131212",
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "ai_and_coding_tools",
+        "matched_by": "rule",
+        "memo": "AI/coding tools for You Inc. operating leverage"
+      }
+    },
+    {
+      "case_id": "real_0044",
+      "source": "real",
+      "input": {
+        "amount": -2.84,
+        "date": "2026-06-10T15:02:16.000Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01f502l582o07gk9",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Snapper"
+        },
+        "description": "SNAPPER SERVICES 8699 WELLINGTON 434667101713",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Transport",
+        "rule_id": "transport_public_and_micro",
+        "matched_by": "rule",
+        "memo": "Operating transport"
+      }
+    },
+    {
+      "case_id": "real_0049",
+      "source": "real",
+      "input": {
+        "amount": -3.5,
+        "date": "2026-06-10T08:00:37.881Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01f002l5ftrg88p5",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "Bronte juice",
+        "type": "PAYMENT"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:MealsAndProvisions",
+        "rule_id": "meals_and_provisions",
+        "matched_by": "rule",
+        "memo": "Operating sustenance/provisions for You Inc."
+      }
+    },
+    {
+      "case_id": "real_0054",
+      "source": "real",
+      "input": {
+        "amount": 100,
+        "date": "2026-06-09T12:49:16.146Z",
+        "created_at": "2026-06-22T11:25:09.174Z",
+        "_id": "trans_cmqp4pepi01ev02l58y9xchs3",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "slush find INTERNET XFR",
+        "type": "TRANSFER"
+      },
+      "expected": {
+        "target_account": "Assets:Internal:TransferClearing",
+        "rule_id": "manual_slush_find",
+        "matched_by": "rule",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "real_0059",
+      "source": "real",
+      "input": {
+        "amount": -17.71,
+        "date": "2026-06-09T10:14:44.000Z",
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "_id": "trans_cmqp4pep701eq02l54lak66yd",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466091049",
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "ai_and_coding_tools",
+        "matched_by": "rule",
+        "memo": "AI/coding tools for You Inc. operating leverage"
+      }
+    },
+    {
+      "case_id": "real_0064",
+      "source": "real",
+      "input": {
+        "amount": -20,
+        "date": "2026-06-08T17:35:40.424Z",
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "_id": "trans_cmqp4pep701el02l55lvdbmll",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "PG License paraglider savings",
+        "type": "STANDING ORDER"
+      },
+      "expected": {
+        "target_account": "Assets:Treasury:CertificationReserve",
+        "rule_id": "transfer_certification_reserve",
+        "matched_by": "rule",
+        "memo": "Capability/certification reserve allocation"
+      }
+    },
+    {
+      "case_id": "real_0069",
+      "source": "real",
+      "input": {
+        "amount": -16.66,
+        "date": "2026-06-07T21:36:36.000Z",
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "_id": "trans_cmqp4pep701eg02l5hub5e9ol",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Brezelmania"
+        },
+        "description": "BREZELMANIA EGMONTST 8699 WELLINGTON 434667081056",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:MealsAndProvisions",
+        "rule_id": "meals_and_provisions",
+        "matched_by": "rule",
+        "memo": "Operating sustenance/provisions for You Inc."
+      }
+    },
+    {
+      "case_id": "real_0074",
+      "source": "real",
+      "input": {
+        "amount": -17.67,
+        "date": "2026-06-07T12:54:05.000Z",
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "_id": "trans_cmqp4pep701eb02l5g3x0ene5",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466070359",
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "ai_and_coding_tools",
+        "matched_by": "rule",
+        "memo": "AI/coding tools for You Inc. operating leverage"
+      }
+    },
+    {
+      "case_id": "real_0079",
+      "source": "real",
+      "input": {
+        "amount": -17.67,
+        "date": "2026-06-07T05:20:27.000Z",
+        "created_at": "2026-06-22T11:25:09.163Z",
+        "_id": "trans_cmqp4pep701e602l5bjww41ku",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "AMP CODE 8699 AMPCODE.COM 406466070558",
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "ai_and_coding_tools",
+        "matched_by": "rule",
+        "memo": "AI/coding tools for You Inc. operating leverage"
+      }
+    },
+    {
+      "case_id": "real_0084",
+      "source": "real",
+      "input": {
+        "amount": 775,
+        "date": "2026-06-06T05:57:21.441Z",
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "_id": "trans_cmqp4pep601e102l5hr156hhb",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "MRS C S MASTERS AND Masters Plyometrics",
+        "type": "CREDIT"
+      },
+      "expected": {
+        "target_account": "Income:Operating:ClientServices",
+        "rule_id": "revenue_client_services",
+        "matched_by": "rule",
+        "memo": "Client/service revenue"
+      }
+    },
+    {
+      "case_id": "real_0089",
+      "source": "real",
+      "input": {
+        "amount": -5.99,
+        "date": "2026-06-05T10:13:48.000Z",
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "_id": "trans_cmqp4pep601dw02l56xpuatxc",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Apple"
+        },
+        "description": "APPLE.COM/BILL 8699 SYDNEY 406988051737",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:CloudServices",
+        "rule_id": "productivity_cloud",
+        "matched_by": "rule",
+        "memo": "Cloud/productivity subscription"
+      }
+    },
+    {
+      "case_id": "real_0094",
+      "source": "real",
+      "input": {
+        "amount": -50,
+        "date": "2026-06-05T02:14:31.391Z",
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "_id": "trans_cmqp4pep601dr02l58we7a9pv",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "PAYCHASE LIMITED INTERNET XFR",
+        "type": "TRANSFER"
+      },
+      "expected": {
+        "target_account": "Equity:Owner:Drawings",
+        "rule_id": "manual_paychase_limited_internet_xfr",
+        "matched_by": "rule",
+        "memo": "Closing out Paychase account (funding from negative to zero)"
+      }
+    },
+    {
+      "case_id": "real_0099",
+      "source": "real",
+      "input": {
+        "amount": -11.07,
+        "date": "2026-06-04T01:36:36.000Z",
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "_id": "trans_cmqp4pep601dm02l5d42x59u1",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "7 Mart"
+        },
+        "description": "7 Mart - 19 Dixon St 8699 Te Aro 420549041336",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:MealsAndProvisions",
+        "rule_id": "meals_and_provisions",
+        "matched_by": "rule",
+        "memo": "Operating sustenance/provisions for You Inc."
+      }
+    },
+    {
+      "case_id": "real_0104",
+      "source": "real",
+      "input": {
+        "amount": -200,
+        "date": "2026-06-03T21:56:05.425Z",
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "_id": "trans_cmqp4pep601dh02l554fbh320",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "Sharesies Spend HB1049329",
+        "type": "STANDING ORDER"
+      },
+      "expected": {
+        "target_account": "Assets:Internal:TransferClearing",
+        "rule_id": "investment_sharesies",
+        "matched_by": "rule",
+        "memo": "BNZ leg of a BNZ <-> Sharesies Spend transfer"
+      }
+    },
+    {
+      "case_id": "real_0109",
+      "source": "real",
+      "input": {
+        "amount": 30,
+        "date": "2026-06-03T21:21:47.707Z",
+        "created_at": "2026-06-22T11:25:09.162Z",
+        "_id": "trans_cmqp4pep601dc02l5bto935wt",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "BURKE BA & WE CHATGPT",
+        "type": "STANDING ORDER"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:Software:AIAndTools",
+        "rule_id": "contra_ai_software_reimbursement",
+        "matched_by": "rule",
+        "memo": "Reimbursement/contra expense for software subscription"
+      }
+    },
+    {
+      "case_id": "real_0219",
+      "source": "real",
+      "input": {
+        "amount": -7.18,
+        "date": "2026-06-22T01:28:06.000Z",
+        "created_at": "2026-06-22T11:25:22.829Z",
+        "_id": "trans_cmqp4pczs13tf02kz9zkb58o0",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "7 Mart"
+        },
+        "description": "7 Mart - 19 Dixon St",
+        "category": {},
+        "type": "EFTPOS"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:MealsAndProvisions",
+        "rule_id": "meals_and_provisions",
+        "matched_by": "rule",
+        "memo": "Operating sustenance/provisions for You Inc."
+      }
+    },
+    {
+      "case_id": "real_0663",
+      "source": "real",
+      "input": {
+        "amount": 11,
+        "date": "2026-06-27T04:07:14.000Z",
+        "created_at": "2026-06-27T11:18:50.798Z",
+        "_id": "trans_cmqw9oi9t06xj02ladifwgt6j",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "description": "MACKRELL,NIKI Passport",
+        "type": "PAYMENT"
+      },
+      "expected": {
+        "target_account": "Expenses:Uncategorized:Suspense",
+        "rule_id": null,
+        "matched_by": "suspense",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "real_0668",
+      "source": "real",
+      "input": {
+        "amount": -28,
+        "date": "2026-06-24T21:46:51.000Z",
+        "created_at": "2026-06-25T11:17:44.711Z",
+        "_id": "trans_cmqtere0p0yia02i84fbp08q5",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "merchant": {
+          "name": "Les Mills"
+        },
+        "description": "LES MILLS LES MILLS BILLING DD0018734097",
+        "category": {},
+        "type": "DIRECT DEBIT"
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:FounderPerformance",
+        "rule_id": "founder_performance_health",
+        "matched_by": "rule",
+        "memo": "Founder health/performance capability"
+      }
+    },
+    {
+      "case_id": "synthetic_suspense_fallback",
+      "source": "synthetic",
+      "note": "no rule or nzfcc matches -> suspense account, rule_id null",
+      "input": {
+        "_id": "txn_r1",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "date": "2026-03-01",
+        "description": "TOTALLY UNKNOWN MERCHANT XYZ",
+        "amount": -12.34
+      },
+      "expected": {
+        "target_account": "Expenses:Uncategorized:Suspense",
+        "rule_id": null,
+        "matched_by": "suspense",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "synthetic_amount_greater_than_boundary_excluded",
+      "source": "synthetic",
+      "note": "amount_greater_than is strict: exactly 0 does not match a >0 rule",
+      "input": {
+        "_id": "txn_r2",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "date": "2026-03-01",
+        "description": "alphero payroll",
+        "amount": 0
+      },
+      "expected": {
+        "target_account": "Expenses:Uncategorized:Suspense",
+        "rule_id": null,
+        "matched_by": "suspense",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "synthetic_priority_tiebreak_insertion_order",
+      "source": "synthetic",
+      "note": "Two rules share priority=10; RulesRouter sorts by (priority, original index), so the FIRST rule declared in the rules list wins when both match. This pins the seq/insertion-order tiebreak behavior a TS port must replicate exactly (a stable sort on declaration order, not e.g. reverse order or hash-map iteration order).",
+      "router_config": {
+        "defaults": {
+          "suspense_account": "Expenses:Uncategorized:Suspense"
+        },
+        "account_mappings": {},
+        "nzfcc_mappings": {},
+        "rules": [
+          {
+            "id": "declared_first",
+            "priority": 10,
+            "match": {
+              "description_regex": "(?i)coffee"
+            },
+            "route": {
+              "target_account": "Expenses:OpEx:First"
+            }
+          },
+          {
+            "id": "declared_second",
+            "priority": 10,
+            "match": {
+              "description_regex": "(?i)coffee"
+            },
+            "route": {
+              "target_account": "Expenses:OpEx:Second"
+            }
+          }
+        ]
+      },
+      "input": {
+        "_id": "txn_tie_1",
+        "_account": "acc_x",
+        "date": "2026-03-01",
+        "description": "COFFEE STOP",
+        "amount": -5.0
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:First",
+        "rule_id": "declared_first",
+        "matched_by": "rule",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "synthetic_priority_lower_number_wins_over_insertion_order",
+      "source": "synthetic",
+      "note": "priority is the PRIMARY sort key; a lower-priority-number rule declared LATER still wins over a higher-priority-number rule declared earlier.",
+      "router_config": {
+        "defaults": {
+          "suspense_account": "Expenses:Uncategorized:Suspense"
+        },
+        "account_mappings": {},
+        "nzfcc_mappings": {},
+        "rules": [
+          {
+            "id": "declared_first_low_priority_number",
+            "priority": 5,
+            "match": {
+              "description_regex": "(?i)coffee"
+            },
+            "route": {
+              "target_account": "Expenses:OpEx:HighPriorityWins"
+            }
+          },
+          {
+            "id": "declared_second_high_priority_number",
+            "priority": 10,
+            "match": {
+              "description_regex": "(?i)coffee"
+            },
+            "route": {
+              "target_account": "Expenses:OpEx:LosesDespiteLaterDeclOrder"
+            }
+          }
+        ]
+      },
+      "input": {
+        "_id": "txn_tie_2",
+        "_account": "acc_x",
+        "date": "2026-03-01",
+        "description": "COFFEE STOP",
+        "amount": -5.0
+      },
+      "expected": {
+        "target_account": "Expenses:OpEx:HighPriorityWins",
+        "rule_id": "declared_first_low_priority_number",
+        "matched_by": "rule",
+        "memo": null
+      }
+    },
+    {
+      "case_id": "synthetic_default_priority_1000_when_omitted",
+      "source": "synthetic",
+      "note": "a rule with no explicit priority defaults to 1000",
+      "input": {
+        "_id": "txn_r3",
+        "_account": "acc_cmqp4p4gx00ev02k09dbja392",
+        "date": "2026-03-01",
+        "description": "no matching pattern at all zzz",
+        "amount": -1.0
+      },
+      "expected": {
+        "target_account": "Expenses:Uncategorized:Suspense",
+        "rule_id": null,
+        "matched_by": "suspense",
+        "memo": null
+      }
+    }
+  ]
+}
