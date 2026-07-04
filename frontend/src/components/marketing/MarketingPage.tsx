@@ -1,7 +1,6 @@
 // frontend/src/components/marketing/MarketingPage.tsx
-import { Link } from "@tanstack/react-router";
-import { PRODUCT, BOOKING_URL } from "./config";
 import { useLightTheme } from "./useLightTheme";
+import { MarketingHeader } from "./MarketingHeader";
 import { Hero } from "./Hero";
 import { LiveProofStrip } from "./LiveProofStrip";
 import { HowItWorks } from "./HowItWorks";
@@ -19,15 +18,7 @@ export function MarketingPage() {
   useLightTheme();
   return (
     <div className="mk">
-      <header className="mk-nav">
-        <span className="mk-nav__logo">{PRODUCT.name}</span>
-        <nav className="mk-nav__links" aria-label="Main navigation">
-          <a href="#showcase-heading">Widgets</a>
-          <a href="#pricing-heading">Pricing</a>
-          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">Custom builds</a>
-          <Link className="mk-nav__signin" to="/login">Sign in</Link>
-        </nav>
-      </header>
+      <MarketingHeader />
       <main>
         <Hero />
         <LiveProofStrip />
