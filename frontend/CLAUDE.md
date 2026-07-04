@@ -60,14 +60,26 @@ All paths default relative to the `frontend/` cwd and assume the standard parent
 
 `src/start.ts` configures TanStack Start's `requestMiddleware`, which runs before every request (pages, SSR, server functions). It holds the **passkey session gate** plus the CSRF middleware that Start installs automatically when there is no `start.ts` — defining a custom `start.ts` opts out of that default, so it's re-added explicitly here.
 
-### Auth (passkey / WebAuthn)
+### Auth — two independent systems
 
-`src/server/auth.ts` is the server-only auth module (single-user, no user table). It uses `@simplewebauthn/server` for the registration/authentication ceremonies and a small separate SQLite file (`YOUINC_AUTH_DB_PATH`) for the one credential, live sessions, and pending challenges. Two layers of protection:
+There are **two** auth systems, for two different audiences:
 
-1. **`sessionGate` in `start.ts`** redirects full-page (`handlerType === "router"`) requests without a valid session cookie to `/login`. Static assets and the routes in the `PUBLIC_PATHS` allowlist (`/`, `/demo`, `/custom-builds`, `/widgets`, `/login`) stay open — **adding a new public marketing route means adding it to `PUBLIC_PATHS` too**, or it will 302 to `/login`.
-2. **`requireSession()`** is called at the top of every data/mutating server function (defense in depth) so data never leaves the server without a session, even though the gate lets serverFn requests through.
+**1. Passkey / WebAuthn (the local owner's private dashboard).**
+`src/server/auth.ts` is the server-only, single-user passkey module. It uses `@simplewebauthn/server` for the registration/authentication ceremonies and a small separate SQLite file (`YOUINC_AUTH_DB_PATH`) for the one credential, live sessions, and pending challenges. `src/routes/login.tsx` runs the browser ceremony with `@simplewebauthn/browser`; registration is gated by `YOUINC_ENROLLMENT_TOKEN`. This protects only `/dashboard` (the local SQLite ledger view).
 
-`src/routes/login.tsx` runs the browser ceremony with `@simplewebauthn/browser`. Registration is gated by `YOUINC_ENROLLMENT_TOKEN` (set to enrol, unset to disable).
+**2. Supabase Auth (public self-service signup + multi-tenant).**
+The self-service flow lets anyone create an account and their own tenant. `src/lib/supabaseConfig.ts` resolves the URL/anon key (defaults to the local `supabase start` stack; prod sets `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`). `src/lib/supabaseBrowser.ts` is the browser client; `src/server/supabaseServer.ts` is the request-cookie-backed server client (runs under the user's RLS context — **not** service_role). `src/server/accounts.ts` wraps the tenancy operations: `getAccountState`, `createTenant` (calls the `create_tenant` RPC from migration `20260704120005`), `signOutUser`.
+- Routes: `/signup`, `/signin` (Supabase email+password), `/onboarding` (multi-step: welcome → name your workspace → connect), and `/workspace` (the signed-in self-service home). Each Supabase-gated route gates itself in its own loader (redirects to `/signin` when signed out), not via the session gate.
+- **Email confirmation:** local `supabase/config.toml` has `enable_confirmations = false`, so `signUp` returns a live session and `/signup` routes straight into onboarding. In production (confirmations on) `signUp` returns a user but no session; `/signup` then shows a "check your email" state instead of navigating. Both paths are handled in `routes/signup.tsx`.
+
+### Workspace ledger (Phase 2, first slice)
+
+`src/server/workspaceLedger.ts` is the **tenant-scoped Postgres DAL** for the self-service `/workspace`. It reads/writes `manual_account_balances` through the request-cookie Supabase client (the user's RLS context — never service_role), always filtering/​setting `tenant_id` explicitly. `getWorkspaceLedger` summarizes into net worth / assets / liabilities using the SAME conventions as the SQLite dashboard (assets positive, liabilities negative, net worth = assets − liabilities; account "type" = first `:`-segment via `server/accountType.ts`). `upsertWorkspaceBalance` / `deleteWorkspaceBalance` are the mutations, surfaced by `components/workspace/ManualBalancesEditor.tsx`.
+
+- The pure `accountType` helper lives in its own `server/accountType.ts` so `workspaceLedger.test.ts` can unit-test it without dragging the Supabase client through the plugin-free vitest config.
+- **Still deferred (rest of P2):** journal-derived balances (Akahu ingestion → Postgres) are NOT read here yet — a fresh self-serve tenant only has the manual balances it enters. This is deliberately the honest self-service loop that needs no bank connection. The owner's rich SQLite `/dashboard` remains separate and single-tenant.
+
+**Session gate (`start.ts`).** Uses a **protected-prefix** model, not an allowlist: only paths under `PROTECTED_PREFIXES` (`/dashboard`) require a passkey session; everything else (marketing, static, demo, and the Supabase auth flow) is public by default. **Adding a new public page needs no change here.** As defense in depth, every data/mutating server function still calls `requireSession()` (passkey) or checks the Supabase user itself, so data never leaves the server without auth even though the gate lets serverFn requests through.
 
 > **reflect-metadata ordering:** `@simplewebauthn/server` pulls in `@peculiar/x509` + `tsyringe`, whose decorators call `Reflect.getMetadata` at import time. The bundler tree-shakes tsyringe's own polyfill, so `auth.ts` statically imports `src/server/reflect-polyfill.ts` (consumed, not tree-shaken) and imports `@simplewebauthn/server` **lazily** inside each ceremony function — never statically, which the bundler would hoist ahead of the polyfill.
 
@@ -157,8 +169,11 @@ variables, deliberately not coupled to the app's `data-theme` tokens).
 - The landing showcase (`DashboardFrame`) and Concierge artifacts (`ConciergeShowcase`) are
   designed marketing objects; the Concierge artifacts are explicitly mock-ups of bespoke work,
   not shipped features — keep that framing honest when editing copy.
-- Waitlist submissions go through `server/leads.ts`; `VITE_YOUINC_BOOKING_URL` overrides the
-  booking link (`resolveBookingUrl` in `config.ts`).
+- The self-serve CTA is now **live signup**: `StartFreeCta.tsx` links to `/signup` (it
+  replaced the old `WaitlistForm` in the hero, pricing, pricing table, and final CTA).
+  `WaitlistForm.tsx` + `server/leads.ts` remain for concierge lead capture but are no longer
+  rendered on the self-serve path. `VITE_YOUINC_BOOKING_URL` overrides the concierge booking
+  link (`resolveBookingUrl` in `config.ts`).
 
 ## Conventions specific to this codebase
 

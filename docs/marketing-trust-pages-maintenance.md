@@ -1,6 +1,6 @@
 # YouInc marketing and trust pages maintenance
 
-Last updated: 4 July 2026
+Last updated: 4 July 2026 (v1.1 copy pass)
 
 ## Positioning principle
 
@@ -313,6 +313,92 @@ Rules:
 - Do not invent customer names, logos, testimonials, or outcomes.
 - Label examples clearly until they become approved case studies.
 
+## "What changed, which pages must update?" matrix
+
+Use this when any product, legal, or operational reality shifts. Find the change on the left; update every page marked. Bold means the page is the primary source of truth for that fact and must not be allowed to drift.
+
+| Change | privacy | terms | security | data-deletion | integrations | contact | docs | help | status | changelog | roadmap | about | compare | use-cases |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Bank provider or Akahu scope changes | ✓ | | ✓ | ✓ | **✓** | | ✓ | ✓ | | ✓ | | | ✓ | |
+| Supported institutions change | | | | | **✓** | | ✓ | ✓ | | ✓ | | | | |
+| Auth method changes (passkey/WebAuthn) | ✓ | ✓ | **✓** | | | | ✓ | ✓ | | ✓ | | | | |
+| Storage / retention / backup changes | **✓** | | ✓ | ✓ | | | | | | ✓ | | | | |
+| Export format or availability changes | ✓ | ✓ | | **✓** | ✓ | | ✓ | ✓ | | ✓ | | | ✓ | ✓ |
+| Deletion process changes | ✓ | | | **✓** | | ✓ | | ✓ | | ✓ | ✓ | | | |
+| Pricing / billing / refund / tax changes | | **✓** | | | | | | ✓ | | ✓ | | | ✓ | |
+| Support contact or response targets change | ✓ | ✓ | ✓ | ✓ | | **✓** | ✓ | ✓ | ✓ | | | | | |
+| Domain email inboxes go live | **✓** | ✓ | ✓ | ✓ | | **✓** | | ✓ | ✓ | ✓ | | | | |
+| New subprocessor / vendor added | **✓** | | ✓ | | ✓ | | | | | ✓ | | | | |
+| Security review / pentest completed | | | **✓** | | | | | | | ✓ | ✓ | | ✓ | |
+| Material incident occurs | | | ✓ | | | ✓ | **✓** | | ✓ | | | | |
+| Public availability / access model changes | ✓ | ✓ | | | | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | |
+| Legal entity incorporated / named | **✓** | **✓** | | | | ✓ | | | | ✓ | | ✓ | | |
+| Jurisdiction / governing law confirmed | **✓** | **✓** | | | | | | | | ✓ | | ✓ | | |
+| New integration shipped | ✓ | | ✓ | | **✓** | | ✓ | ✓ | | ✓ | ✓ | | ✓ | ✓ |
+| AI feature that touches financial data | **✓** | ✓ | **✓** | | ✓ | | ✓ | ✓ | | ✓ | ✓ | ✓ | ✓ | |
+| Real customer story approved | | | | | | | | | | ✓ | | | ✓ | **✓** |
+
+Rule of thumb: if a change touches money, bank data, identity, or where data lives, assume privacy + security + data-deletion all need a look, plus a changelog entry.
+
+## Pre-publish review checklists
+
+Run the relevant checklist before merging copy changes to these pages.
+
+### Trust/legal pages (`/privacy`, `/terms`, `/security`, `/data-deletion`)
+
+- [ ] Every factual claim is verifiable from the codebase, infra, or a signed agreement.
+- [ ] No unverified compliance, certification, or "bank-grade" language.
+- [ ] Encryption/backup claims match what is actually configured.
+- [ ] Contact address is correct and monitored.
+- [ ] Anything not yet true is clearly marked as planned/roadmap, not stated as fact.
+- [ ] Items needing legal or security sign-off are flagged (see triggers below).
+- [ ] "Last updated" date bumped.
+
+### Resource pages (`/docs`, `/help`, `/integrations`, `/status`, `/changelog`, `/roadmap`)
+
+- [ ] Steps match the current product flow (sign-in, connect, export, delete).
+- [ ] Internal links resolve to real routes.
+- [ ] No promises of features that are not built.
+- [ ] Roadmap dates are conservative or omitted; shipped items moved to changelog.
+- [ ] Status reflects reality; no stale "no known issue" during an active incident.
+
+### Company/marketing pages (`/about`, `/compare`, `/contact`, `/use-cases`)
+
+- [ ] No invented customers, testimonials, logos, metrics, headcount, or SLAs.
+- [ ] Founder-led framing stays honest (see rule 3).
+- [ ] Competitor claims are fair and verifiable.
+- [ ] Use cases are labelled as product capabilities, not customer outcomes, until approved.
+
+## When to get legal or security review
+
+Get **legal review** before publishing when a change involves:
+
+- The legal entity name, address, or governing-law/jurisdiction clause.
+- Liability limitations, warranties, indemnities, or dispute resolution.
+- Payment, refund, cancellation, subscription, or tax terms that bind users.
+- A new class of personal data, a new subprocessor, or cross-border data transfer.
+- Any statement about compliance with a named law or standard.
+
+Get **security review** (and verify against implementation) before publishing when a change involves:
+
+- Authentication, session handling, or access control.
+- Encryption at rest or in transit, key management, or backups.
+- The tenant-isolation / row-level-security model.
+- Incident-response commitments or disclosure timelines.
+- Any claim of an audit, penetration test, or certification.
+
+When either review happens, record the reviewer and date in the PR and do not silently rewrite reviewed clauses without another review.
+
+## Maintaining changelog, status, and roadmap over time
+
+These three pages are what make "founder-led" read as "maintained" rather than "abandoned". Treat them as a system:
+
+- **Changelog is the ledger of what happened.** Add a short, dated, user-facing entry whenever something visible ships. Newest date on top. Never backdate or invent momentum. When a `/roadmap` "Now/Next" item ships, write the changelog entry in the same PR.
+- **Roadmap is the forward promise, kept deliberately vague on timing.** Keep the Now / Next / Later buckets. Move shipped items out of Now and into the changelog. Drop items honestly when priorities change rather than letting them rot. Mark uncertain items as exploratory. Do not put dates you are not confident about.
+- **Status is the truth about right now.** During normal operation it can stay a short "no known issue" list. The instant something breaks (bank sync, demo, app, support availability), update it *first*, before fixing, and log the incident with date, affected systems, user impact, and resolution. Stale status is worse than no status.
+
+Cadence tie-in: every release touches changelog; roadmap is reviewed at least each release; status is event-driven and must be updated immediately on any incident.
+
 ## Launch-readiness checklist
 
 Before sending significant public traffic to these pages:
@@ -338,17 +424,19 @@ Before sending significant public traffic to these pages:
 
 ## Source files
 
-The current v1 pages are defined in:
+The current pages are defined in:
 
-- `frontend/src/components/marketing/staticPages.tsx`
-- `frontend/src/components/marketing/StaticMarketingPage.tsx`
+- `frontend/src/components/marketing/staticPages.tsx` (all copy)
+- `frontend/src/components/marketing/StaticMarketingPage.tsx` (shared layout)
+- `frontend/src/components/marketing/staticPageRoute.tsx` (route + `<head>` glue)
 - `frontend/src/components/marketing/static-page.css`
-- `frontend/src/routes/*.tsx` for each route
+- `frontend/src/routes/*.tsx` for each route (one thin file per slug)
 
-Footer discovery is defined in:
+Discovery is defined in:
 
-- `frontend/src/components/marketing/MarketingFooter.tsx`
+- `frontend/src/components/marketing/MarketingFooter.tsx` (Product / Resources / Trust / Company columns)
+- `frontend/src/components/marketing/MarketingHeader.tsx` (top nav also exposes Docs and Security)
 
-Header discovery is defined in:
+Coverage:
 
-- `frontend/src/components/marketing/MarketingHeader.tsx`
+- `frontend/e2e/marketing-pages.spec.ts` checks every static page loads publicly (not redirected to `/login`) and that footer Trust links and header Docs/Security links route correctly. Add a row to the `STATIC_PAGES` list there whenever a new slug is added.

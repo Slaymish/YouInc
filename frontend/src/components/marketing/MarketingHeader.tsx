@@ -20,8 +20,11 @@ export function MarketingHeader() {
         <Link to="/docs">Docs</Link>
         <Link to="/security">Security</Link>
         <Link to="/custom-builds">Custom builds</Link>
-        <Link className="mk-nav__signin" to="/login">
+        <Link className="mk-nav__signin" to="/signin">
           Sign in
+        </Link>
+        <Link className="mk-nav__cta" to="/signup">
+          Start free
         </Link>
       </nav>
     </header>

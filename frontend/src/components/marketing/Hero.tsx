@@ -1,7 +1,7 @@
 import { PRODUCT } from "./config";
 import { SAMPLE_DASHBOARD } from "./sampleDashboard";
 import { shortMoney, formatMonths, formatPercent } from "../widgets/format";
-import { WaitlistForm } from "./WaitlistForm";
+import { StartFreeCta } from "./StartFreeCta";
 import "./Hero.css";
 
 // ── Live product-proof figures ─────────────────────────────────────────────
@@ -20,13 +20,17 @@ const expenseTotalCents = SAMPLE_DASHBOARD.expenseBreakdown.reduce(
   (sum, row) => sum + row.amountCents,
   0,
 );
-const topExpenseName = topExpense.account.split(":").pop() ?? topExpense.account;
+const topExpenseName =
+  topExpense.account.split(":").pop() ?? topExpense.account;
 const topExpenseLabel = shortMoney(topExpense.amountCents); // $24.0k
-const topExpenseShare = formatPercent(topExpense.amountCents / expenseTotalCents);
+const topExpenseShare = formatPercent(
+  topExpense.amountCents / expenseTotalCents,
+);
 
 // Month-over-month net-worth delta for the chart header.
 const nwValues = TREND.map((point) => point.netWorthCents);
-const prevNetWorth = nwValues[nwValues.length - 2] ?? nwValues[nwValues.length - 1];
+const prevNetWorth =
+  nwValues[nwValues.length - 2] ?? nwValues[nwValues.length - 1];
 const lastNetWorth = nwValues[nwValues.length - 1];
 const netWorthDelta = formatPercent(
   prevNetWorth === 0 ? 0 : (lastNetWorth - prevNetWorth) / prevNetWorth,
@@ -42,7 +46,10 @@ const nwMax = Math.max(...nwValues);
 const nwSpan = nwMax - nwMin || 1;
 const points = nwValues.map((value, index) => {
   const x = TREND.length === 1 ? 0 : (index / (TREND.length - 1)) * CHART_W;
-  const y = CHART_H - CHART_PAD_Y - ((value - nwMin) / nwSpan) * (CHART_H - CHART_PAD_Y * 2);
+  const y =
+    CHART_H -
+    CHART_PAD_Y -
+    ((value - nwMin) / nwSpan) * (CHART_H - CHART_PAD_Y * 2);
   return { x, y };
 });
 const linePath = points
@@ -68,7 +75,11 @@ const monthLabel = (month: string): string => {
   if (Number.isNaN(date.getTime())) return month;
   return new Intl.DateTimeFormat("en-NZ", { month: "short" }).format(date);
 };
-const axisMonths = [TREND[0], TREND[Math.floor(TREND.length / 2)], TREND[TREND.length - 1]];
+const axisMonths = [
+  TREND[0],
+  TREND[Math.floor(TREND.length / 2)],
+  TREND[TREND.length - 1],
+];
 
 export function Hero() {
   const headlineWords = PRODUCT.heroHeadline.split(" ");
@@ -84,10 +95,7 @@ export function Hero() {
         </h1>
         <p className="hero__sub">{PRODUCT.heroSub}</p>
         <div className="hero__ctas">
-          <WaitlistForm source="hero" />
-          <a className="mk-btn mk-btn--ghost" href="/demo">
-            Try the free demo →
-          </a>
+          <StartFreeCta source="hero" withDemo />
         </div>
 
         {/* Mobile-only static stat row: on narrow screens the floating visual
@@ -117,7 +125,9 @@ export function Hero() {
             </span>
             <span className="hero__chart-lab">Net worth</span>
             <span className="hero__chart-val">{netWorthLabel}</span>
-            <span className="hero__chart-delta">▲ {netWorthDelta} this month</span>
+            <span className="hero__chart-delta">
+              ▲ {netWorthDelta} this month
+            </span>
           </figcaption>
 
           <div className="hero__plot">
@@ -133,7 +143,11 @@ export function Hero() {
                   <stop className="hero__grad-bot" offset="100%" />
                 </linearGradient>
               </defs>
-              <path className="hero__area" d={areaPath} fill="url(#heroAreaGrad)" />
+              <path
+                className="hero__area"
+                d={areaPath}
+                fill="url(#heroAreaGrad)"
+              />
               <path
                 className="hero__line"
                 d={linePath}
@@ -143,7 +157,10 @@ export function Hero() {
             </svg>
             <span
               className="hero__dot"
-              style={{ left: `${lastPoint.x}%`, top: `${(lastPoint.y / CHART_H) * 100}%` }}
+              style={{
+                left: `${lastPoint.x}%`,
+                top: `${(lastPoint.y / CHART_H) * 100}%`,
+              }}
             />
           </div>
 
@@ -157,7 +174,11 @@ export function Hero() {
         <div className="fw fw--runway">
           <span className="fw__lab">Runway</span>
           <span className="fw__big">{runwayLabel}</span>
-          <svg className="fw__spark" viewBox="0 0 100 20" preserveAspectRatio="none">
+          <svg
+            className="fw__spark"
+            viewBox="0 0 100 20"
+            preserveAspectRatio="none"
+          >
             <polyline
               points={sparkPoints}
               fill="none"

@@ -1,8 +1,28 @@
-import { createCsrfMiddleware, createMiddleware, createStart } from "@tanstack/react-start";
+import {
+  createCsrfMiddleware,
+  createMiddleware,
+  createStart,
+} from "@tanstack/react-start";
 
 const SESSION_COOKIE = "youinc_session";
 const LOGIN_PATH = "/login";
-const PUBLIC_PATHS = new Set(["/", "/demo", "/custom-builds", "/widgets", "/pricing", LOGIN_PATH]);
+
+// The passkey session gate protects ONLY the local owner's private SQLite
+// dashboard surface. Everything else — the marketing site, the trust/resource
+// static pages, the public demo, and the self-service Supabase auth flow
+// (`/signup`, `/signin`, `/onboarding`, `/workspace`) — is public by default.
+//
+// This is a protected-prefix model, deliberately inverted from an allowlist:
+// adding a new public page must never require touching this file (the old
+// allowlist silently 302'd any un-listed route to /login). The Supabase-gated
+// routes gate themselves on the Supabase session inside their own loaders.
+const PROTECTED_PREFIXES = ["/dashboard"];
+
+function isProtectedPath(pathname: string): boolean {
+  return PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + "/"),
+  );
+}
 
 function readCookie(request: Request, name: string): string | undefined {
   const header = request.headers.get("cookie");
@@ -15,24 +35,28 @@ function readCookie(request: Request, name: string): string | undefined {
 }
 
 /**
- * Passkey session gate. Full-page (router) requests without a valid session
- * cookie are redirected to /login. The landing page, login page, and static
- * assets stay open, and server functions gate themselves via
- * `requireSession()` in auth.ts so data never leaves the server without a
- * session (defense in depth).
+ * Passkey session gate. Full-page (router) requests to a PROTECTED path without
+ * a valid session cookie are redirected to /login. Everything else stays open,
+ * and server functions gate themselves via `requireSession()` in auth.ts so
+ * data never leaves the server without a session (defense in depth).
  */
-const sessionGate = createMiddleware().server(async ({ next, request, pathname, handlerType }) => {
-  if (handlerType !== "router" || PUBLIC_PATHS.has(pathname)) {
-    return next();
-  }
+const sessionGate = createMiddleware().server(
+  async ({ next, request, pathname, handlerType }) => {
+    if (handlerType !== "router" || !isProtectedPath(pathname)) {
+      return next();
+    }
 
-  const { isValidSession } = await import("~/server/auth");
-  if (isValidSession(readCookie(request, SESSION_COOKIE))) {
-    return next();
-  }
+    const { isValidSession } = await import("~/server/auth");
+    if (isValidSession(readCookie(request, SESSION_COOKIE))) {
+      return next();
+    }
 
-  return new Response(null, { status: 302, headers: { Location: LOGIN_PATH } });
-});
+    return new Response(null, {
+      status: 302,
+      headers: { Location: LOGIN_PATH },
+    });
+  },
+);
 
 // Defining a custom start.ts disables Start's automatic CSRF middleware, so
 // it must be re-added explicitly to keep server functions protected.

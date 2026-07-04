@@ -8,7 +8,7 @@ import { DashboardFrame } from "./DashboardFrame";
 import { BespokeSection } from "./BespokeSection";
 import { ConciergeShowcase } from "./ConciergeShowcase";
 import { Pricing } from "./Pricing";
-import { WaitlistForm } from "./WaitlistForm";
+import { StartFreeCta } from "./StartFreeCta";
 import { Faq } from "./Faq";
 import { MarketingFooter } from "./MarketingFooter";
 import { FeedbackWidget } from "./FeedbackWidget";
@@ -33,8 +33,10 @@ export function MarketingPage() {
         <ConciergeShowcase />
         <Pricing />
         <section className="final-cta" aria-labelledby="final-heading">
-          <h2 id="final-heading" className="section-heading">Start running yourself like a company.</h2>
-          <WaitlistForm source="final-cta" />
+          <h2 id="final-heading" className="section-heading">
+            Start running yourself like a company.
+          </h2>
+          <StartFreeCta source="final-cta" withDemo />
         </section>
         <Faq />
       </main>

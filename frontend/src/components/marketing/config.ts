@@ -39,7 +39,7 @@ export const PRICING = {
     name: "Self-serve",
     price: "NZD $15",
     cadence: "/mo",
-    cta: "Join the waitlist",
+    cta: "Start free",
     features: [
       "Live bank sync via Akahu",
       "All standard widgets",

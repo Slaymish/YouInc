@@ -23,10 +23,11 @@ insert into auth.users (id, email) values
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'b@example.com'),
   ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'c@example.com');
 
-insert into public.profiles (id, display_name) values
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'User A'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'User B'),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'User C');
+-- profiles are auto-created by the on_auth_user_created trigger (migration 5);
+-- just set display names on the rows it already inserted.
+update public.profiles set display_name = 'User A' where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+update public.profiles set display_name = 'User B' where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+update public.profiles set display_name = 'User C' where id = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 
 -- A owns tenant A; B owns tenant B; C belongs to nothing (yet).
 insert into public.memberships (tenant_id, user_id, role) values

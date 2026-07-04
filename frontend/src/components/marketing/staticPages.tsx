@@ -48,15 +48,19 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     heading: "Privacy Policy",
     updated: "4 July 2026",
     subheading:
-      "YouInc is a founder-led finance product. This v1 policy explains the data used to run the service, how bank access works, and how to ask for export or deletion.",
+      "YouInc is a founder-led finance product built and operated in New Zealand. This plain-English policy explains what data the service uses, how bank access works, and how to export or delete your data. It is a v1 policy and is not yet a substitute for legally reviewed terms.",
     sections: [
+      {
+        title: "Who runs YouInc",
+        body: "YouInc is operated by its founder from New Zealand. Because it is still early and founder-led, the person you email is the person who runs the service. A registered legal entity name and address will be added here once finalised.",
+      },
       {
         title: "What YouInc collects",
         items: [
-          "Your email address and basic account details when you join the waitlist, sign in, book a call, or request support.",
-          "Financial data you choose to connect, including account names, balances, transactions, categories, and ledger entries.",
-          "Product feedback, support messages, booking details, and the page or source that generated the message.",
-          "Technical information such as user agent, session information, logs, and security events needed to operate and protect the product.",
+          "Account basics: your email address and sign-in details when you join the waitlist, enrol a passkey, book a call, or contact support.",
+          "Financial data you choose to connect or enter, including account names, balances, transactions, categories, manual accounts, and ledger entries.",
+          "Messages you send, including support requests, feedback, booking details, and the page or source that generated the message.",
+          "Technical records needed to run and protect the service, such as browser/user-agent details, session records, and security and error logs.",
         ],
       },
       {
@@ -64,42 +68,67 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         body: (
           <>
             Live bank sync is provided through{" "}
-            <a href="https://akahu.nz" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://akahu.nz"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Akahu
             </a>
-            . Connections are read-only. YouInc does not ask for or store your bank password. You choose which accounts to share and can revoke access through Akahu or by contacting YouInc.
+            , New Zealand's open-finance provider. Connections are read-only:
+            YouInc receives account and transaction data you approve, and never
+            asks for or stores your online-banking password. You choose which
+            accounts to share, and you can revoke access at any time through
+            Akahu or by asking YouInc.
           </>
         ),
       },
       {
         title: "How the data is used",
         items: [
-          "To build and maintain your double-entry ledger, dashboard widgets, exports, and custom views.",
-          "To provide support, respond to questions, and improve onboarding and product quality.",
-          "To detect errors, abuse, failed syncs, suspicious activity, and operational problems.",
-          "To communicate about access, billing, product updates, and service changes.",
+          "To build and maintain your double-entry ledger, dashboard widgets, exports, and any custom views.",
+          "To provide support, answer your questions, and improve onboarding and product quality.",
+          "To detect errors, failed syncs, abuse, suspicious activity, and other operational problems.",
+          "To contact you about access, billing, product updates, and service changes.",
         ],
+      },
+      {
+        title: "Service providers YouInc relies on",
+        body: "To operate, YouInc uses a small number of third-party providers, including Akahu for bank connections and cloud infrastructure for hosting, storage, and backups. These providers process data only to deliver their part of the service. A named subprocessor list will be published on this page as the provider set is finalised.",
       },
       {
         title: "What YouInc does not do",
         items: [
           "YouInc does not sell your personal or financial data.",
-          "YouInc does not use your bank data for advertising targeting.",
-          "YouInc does not store your bank login details.",
+          "YouInc does not use your bank data for advertising or ad targeting.",
+          "YouInc does not store your online-banking login details.",
           "YouInc does not provide financial, tax, investment, or legal advice.",
         ],
       },
       {
+        title: "Your choices and rights",
+        items: [
+          "Access and export: request a copy of your ledger as plain-text accounting journals at any time.",
+          "Correction: fix or re-classify data inside the product, or ask for help correcting it.",
+          "Disconnect: revoke bank access through Akahu so new transactions stop syncing.",
+          "Deletion: ask YouInc to delete your account and connected data. See the data controls page for the full process.",
+        ],
+      },
+      {
         title: "Storage, retention, and deletion",
-        body:
-          "Data is kept for as long as needed to provide the service, meet legal or operational obligations, resolve disputes, prevent abuse, and maintain backups. You can request export or deletion at any time. Some records may remain temporarily in backups, logs, or accounting records where required.",
+        body: "Data is kept only as long as needed to provide the service, meet legal or accounting obligations, resolve disputes, prevent abuse, and maintain backups. You can request export or deletion at any time. After deletion, some records may remain briefly in encrypted backups or in billing and security logs until they age out or are no longer required.",
+      },
+      {
+        title: "Jurisdiction",
+        body: "YouInc is built and operated in New Zealand and aims to handle personal information consistently with the New Zealand Privacy Act 2020. This section will be confirmed during legal review before broad public launch.",
       },
       {
         title: "Contact",
         body: (
           <>
             Privacy questions and deletion requests can be sent to{" "}
-            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>. A domain-specific privacy inbox should replace this address before broader public launch.
+            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>. A dedicated
+            privacy address will be published as YouInc opens up to more users.
           </>
         ),
       },
@@ -114,44 +143,52 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     heading: "Terms of Service",
     updated: "4 July 2026",
     subheading:
-      "These plain-English v1 terms describe how YouInc is offered while the product is founder-led and access is still controlled. They should be reviewed by a lawyer before broad public launch.",
+      "These plain-English v1 terms describe how YouInc is offered while the product is founder-led and access is still controlled. They are written to be honest and readable, not to serve as final legal terms, and will be reviewed by a lawyer before broad public launch.",
     sections: [
       {
         title: "Using YouInc",
         items: [
           "YouInc helps individuals understand their finances through bank sync, a double-entry ledger, dashboards, exports, and optional custom work.",
-          "You are responsible for the accuracy of any information you connect, import, edit, or manually enter.",
-          "You must not misuse the service, attempt to access another person's data, interfere with security controls, or use YouInc for unlawful activity.",
+          "You need a compatible account and, for live access, a passkey to sign in. You are responsible for keeping access to your device and passkey secure.",
+          "You are responsible for the accuracy of any information you connect, import, edit, or enter by hand.",
+        ],
+      },
+      {
+        title: "Acceptable use",
+        items: [
+          "Do not attempt to access another person's account or data.",
+          "Do not probe, disable, or interfere with security controls except through the vulnerability disclosure process on the security page.",
+          "Do not use YouInc for unlawful activity or to store data you are not entitled to hold.",
         ],
       },
       {
         title: "Not financial advice",
-        body:
-          "YouInc provides software, reports, widgets, and operational views. It does not provide financial advice, tax advice, legal advice, investment advice, lending advice, or accounting services. You should verify important decisions with a qualified professional.",
+        body: "YouInc provides software, reports, widgets, and operational views. It does not provide financial, tax, legal, investment, lending, or accounting advice, and it is not a registered financial adviser. You should verify important decisions with a qualified professional.",
       },
       {
         title: "Plans and billing",
         items: [
-          "Demo access uses sample data and does not require a bank connection.",
-          "Self-serve access is shown as a monthly NZD subscription while access is being rolled out.",
-          "Concierge work may include a monthly plan, scoped one-off builds, or both. Any paid custom work should be confirmed in writing before work begins.",
-          "Prices may change over time. Existing users should receive reasonable notice before material changes apply to them.",
+          "Demo access uses sample data, is free, and does not require a bank connection.",
+          "Self-serve access is offered as a monthly NZD subscription while access is being rolled out.",
+          "Concierge work may be a monthly plan, a scoped one-off build, or both. Paid custom work is confirmed in writing, including scope and price, before work begins.",
+          "Prices may change over time. Existing subscribers will get reasonable notice before a material change applies to them.",
         ],
       },
       {
         title: "Custom builds",
-        body:
-          "Custom widgets, integrations, and ledger-aware automation are scoped around a specific outcome. Unless agreed otherwise, custom work is delivered inside YouInc and may inform general product improvements without exposing your private data.",
+        body: "Custom widgets, integrations, and ledger-aware automation are scoped around a specific outcome agreed in writing. Unless agreed otherwise, custom work is delivered inside YouInc. General product improvements learned from custom work do not expose your private financial data.",
       },
       {
         title: "Cancellation and export",
-        body:
-          "You can stop using YouInc and request export of your ledger. YouInc aims to make your data portable through plain-text accounting journals and related export formats where available.",
+        body: "You can stop using YouInc at any time and request an export of your ledger. YouInc keeps your data portable through hledger-compatible plain-text accounting journals so your financial history can outlive the product. See the data controls page for the export, disconnect, and deletion steps.",
       },
       {
-        title: "Availability and changes",
-        body:
-          "YouInc is operated as a founder-led product. The service may change, improve, pause, or experience outages. Critical incidents and material changes should be communicated clearly as the product matures.",
+        title: "Availability and liability",
+        body: "YouInc is a founder-led product still in early access. The service may change, pause, or experience outages, and it is provided on an as-is basis without guarantees of uninterrupted availability. Material incidents and changes will be communicated as clearly as possible. Specific liability limits will be set during legal review.",
+      },
+      {
+        title: "Governing law",
+        body: "YouInc is operated from New Zealand and these terms are intended to be governed by New Zealand law. The governing-law clause, dispute process, and the operating legal entity will be confirmed during legal review.",
       },
       {
         title: "Contact",
@@ -173,37 +210,57 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     heading: "Security at YouInc",
     updated: "4 July 2026",
     subheading:
-      "YouInc handles sensitive financial data, so the security model starts with limited access, read-only bank connections, clear export controls, and founder-accountable support.",
+      "YouInc handles sensitive financial data, so the security model starts with least-privilege access, read-only bank connections, per-user data separation, clear export controls, and founder-accountable support. This page describes today's posture honestly and marks what is still planned.",
     sections: [
       {
-        title: "Current security posture",
+        title: "How sign-in works",
         items: [
-          "Bank connections are read-only and run through Akahu. YouInc does not store bank passwords.",
-          "Passkey-based sign-in is used for product access where accounts are enabled.",
-          "Connected financial data is used to build the ledger and dashboard views you request.",
-          "Demo access uses sample data and does not expose real customer data.",
+          "Live product access is gated behind passkey (WebAuthn) sign-in. There is no reusable password to phish, leak, or reuse.",
+          "Authenticated routes redirect to sign-in until you present your passkey; only the public marketing and demo pages are open.",
+          "The app is served over HTTPS, which WebAuthn requires, so credentials are bound to the YouInc origin.",
         ],
+      },
+      {
+        title: "How bank data is handled",
+        items: [
+          "Bank connections run through Akahu and are read-only. YouInc never receives or stores your online-banking password.",
+          "You choose which accounts to share, and you can revoke access through Akahu at any time.",
+          "Connected data is used only to build the ledger and dashboard views you ask for.",
+          "The demo uses sample data on a separate store and never exposes real customer data.",
+        ],
+      },
+      {
+        title: "Data separation",
+        body: "YouInc is built as a multi-tenant system where each user's ledger is scoped to their own tenant, and database row-level security is designed so a query can only reach rows the signed-in user is a member of. This isolation model has not yet been independently audited, and a third-party review is on the roadmap below.",
       },
       {
         title: "Data protection principles",
         items: [
-          "Collect the minimum data needed to operate the product and support the user.",
-          "Keep financial data separated by account and avoid pooling user ledgers for advertising or resale.",
-          "Make ledger export and exit paths part of the product, not an afterthought.",
-          "Treat support access to financial data as sensitive and use it only to help the user or operate the service.",
+          "Collect the minimum data needed to run the product and support the user.",
+          "Keep financial data separated per user and never pool ledgers for advertising or resale.",
+          "Make ledger export and exit paths first-class, not an afterthought.",
+          "Treat any support access to financial data as sensitive and use it only to help the user or operate the service.",
         ],
       },
       {
-        title: "Incident response v1",
-        body:
-          "Security reports and suspected incidents are reviewed directly by the founder. Confirmed issues should be triaged, patched, communicated to affected users where appropriate, and recorded in the changelog or status history when they materially affect customers.",
+        title: "Backups",
+        body: "Production data is backed up on a scheduled basis so it can be restored after a failure. Restore drills, retention windows, and encryption-at-rest details will be documented as part of the security roadmap below.",
       },
       {
-        title: "Vulnerability disclosure",
+        title: "Incident response",
+        body: "Security reports and suspected incidents are reviewed directly by the founder. Confirmed issues are triaged, patched, communicated to affected users where appropriate, and recorded on the status page and changelog when they materially affect customers.",
+      },
+      {
+        title: "Reporting a vulnerability",
         body: (
           <>
             Please report suspected vulnerabilities to{" "}
-            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>. Include the affected page or endpoint, reproduction steps, impact, and whether any data may have been accessed. A dedicated security@youinc.app inbox should replace this before broad launch.
+            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a> with
+            "security" in the subject line. Include the affected page or
+            endpoint, reproduction steps, impact, and whether any data may have
+            been accessed. Please do not publicly disclose an issue before it is
+            fixed. A dedicated security inbox and a formal disclosure policy are
+            on the roadmap below.
           </>
         ),
       },
@@ -211,9 +268,9 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         title: "Security roadmap",
         items: [
           "Publish infrastructure and data-flow diagrams at a non-sensitive level.",
-          "Create a dedicated security contact address and vulnerability disclosure policy.",
-          "Document backup, restore, encryption, access-review, and incident-response procedures.",
-          "Add third-party review or penetration testing before scaling beyond early users.",
+          "Stand up a dedicated security contact address and a written vulnerability disclosure policy.",
+          "Document backup, restore, encryption, and access-review procedures in detail.",
+          "Commission a third-party security review before scaling beyond early users.",
         ],
       },
     ],
@@ -228,41 +285,41 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     heading: "Export, disconnect, and delete your data",
     updated: "4 July 2026",
     subheading:
-      "YouInc is designed around data portability. You should be able to leave with a readable ledger and revoke bank access without lock-in.",
+      "YouInc is designed around data portability. You should be able to leave with a readable ledger and revoke bank access without lock-in. These three controls — export, disconnect, and delete — are separate, so you can do any one of them without the others.",
     sections: [
       {
-        title: "Export your ledger",
+        title: "Step 1 — Export your ledger",
         items: [
-          "Export the full double-entry ledger as plain-text accounting journals where available.",
-          "Keep your own copy before cancelling or requesting deletion.",
-          "Ask for help if you need a format suitable for hledger, accounting review, or custom analysis.",
+          "Export your full double-entry ledger as hledger-compatible plain-text accounting journals.",
+          "Do this before you cancel or delete, so you keep your own permanent copy.",
+          "The journal is a readable text file you can archive, hand to an accountant, or load into hledger and other plain-text accounting tools.",
+          "If you need help producing a specific format for review or analysis, ask and YouInc will help.",
         ],
       },
       {
-        title: "Disconnect bank access",
-        body:
-          "Bank feeds are permissioned through Akahu. You can revoke access through Akahu or ask YouInc to guide you through the process. Once access is revoked, new bank transactions should stop syncing.",
+        title: "Step 2 — Disconnect bank access",
+        body: "Bank feeds are permissioned through Akahu. You can revoke YouInc's read-only access from Akahu at any time, or ask YouInc to walk you through it. Once access is revoked, no new bank transactions sync. Disconnecting stops new data but does not delete data already imported — use step 3 for that.",
       },
       {
-        title: "Delete your YouInc account",
+        title: "Step 3 — Delete your account and data",
         items: [
-          "Email the support contact with the email address connected to your account.",
-          "YouInc may verify the request before deletion to protect against unauthorized account removal.",
-          "Active subscriptions or custom work may need to be settled or cancelled before final deletion.",
-        ],
-      },
-      {
-        title: "What deletion means",
-        body:
-          "Deletion should remove active account records, connected financial data, ledger entries, and dashboard configuration from production systems where practical. Some information may remain temporarily in backups, security logs, invoices, or records needed for legal, billing, abuse-prevention, or dispute-resolution purposes.",
-      },
-      {
-        title: "Request deletion",
-        body: (
           <>
-            Send requests to <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>. Include the email address used with YouInc and whether you want export, disconnection, deletion, or all three.
-          </>
-        ),
+            Email <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a> from
+            the address connected to your account, with "delete my account" in
+            the subject.
+          </>,
+          "YouInc may verify the request first, so that nobody else can delete your account.",
+          "Settle or cancel any active subscription or in-progress custom work before final deletion.",
+          "Export first (step 1) if you want a copy — deletion cannot be undone.",
+        ],
+      },
+      {
+        title: "What deletion removes, and what may remain",
+        body: "Deletion removes your active account, connected financial data, ledger entries, and dashboard configuration from live systems. For a short period afterwards, some data may still exist in scheduled backups until they age out, and limited records may be kept where the law requires it — for example invoices for tax purposes and security logs for abuse prevention. These are retained no longer than necessary.",
+      },
+      {
+        title: "Response time",
+        body: "Deletion is currently handled by hand during early access, so it is not instant. YouInc aims to acknowledge requests quickly and complete verified deletions promptly. A self-serve deletion control is on the roadmap.",
       },
     ],
   },
@@ -280,23 +337,32 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         title: "Best ways to reach YouInc",
         items: [
           <>
-            Book an intro call for Concierge, onboarding, or custom-build questions: <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">cal.com/youinc/intro</a>.
+            Book an intro call for Concierge, onboarding, or custom-build
+            questions:{" "}
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
+              cal.com/youinc/intro
+            </a>
+            .
           </>,
           <>
-            Email support, privacy, billing, and security questions to <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>.
+            Email support, privacy, billing, and security questions to{" "}
+            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>.
           </>,
           "Include the page, account email, and a short description of what happened if you are reporting a bug or sync issue.",
         ],
       },
       {
-        title: "Response expectations",
-        body:
-          "V1 support is human and founder-led, not a 24/7 call center. Urgent security or data-access concerns should be marked clearly in the email subject so they can be triaged first.",
+        title: "What to expect",
+        body: 'Support is human and founder-led, not a 24/7 call centre. During early access you are emailing the person who builds and runs YouInc. Urgent security or data-access concerns should say "security" or "urgent" in the subject line so they can be triaged first.',
       },
       {
-        title: "Before wider launch",
-        body:
-          "The contact surface should move to domain-specific addresses such as support@youinc.app, security@youinc.app, privacy@youinc.app, and billing@youinc.app.",
+        title: "Which topics go where",
+        items: [
+          "Support, bugs, and sync issues: email with the page, your account email, and what happened.",
+          "Privacy, export, or deletion requests: email from your account address — see the data controls page for the steps.",
+          'Security reports: email with "security" in the subject — see the security page for what to include.',
+          "Billing, Concierge, and custom builds: email or book an intro call.",
+        ],
       },
     ],
     cta: { label: "Book a call", href: BOOKING_URL, external: true },
@@ -309,40 +375,89 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     eyebrow: "Resources",
     heading: "Documentation",
     subheading:
-      "A starting map for using YouInc. These docs should grow into a full help center as onboarding, bank sync, exports, and custom builds mature.",
+      "A starting map for using YouInc: what it is, how to get in, the core ideas, and where to go next. These docs will grow into full task walkthroughs with screenshots as onboarding, bank sync, and exports mature.",
     sections: [
+      {
+        title: "What YouInc does",
+        body: (
+          <>
+            YouInc turns your connected accounts into a live double-entry
+            ledger, then renders it as dashboard widgets — net worth, cashflow,
+            runway, income, expenses, and exceptions. The{" "}
+            <Link to="/widgets">widget library</Link> shows each one running on
+            sample data.
+          </>
+        ),
+      },
       {
         title: "Getting started",
         items: [
-          "Open the demo to understand the dashboard without connecting real accounts.",
-          "Join the waitlist or book a call if you want live bank sync enabled for your account.",
-          "When invited, connect supported accounts through Akahu and confirm which accounts should be included.",
-          "Review the generated ledger and dashboard widgets before relying on reports for decisions.",
+          <>
+            Open the <Link to="/demo">live demo</Link> to explore the dashboard
+            on sample data, with no sign-up and no bank connection.
+          </>,
+          <>
+            <Link to="/signup">Create your account</Link> and follow the short
+            onboarding to name your workspace — no card required.
+          </>,
+          "Connect the accounts you want through Akahu, choosing exactly which accounts to share.",
+          "Review the generated ledger and widgets, and re-classify anything that looks off before relying on the reports.",
         ],
+      },
+      {
+        title: "Connect a bank account",
+        body: (
+          <>
+            Live bank sync uses{" "}
+            <a
+              href="https://akahu.nz"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Akahu
+            </a>
+            . You approve read-only access to specific accounts, YouInc imports
+            transactions and balances, and posts them into your ledger. YouInc
+            never sees your banking password, and you can revoke access from
+            Akahu at any time. See <Link to="/integrations">integrations</Link>{" "}
+            for what is supported.
+          </>
+        ),
+      },
+      {
+        title: "Add a manual account",
+        body: "Assets and liabilities without a bank feed — property, KiwiSaver, vehicles, private loans — can be tracked as manual accounts. You set the balance yourself and update it as it changes, and it flows into the same net-worth and dashboard views as connected accounts.",
+      },
+      {
+        title: "Export your ledger",
+        body: (
+          <>
+            Your full history exports as hledger-compatible plain-text journals,
+            so it stays portable and readable outside YouInc. The{" "}
+            <Link to="/data-deletion">data controls</Link> page covers export,
+            disconnecting Akahu, and deletion.
+          </>
+        ),
       },
       {
         title: "Core concepts",
         items: [
-          "Ledger: the double-entry record underneath every dashboard view.",
+          "Ledger: the balanced double-entry record underneath every dashboard view.",
           "Widgets: configurable dashboard panels that read from the ledger.",
-          "Manual accounts: assets or liabilities that bank feeds cannot see, maintained by hand or custom integration.",
-          "Exports: plain-text ledger output so your financial history stays portable.",
+          "Manual accounts: assets or liabilities bank feeds cannot see, maintained by hand.",
+          "Classification: how transactions are sorted into accounts; you can correct and re-run it.",
+          "Exports: plain-text journal output so your financial history stays portable.",
         ],
       },
       {
-        title: "Useful pages",
+        title: "Where to go next",
         items: [
-          <Link to="/demo">Live demo</Link>,
           <Link to="/widgets">Widget library</Link>,
           <Link to="/integrations">Integrations</Link>,
+          <Link to="/help">Help and common questions</Link>,
           <Link to="/security">Security</Link>,
           <Link to="/data-deletion">Data controls</Link>,
         ],
-      },
-      {
-        title: "Docs roadmap",
-        body:
-          "Add screenshots, task walkthroughs, troubleshooting guides, export examples, and short videos as real onboarding questions appear.",
       },
     ],
   },
@@ -354,34 +469,71 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     eyebrow: "Help center",
     heading: "Help and support",
     subheading:
-      "Short answers for the questions people are most likely to ask before or during early access.",
+      "Short, honest answers to the questions people ask most before and during early access. If your question is not here, email and ask.",
     sections: [
       {
-        title: "Access",
+        title: "How do I get access?",
         items: [
-          "The demo is public and uses sample data.",
-          "Live connected accounts are enabled through controlled early access.",
+          "The demo is public, uses sample data, and needs no sign-up.",
+          "Self-serve accounts are open: create an account, name your workspace, and connect your accounts when you're ready.",
           "Concierge users can book a call to scope custom dashboards, integrations, or ledger-aware automation.",
         ],
       },
       {
-        title: "Bank sync",
+        title: "How do I sign in?",
+        body: "Live access uses a passkey (WebAuthn) rather than a password, so sign-in relies on your device's biometrics or PIN. There is no password to reset; if you lose access to your passkey, contact support to recover your account.",
+      },
+      {
+        title: "Is my bank login safe?",
         items: [
-          "Live bank sync currently depends on Akahu and is focused on New Zealand-connected accounts.",
-          "Connections are read-only and can be revoked.",
-          "Unsupported accounts can be tracked manually or through a custom integration where practical.",
+          "Live bank sync runs through Akahu and is read-only.",
+          "YouInc never sees or stores your online-banking password.",
+          "You choose which accounts to share and can revoke access from Akahu at any time.",
         ],
       },
       {
-        title: "Exports and cancellation",
-        body:
-          "YouInc is designed to avoid lock-in. Export your ledger before cancellation or deletion, and contact support if you need help with a specific format.",
+        title: "Which banks and accounts are supported?",
+        body: (
+          <>
+            Live sync currently covers New Zealand accounts available through
+            Akahu. Anything without a feed — property, KiwiSaver, vehicles,
+            private loans — can be tracked as a manual account. See{" "}
+            <Link to="/integrations">integrations</Link> for detail.
+          </>
+        ),
+      },
+      {
+        title: "Can I get my data out?",
+        body: (
+          <>
+            Yes. Export your full ledger as plain-text accounting journals at
+            any time — there is no lock-in. Do this before you cancel or delete.
+            The <Link to="/data-deletion">data controls</Link> page has the
+            steps.
+          </>
+        ),
+      },
+      {
+        title: "How do I cancel or delete my account?",
+        body: (
+          <>
+            Cancelling stops billing; deletion removes your data. They are
+            separate — you can cancel and keep your data, or ask for full
+            deletion. Export first if you want a copy. See{" "}
+            <Link to="/data-deletion">data controls</Link>.
+          </>
+        ),
       },
       {
         title: "Still stuck?",
         body: (
           <>
-            Email <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a> or <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">book a call</a>.
+            Email <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a> or{" "}
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
+              book a call
+            </a>
+            . Include the page and your account email if it is a bug or sync
+            issue.
           </>
         ),
       },
@@ -395,40 +547,63 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     eyebrow: "Product",
     heading: "Integrations",
     subheading:
-      "YouInc starts with New Zealand open banking through Akahu, then fills the gaps with manual accounts, exports, and scoped custom integrations.",
+      "YouInc starts with New Zealand open banking through Akahu, then fills the gaps with manual accounts, exports, and scoped custom integrations. Here is what connects today and what does not.",
     sections: [
       {
         title: "Akahu bank sync",
         body: (
           <>
-            YouInc uses <a href="https://akahu.nz" target="_blank" rel="noopener noreferrer">Akahu</a> as the secure open-finance bridge for supported New Zealand accounts. You choose which accounts to share. Access is read-only.
+            Live bank sync runs through{" "}
+            <a
+              href="https://akahu.nz"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Akahu
+            </a>
+            , New Zealand's open-finance provider. You approve read-only access
+            to specific accounts through Akahu's own consent flow, YouInc
+            imports balances and transactions, and posts them into your ledger.
+            YouInc never receives your banking password, and you can revoke
+            access from Akahu at any time.
           </>
         ),
       },
       {
-        title: "Supported institution types",
+        title: "What connects today",
         items: [
-          "Banks and account providers available through Akahu.",
-          "Investment or savings providers available through Akahu where supported.",
-          "Manual accounts for assets and liabilities that are not available through a live feed.",
+          "New Zealand bank and account providers available through Akahu.",
+          "Investment or savings providers available through Akahu, where they are supported.",
+          "Manual accounts for anything without a live feed — you keep the balance current yourself.",
         ],
       },
       {
-        title: "Manual and custom sources",
-        body:
-          "Some assets and liabilities do not have a clean bank feed. YouInc can track them manually or through a scoped integration if there is an export, API, spreadsheet, or reliable source to map into journal entries.",
+        title: "Manual accounts",
+        body: "Many assets and liabilities have no clean bank feed — property, KiwiSaver, vehicles, private investments, or personal loans. Track these as manual accounts: you set and update the balance, and it flows into the same net-worth and dashboard views as connected accounts, so nothing is missing from the picture.",
+      },
+      {
+        title: "Unsupported accounts",
+        body: "If an account is not available through Akahu, YouInc shows it as unsupported rather than pretending bank sync covers everything. The practical options are to track it as a manual account, or to discuss a scoped custom integration if there is a reliable source to pull from.",
+      },
+      {
+        title: "Custom integrations",
+        body: "When there is an export, API, or dependable spreadsheet behind an account, a scoped custom integration can map it into balanced journal entries so it lives in the ledger like everything else. Custom integrations are Concierge work, agreed in writing before they begin.",
       },
       {
         title: "Integration principles",
         items: [
-          "Prefer read-only access where possible.",
-          "Post imported data into a balanced ledger rather than leaving it as disconnected rows.",
-          "Make unsupported accounts visible instead of pretending bank sync covers everything.",
-          "Keep export paths available so the ledger can outlive YouInc.",
+          "Prefer read-only access wherever possible.",
+          "Post imported data into a balanced ledger rather than leaving disconnected rows.",
+          "Make unsupported accounts visible instead of hiding the gaps.",
+          "Keep export paths open so the ledger can outlive YouInc.",
         ],
       },
     ],
-    cta: { label: "Discuss a custom integration", href: BOOKING_URL, external: true },
+    cta: {
+      label: "Discuss a custom integration",
+      href: BOOKING_URL,
+      external: true,
+    },
   },
 
   status: {
@@ -451,8 +626,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
       {
         title: "Incident history",
-        body:
-          "No public incidents have been posted yet. Future material incidents should list date, affected systems, user impact, resolution, and follow-up actions.",
+        body: "No public incidents have been posted yet. Future material incidents should list date, affected systems, user impact, resolution, and follow-up actions.",
       },
       {
         title: "Status roadmap",
@@ -467,18 +641,28 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
 
   changelog: {
     title: "Changelog - YouInc",
-    description:
-      "A v1 changelog showing how YouInc is changing over time.",
+    description: "A v1 changelog showing how YouInc is changing over time.",
     eyebrow: "Product updates",
     heading: "Changelog",
     subheading:
       "A public record that YouInc is maintained. Keep this factual, dated, and tied to user-visible changes.",
     sections: [
       {
+        title: "5 July 2026",
+        items: [
+          "Opened self-service signup: create an account and your own workspace directly, with a short guided onboarding — the old waitlist is gone from the self-serve path.",
+          "Your workspace now shows a live net-worth, assets, and liabilities summary, with a built-in editor to add, update, and remove accounts by hand.",
+          "Each workspace is fully isolated: your data is scoped to your own tenant and protected by row-level security.",
+          "Added a 'check your email' confirmation step for new signups where email verification is required.",
+        ],
+      },
+      {
         title: "4 July 2026",
         items: [
-          "Added v1 trust, legal, security, docs, status, and company pages.",
-          "Expanded footer navigation so users can find data controls before connecting financial accounts.",
+          "Rewrote the trust surface for clarity: added how sign-in, bank data, and data separation work to the security page, and named the data controls as three separate steps.",
+          "Expanded docs with connect-a-bank, add-a-manual-account, and export walkthroughs, and turned help into direct answers to the most common early-access questions.",
+          "Clarified integrations to cover Akahu, manual accounts, unsupported accounts, and custom integrations, and added service-provider, rights, and jurisdiction detail to privacy and terms.",
+          "Added v1 trust, legal, security, docs, status, and company pages, and expanded footer navigation so users can find data controls before connecting financial accounts.",
           "Documented the page-maintenance process for privacy, security, legal, and product updates.",
         ],
       },
@@ -492,8 +676,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
       {
         title: "How to maintain this page",
-        body:
-          "Add a short entry whenever a user-visible feature, security posture, pricing detail, onboarding step, integration, or support process changes. Do not use it for internal chores that do not matter to users.",
+        body: "Add a short entry whenever a user-visible feature, security posture, pricing detail, onboarding step, integration, or support process changes. Do not use it for internal chores that do not matter to users.",
       },
     ],
   },
@@ -510,7 +693,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       {
         title: "Now",
         items: [
-          "Controlled early access for connected accounts.",
+          "Self-service signup and onboarding: create your own workspace and start tracking net worth from manual accounts today.",
           "Public demo, pricing comparison, widget library, and custom-build explanation.",
           "V1 privacy, terms, security, data controls, docs, and support pages.",
         ],
@@ -518,10 +701,10 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       {
         title: "Next",
         items: [
+          "Automatic bank sync via Akahu for self-serve workspaces, so balances stay current without manual updates.",
+          "Grow the workspace into the full widget dashboard once live transactions post to your ledger.",
           "Clearer onboarding docs for Akahu connection, manual accounts, exports, and dashboard customization.",
-          "Domain-specific support, privacy, billing, and security email addresses.",
           "More export examples and ledger troubleshooting guides.",
-          "Better public status and incident communication.",
         ],
       },
       {
@@ -547,13 +730,11 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     sections: [
       {
         title: "What YouInc is",
-        body:
-          "YouInc turns connected accounts into a live double-entry ledger, then renders the numbers through dashboard widgets for net worth, cashflow, runway, income, expenses, and exceptions worth attention.",
+        body: "YouInc turns connected accounts into a live double-entry ledger, then renders the numbers through dashboard widgets for net worth, cashflow, runway, income, expenses, and exceptions worth attention.",
       },
       {
         title: "Why founder-led",
-        body:
-          "The product is still early, and finance workflows are personal. Founder-led support means onboarding and custom work can stay close to real user problems while the core product matures.",
+        body: "The product is still early, and finance workflows are personal. Founder-led support means onboarding and custom work can stay close to real user problems while the core product matures.",
       },
       {
         title: "Operating principles",
@@ -566,11 +747,14 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
       {
         title: "Built in New Zealand",
-        body:
-          "YouInc is designed around New Zealand open banking through Akahu first. The product may expand over time, but the initial trust model and integration surface are intentionally focused.",
+        body: "YouInc is designed around New Zealand open banking through Akahu first. The product may expand over time, but the initial trust model and integration surface are intentionally focused.",
       },
     ],
-    cta: { label: "Book a founder-led intro", href: BOOKING_URL, external: true },
+    cta: {
+      label: "Book a founder-led intro",
+      href: BOOKING_URL,
+      external: true,
+    },
   },
 
   compare: {
@@ -584,18 +768,15 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     sections: [
       {
         title: "Versus budgeting apps",
-        body:
-          "Budgeting apps usually focus on envelopes, habit tracking, and spending limits. YouInc focuses on a double-entry view of what you own, owe, earn, and spend, then reports on net worth, runway, cashflow, and exceptions.",
+        body: "Budgeting apps usually focus on envelopes, habit tracking, and spending limits. YouInc focuses on a double-entry view of what you own, owe, earn, and spend, then reports on net worth, runway, cashflow, and exceptions.",
       },
       {
         title: "Versus spreadsheets",
-        body:
-          "Spreadsheets are flexible, but they are easy to break and hard to keep synced. YouInc aims to keep the source data connected, the ledger balanced, and the dashboard reusable.",
+        body: "Spreadsheets are flexible, but they are easy to break and hard to keep synced. YouInc aims to keep the source data connected, the ledger balanced, and the dashboard reusable.",
       },
       {
         title: "Versus accounting software",
-        body:
-          "Small-business accounting tools are powerful, but often shaped around invoices, tax workflows, payroll, and business compliance. YouInc borrows the ledger discipline without forcing your personal finances into a business-operations product.",
+        body: "Small-business accounting tools are powerful, but often shaped around invoices, tax workflows, payroll, and business compliance. YouInc borrows the ledger discipline without forcing your personal finances into a business-operations product.",
       },
       {
         title: "Where YouInc may not fit",
@@ -621,23 +802,19 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     sections: [
       {
         title: "Personal CFO dashboard",
-        body:
-          "See net worth, liquidity, runway, income, expenses, debt, and exceptions in one place instead of hopping between accounts and spreadsheets.",
+        body: "See net worth, liquidity, runway, income, expenses, debt, and exceptions in one place instead of hopping between accounts and spreadsheets.",
       },
       {
         title: "Manual asset tracking",
-        body:
-          "Track assets and liabilities that bank feeds cannot see, such as property, KiwiSaver, vehicles, private investments, or loans, then bring them into the same dashboard.",
+        body: "Track assets and liabilities that bank feeds cannot see, such as property, KiwiSaver, vehicles, private investments, or loans, then bring them into the same dashboard.",
       },
       {
         title: "Custom decision views",
-        body:
-          "Concierge work can create a view around a specific decision, such as taking time off, paying down debt, tracking a savings target, or understanding project-level income.",
+        body: "Concierge work can create a view around a specific decision, such as taking time off, paying down debt, tracking a savings target, or understanding project-level income.",
       },
       {
         title: "Ledger export and review",
-        body:
-          "Export the underlying journal so you can inspect, archive, or process your financial history outside YouInc.",
+        body: "Export the underlying journal so you can inspect, archive, or process your financial history outside YouInc.",
       },
     ],
     cta: { label: "Explore custom builds", href: "/custom-builds" },

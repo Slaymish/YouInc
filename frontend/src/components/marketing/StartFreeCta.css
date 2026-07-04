@@ -1,0 +1,8 @@
+/* Self-service signup CTA layout — mirrors the old .waitlist-form flex so the
+ * placements it replaces (hero, pricing, final CTA) keep their alignment. */
+.start-free {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}

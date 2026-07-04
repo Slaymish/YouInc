@@ -57,7 +57,9 @@
   border-bottom: 2px solid var(--mk-line);
 }
 
-.pricing-table__corner { background: var(--mk-surface-1); }
+.pricing-table__corner {
+  background: var(--mk-surface-1);
+}
 
 .pricing-table__tier-name {
   display: block;
@@ -104,28 +106,45 @@
   border-left: 1px solid var(--mk-accent-line);
   border-right: 1px solid var(--mk-accent-line);
 }
-.pricing-table thead th.pricing-table__featured { border-top: 1px solid var(--mk-accent-line); }
+.pricing-table thead th.pricing-table__featured {
+  border-top: 1px solid var(--mk-accent-line);
+}
 .pricing-table tbody tr:last-child td.pricing-table__featured {
   border-bottom: 1px solid var(--mk-accent-line);
 }
 
-.pricing-table__yes { color: var(--mk-accent); font-weight: 700; }
-.pricing-table__no { color: var(--mk-soft); }
-.pricing-table__note { color: var(--mk-soft); font-size: var(--text-small); }
+.pricing-table__yes {
+  color: var(--mk-accent);
+  font-weight: 700;
+}
+.pricing-table__no {
+  color: var(--mk-soft);
+}
+.pricing-table__note {
+  color: var(--mk-soft);
+  font-size: var(--text-small);
+}
 
 .pricing-table tbody tr:hover td,
 .pricing-table tbody tr:hover th[scope="row"] {
   background: var(--mk-surface-2);
 }
-.pricing-table tbody tr:hover td.pricing-table__featured { background: var(--mk-accent-tint); }
+.pricing-table tbody tr:hover td.pricing-table__featured {
+  background: var(--mk-accent-tint);
+}
 
 .pricing-table__cta-row td,
 .pricing-table__cta-row th {
   border-bottom: 2px solid var(--mk-line);
   padding-bottom: var(--space-5);
 }
-.pricing-table__cta-row td { text-align: center; }
-.pricing-table__cta-row .waitlist-form { justify-content: center; }
+.pricing-table__cta-row td {
+  text-align: center;
+}
+.pricing-table__cta-row .waitlist-form,
+.pricing-table__cta-row .start-free {
+  justify-content: center;
+}
 
 .pricing-table a:focus-visible,
 .pricing-table button:focus-visible {
@@ -134,5 +153,7 @@
 }
 
 @media (max-width: 640px) {
-  .pricing-table__caption { padding: var(--space-4) var(--space-4) var(--space-3); }
+  .pricing-table__caption {
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
 }

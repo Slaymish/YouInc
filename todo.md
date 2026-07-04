@@ -24,6 +24,28 @@ Done:
 
 ***
 
+Done:
+
+- [x] Self-service signup + onboarding (replaces "Join the waitlist"): finished the Supabase
+  migration (`20260704120005_self_registration.sql` — `handle_new_user` trigger + `create_tenant`
+  RPC, verified by `supabase/tests/self_registration.sql`). Wired Supabase Auth into the frontend
+  (`/signup`, `/signin`, `/onboarding`, `/workspace`), repointed all self-serve CTAs to "Start free"
+  → `/signup`, and switched the session gate to a protected-prefix model. E2E-covered end to end
+  against a live local Supabase stack.
+
+***
+
 - [ ] Feature: actually build the email summary/gist delivery (needs an email provider decision; touches session-gated server surface — deliberately deferred)
+- [x] Self-service follow-ups (Phase 2, first slice):
+  - [x] Tenant-scoped Postgres ledger DAL (`server/workspaceLedger.ts`) — reads/writes
+    `manual_account_balances` under the user's RLS context; `/workspace` is now a real per-tenant
+    dashboard (net worth / assets / liabilities) with an add/edit/remove accounts editor. E2E-covered.
+  - [x] Email-confirmation UX: `/signup` shows a "check your email" state when the project requires
+    confirmation (prod), and routes straight to onboarding when it's off (local).
+- [ ] Self-service follow-ups (rest of Phase 2): (a) journal-derived balances — port Akahu ingestion
+  writes to Postgres so synced transactions post to a per-tenant double-entry ledger and feed the
+  workspace (currently manual balances only); (b) real Akahu connect flow for self-serve tenants
+  (OAuth + Vault token storage per `akahu_connections`); (c) grow `/workspace` toward the full
+  widget dashboard once journal reads land.
 - [ ] Maybe work on infra: How this is all hosted and secure. (untracked supabase/ migrations + docs/architecture/ + tests/golden/ from separate work exist in the repo — not part of the marketing revamp branch)
 - [ ] Optional polish (from review): demo opens with the red "books not decision-grade" exception from 50 sample suspense items — honest but alarming as a first impression; consider a calmer sample backlog. Action Center widget is tall/sparse at its default size.

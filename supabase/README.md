@@ -12,19 +12,25 @@ test suite passes (8/8 assertions, exit 0). See "Verification" below to reproduc
 | `20260704120002_rls_policies.sql` | `SECURITY DEFINER` helpers (`user_tenant_ids`, `is_tenant_member`, `has_tenant_role`), RLS enabled on every table, one tenant-scoped policy per business table, identity-table policies, leads anon-insert. |
 | `20260704120003_accept_invite.sql` | `accept_invite(code)` RPC — role-only membership creation (tier comes from the tenant), email-binding check, concurrency-safe, on-conflict-safe. |
 | `20260704120004_grants.sql` | Base table privileges for `anon`/`authenticated`. **Required** — RLS filters rows but a role still needs table GRANTs to touch a table at all; without this every authenticated query fails "permission denied for table" before RLS runs. (Found via the live apply — not caught by review.) |
+| `20260704120005_self_registration.sql` | **Public self-service signup.** `handle_new_user()` AFTER-INSERT trigger on `auth.users` auto-provisions a `profiles` row for every new user (seeded from signup metadata / email local-part). `create_tenant(name, currency, suspense)` `SECURITY DEFINER` RPC lets a brand-new authenticated user (no membership yet) create their own tenant and become its `owner` atomically — always `tier='self-serve'`. This is what the onboarding flow calls. |
 
 ## Verification
 
 ```sh
 # needs Docker running
 supabase start
-supabase db reset        # applies all 4 migrations from scratch — must succeed clean
+supabase db reset        # applies all 5 migrations from scratch — must succeed clean
 
 # RLS tenant-isolation suite (rolled-back, re-runnable). Container name is
 # supabase_db_<project>; here supabase_db_YouInc:
 docker exec -i supabase_db_YouInc \
   psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_isolation.sql
 # expect: "ALL RLS ISOLATION TESTS PASSED", exit 0
+
+# Self-registration suite (trigger + create_tenant RPC, rolled-back):
+docker exec -i supabase_db_YouInc \
+  psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/self_registration.sql
+# expect: "ALL SELF-REGISTRATION TESTS PASSED", exit 0
 ```
 
 `supabase/tests/rls_isolation.sql` proves, against the real stack:
@@ -49,6 +55,15 @@ Confirmed on the live stack (only resolvable there, not on plain Postgres):
   (`app_metadata.active_tenant_id`) — see `rls_policies.sql` §7. Sketch only.
 - **Passkeys** SDK minimum (`@supabase/supabase-js` ~v2.105.0+, beta) — pin exactly.
 
+## Done in P4 (self-service signup)
+
+- **Public signup / create-tenant RPC** — shipped in
+  `20260704120005_self_registration.sql` (see the migration table above). A new
+  user signs up via Supabase Auth (which fires `handle_new_user` to create their
+  profile), then the onboarding flow calls `create_tenant(...)` to create their
+  self-serve tenant and owner membership. Verified by
+  `supabase/tests/self_registration.sql`.
+
 ## Deliberately deferred to P2 (not an omission)
 
 - **The tenant-aware data-access layer.** `readLedgerDashboard()` is SQL
@@ -57,7 +72,6 @@ Confirmed on the live stack (only resolvable there, not on plain Postgres):
   make the dashboard read an empty DB — reads and writes must migrate together,
   which is the P2 ledger-port work. Writing query code now (against a stack we
   can't run, that P2 rewrites) would be churn.
-- **Public signup / create-tenant RPC.** That is P4 self-registration.
 - **Concierge onboarding shape.** Assumption baked in: a concierge client gets
   their own `tier='concierge'` tenant (role=owner), NOT a membership in the
   operator's tenant — keeps client finances isolated. Confirm before P5.

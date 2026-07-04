@@ -9,14 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkspaceRouteImport } from './routes/workspace'
 import { Route as WidgetsRouteImport } from './routes/widgets'
 import { Route as UseCasesRouteImport } from './routes/use-cases'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as HelpRouteImport } from './routes/help'
@@ -31,6 +35,11 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WidgetsRoute = WidgetsRouteImport.update({
   id: '/widgets',
   path: '/widgets',
@@ -51,6 +60,16 @@ const StatusRoute = StatusRouteImport.update({
   path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SecurityRoute = SecurityRouteImport.update({
   id: '/security',
   path: '/security',
@@ -69,6 +88,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -151,14 +175,18 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
+  '/workspace': typeof WorkspaceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -174,14 +202,18 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
+  '/workspace': typeof WorkspaceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -198,14 +230,18 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
+  '/workspace': typeof WorkspaceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -223,14 +259,18 @@ export interface FileRouteTypes {
     | '/help'
     | '/integrations'
     | '/login'
+    | '/onboarding'
     | '/pricing'
     | '/privacy'
     | '/roadmap'
     | '/security'
+    | '/signin'
+    | '/signup'
     | '/status'
     | '/terms'
     | '/use-cases'
     | '/widgets'
+    | '/workspace'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -246,14 +286,18 @@ export interface FileRouteTypes {
     | '/help'
     | '/integrations'
     | '/login'
+    | '/onboarding'
     | '/pricing'
     | '/privacy'
     | '/roadmap'
     | '/security'
+    | '/signin'
+    | '/signup'
     | '/status'
     | '/terms'
     | '/use-cases'
     | '/widgets'
+    | '/workspace'
   id:
     | '__root__'
     | '/'
@@ -269,14 +313,18 @@ export interface FileRouteTypes {
     | '/help'
     | '/integrations'
     | '/login'
+    | '/onboarding'
     | '/pricing'
     | '/privacy'
     | '/roadmap'
     | '/security'
+    | '/signin'
+    | '/signup'
     | '/status'
     | '/terms'
     | '/use-cases'
     | '/widgets'
+    | '/workspace'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -293,18 +341,29 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RoadmapRoute: typeof RoadmapRoute
   SecurityRoute: typeof SecurityRoute
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
   UseCasesRoute: typeof UseCasesRoute
   WidgetsRoute: typeof WidgetsRoute
+  WorkspaceRoute: typeof WorkspaceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/widgets': {
       id: '/widgets'
       path: '/widgets'
@@ -333,6 +392,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/security': {
       id: '/security'
       path: '/security'
@@ -359,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -469,14 +549,18 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RoadmapRoute: RoadmapRoute,
   SecurityRoute: SecurityRoute,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
   UseCasesRoute: UseCasesRoute,
   WidgetsRoute: WidgetsRoute,
+  WorkspaceRoute: WorkspaceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
