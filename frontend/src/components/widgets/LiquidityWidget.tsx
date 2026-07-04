@@ -1,4 +1,4 @@
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import { formatMoney, formatPercent } from "./format";
 
 export function LiquidityWidget({

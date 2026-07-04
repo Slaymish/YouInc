@@ -7,6 +7,7 @@
 // idempotency_hash / external_id, so re-running "Load sample data" converges.
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { ingestTenantPayloads, type IngestResult } from "./tenantIngestion";
+import { throwServerError } from "./serverError";
 
 const SAMPLE_SOURCE_ACCOUNT = "acc_youinc_sample";
 
@@ -115,16 +116,16 @@ const STARTER_RULES: StarterRule[] = [
 
 async function requireTenantId(): Promise<string> {
   const user = await getServerUser();
-  if (!user) throw new Response("You must be signed in.", { status: 401 });
+  if (!user) throwServerError("You must be signed in.", 401);
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tenants")
     .select("id")
     .order("created_at", { ascending: true })
     .limit(1);
-  if (error) throw new Response(error.message, { status: 400 });
+  if (error) throwServerError(error.message, 400);
   const row = data?.[0] as { id: string } | undefined;
-  if (!row) throw new Response("No workspace found. Finish onboarding first.", { status: 409 });
+  if (!row) throwServerError("No workspace found. Finish onboarding first.", 409);
   return row.id;
 }
 
@@ -143,7 +144,7 @@ export async function loadSampleData(): Promise<IngestResult> {
     },
     { onConflict: "tenant_id,akahu_account_id" },
   );
-  if (mappingRes.error) throw new Response(mappingRes.error.message, { status: 400 });
+  if (mappingRes.error) throwServerError(mappingRes.error.message, 400);
 
   const rulesRes = await supabase.from("classification_rules").upsert(
     STARTER_RULES.map((r) => ({
@@ -157,7 +158,7 @@ export async function loadSampleData(): Promise<IngestResult> {
     })),
     { onConflict: "tenant_id,rule_key" },
   );
-  if (rulesRes.error) throw new Response(rulesRes.error.message, { status: 400 });
+  if (rulesRes.error) throwServerError(rulesRes.error.message, 400);
 
   return ingestTenantPayloads(SAMPLE_PAYLOADS);
 }

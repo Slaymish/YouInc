@@ -20,25 +20,15 @@ COPY frontend/ ./
 RUN pnpm build
 
 # ---------------------------------------------------------------------------
-# Stage 2: runtime image. Node runs the built Nitro server; Python (in a
-# venv) backs the youinc_ledger CLI that the frontend shells out to for
-# sync/reclassify/account-mapping operations.
+# Stage 2: runtime image. Node runs the built Nitro server.
 # ---------------------------------------------------------------------------
 FROM node:22-bookworm-slim AS runtime
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 python3-venv && \
-    rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
-# Python package: only what's needed to run the CLI, not the dev/test extras.
-COPY pyproject.toml README.md ./
-COPY src ./src
+# Default rules.yaml, seeded onto the persistent data volume by entrypoint.sh
+# on first boot.
 COPY config ./config
-RUN python3 -m venv /app/.venv && \
-    /app/.venv/bin/pip install --upgrade pip && \
-    /app/.venv/bin/pip install .
 
 # Built frontend, including the Nitro server and its traced node_modules
 # (e.g. better-sqlite3) from the build stage.
@@ -48,7 +38,6 @@ COPY docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 ENV YOUINC_PROJECT_ROOT=/app \
-    YOUINC_PYTHON=/app/.venv/bin/python \
     NODE_ENV=production \
     PORT=3000
 

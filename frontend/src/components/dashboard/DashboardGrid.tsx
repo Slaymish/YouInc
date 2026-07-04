@@ -14,7 +14,7 @@ import { DashboardPanel } from "./DashboardPanel";
 import { DashboardTabs } from "./DashboardTabs";
 import { WidgetPicker } from "./WidgetPicker";
 import { WIDGET_MAP, type WidgetId } from "./widgets";
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import { METRIC_IDS, renderWidgetContent } from "./renderWidget";
 
 const ROW_HEIGHT = 80;

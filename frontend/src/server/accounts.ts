@@ -8,6 +8,7 @@
 // tables that already exist and are RLS-safe: profiles, tenants, memberships,
 // akahu_connections.
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
+import { throwServerError } from "./serverError";
 
 export interface TenantSummary {
   id: string;
@@ -93,15 +94,15 @@ export async function getAccountState(): Promise<AccountState | null> {
 export async function createTenant(name: string): Promise<TenantSummary> {
   const user = await getServerUser();
   if (!user) {
-    throw new Response("You must be signed in to create a workspace.", { status: 401 });
+    throwServerError("You must be signed in to create a workspace.", 401);
   }
 
   const trimmed = name.trim();
   if (trimmed.length === 0) {
-    throw new Response("Please enter a name for your workspace.", { status: 400 });
+    throwServerError("Please enter a name for your workspace.", 400);
   }
   if (trimmed.length > 120) {
-    throw new Response("That name is too long (max 120 characters).", { status: 400 });
+    throwServerError("That name is too long (max 120 characters).", 400);
   }
 
   const supabase = getSupabaseServerClient();
@@ -110,7 +111,7 @@ export async function createTenant(name: string): Promise<TenantSummary> {
   });
 
   if (error) {
-    throw new Response(error.message || "Could not create your workspace.", { status: 400 });
+    throwServerError(error.message || "Could not create your workspace.", 400);
   }
 
   const row = (Array.isArray(data) ? data[0] : data) as TenantRow;

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import { formatMoney } from "./format";
 import { NoData } from "./NoData";
 import { spendCalendar, type CalendarCell } from "./derive";

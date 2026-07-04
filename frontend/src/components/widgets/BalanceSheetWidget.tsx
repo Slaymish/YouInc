@@ -1,4 +1,4 @@
-import type { LiquidityTier, BalanceRow, LedgerDashboardData } from "~/server/ledger";
+import type { LiquidityTier, BalanceRow, LedgerDashboardData } from "~/components/dashboard/dashboardData";
 
 function formatMoney(cents: number) {
   return new Intl.NumberFormat("en-NZ", { style: "currency", currency: "NZD" }).format(cents / 100);

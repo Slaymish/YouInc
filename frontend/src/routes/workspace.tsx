@@ -10,31 +10,43 @@ import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { PRODUCT } from "~/components/marketing/config";
 import { ManualBalancesEditor } from "~/components/workspace/ManualBalancesEditor";
 import { AkahuConnectPanel } from "~/components/workspace/AkahuConnectPanel";
+import { RulesEditor } from "~/components/workspace/RulesEditor";
+import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
+import { WORKSPACE_WIDGET_IDS } from "~/components/workspace/workspaceWidgetIds";
 import { formatMoney } from "~/components/widgets/format";
 import type { AccountState } from "~/server/accounts";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
 import type { AkahuConnectionStatus } from "~/server/akahuConnection";
+import type { ClassificationRule } from "~/server/tenantRules";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import "~/styles/auth.css";
 import "~/styles/workspace.css";
+import "~/components/dashboard/dashboard.css";
 
 const loadWorkspace = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
     account: AccountState | null;
     ledger: WorkspaceLedgerSummary | null;
     akahu: AkahuConnectionStatus | null;
+    rules: ClassificationRule[];
+    dashboard: LedgerDashboardData | null;
   }> => {
     const { getAccountState } = await import("~/server/accounts");
     const account = await getAccountState();
     if (!account || !account.tenant)
-      return { account, ledger: null, akahu: null };
+      return { account, ledger: null, akahu: null, rules: [], dashboard: null };
     const { getWorkspaceLedger } = await import("~/server/workspaceLedger");
     const { getAkahuConnectionStatus } =
       await import("~/server/akahuConnection");
-    const [ledger, akahu] = await Promise.all([
+    const { listRules } = await import("~/server/tenantRules");
+    const { getWorkspaceDashboard } = await import("~/server/workspaceDashboard");
+    const [ledger, akahu, rules, dashboard] = await Promise.all([
       getWorkspaceLedger(),
       getAkahuConnectionStatus(),
+      listRules(),
+      getWorkspaceDashboard(),
     ]);
-    return { account, ledger, akahu };
+    return { account, ledger, akahu, rules, dashboard };
   },
 );
 
@@ -57,6 +69,13 @@ const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
+const refreshDashboardFn = createServerFn({ method: "GET" }).handler(
+  async (): Promise<LedgerDashboardData> => {
+    const { getWorkspaceDashboard } = await import("~/server/workspaceDashboard");
+    return getWorkspaceDashboard();
+  },
+);
+
 export const Route = createFileRoute("/workspace")({
   loader: async () => {
     const data = await loadWorkspace();
@@ -66,6 +85,8 @@ export const Route = createFileRoute("/workspace")({
       account: AccountState;
       ledger: WorkspaceLedgerSummary;
       akahu: AkahuConnectionStatus;
+      rules: ClassificationRule[];
+      dashboard: LedgerDashboardData;
     };
   },
   component: WorkspacePage,
@@ -90,13 +111,20 @@ function Metric({
 }
 
 function WorkspacePage() {
-  const { account, ledger: initialLedger, akahu } = Route.useLoaderData();
+  const {
+    account,
+    ledger: initialLedger,
+    akahu,
+    rules,
+    dashboard,
+  } = Route.useLoaderData();
   const router = useRouter();
   useLightTheme();
   const [busy, setBusy] = useState(false);
   const [sampleBusy, setSampleBusy] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
   const [ledger, setLedger] = useState(initialLedger);
+  const [dashboardData, setDashboardData] = useState(dashboard);
   const tenant = account.tenant!;
 
   const hasAccounts = ledger.totals.accountCount > 0;
@@ -119,7 +147,12 @@ function WorkspacePage() {
     setSampleError(null);
     try {
       await loadSampleDataFn();
-      setLedger(await refreshLedgerFn());
+      const [nextLedger, nextDashboard] = await Promise.all([
+        refreshLedgerFn(),
+        refreshDashboardFn(),
+      ]);
+      setLedger(nextLedger);
+      setDashboardData(nextDashboard);
     } catch (err) {
       setSampleError(
         err instanceof Error ? err.message : "Could not load sample data.",
@@ -189,6 +222,20 @@ function WorkspacePage() {
           />
         </section>
 
+        <section
+          className="ws-dashboard-section"
+          aria-labelledby="ws-dashboard-heading"
+        >
+          <h2 id="ws-dashboard-heading" className="ws-section-heading">
+            Dashboard
+          </h2>
+          <DashboardGrid
+            dashboard={dashboardData}
+            storageKey={`youinc.workspace.layout.v1.${tenant.id}`}
+            allowedWidgetIds={WORKSPACE_WIDGET_IDS}
+          />
+        </section>
+
         <section className="ws-panel" aria-labelledby="ws-accounts-heading">
           <div className="ws-panel__head">
             <h2 id="ws-accounts-heading">Your accounts</h2>
@@ -246,6 +293,15 @@ function WorkspacePage() {
           </div>
           <div style={{ padding: "1.25rem" }}>
             <AkahuConnectPanel status={akahu} onLedgerChange={setLedger} />
+          </div>
+        </section>
+
+        <section className="ws-panel" aria-labelledby="ws-rules-heading">
+          <div className="ws-panel__head">
+            <h2 id="ws-rules-heading">Classification rules</h2>
+          </div>
+          <div style={{ padding: "1.25rem" }}>
+            <RulesEditor initialRules={rules} />
           </div>
         </section>
 

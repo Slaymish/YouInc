@@ -12,7 +12,6 @@ import {
   METRIC_IDS,
 } from "~/components/dashboard/renderWidget";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
-import { DEMO_WIDGET_IDS } from "~/components/marketing/demoWidgets";
 import { noop } from "~/components/marketing/noop";
 import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { MarketingHeader } from "~/components/marketing/MarketingHeader";
@@ -36,25 +35,9 @@ export const Route = createFileRoute("/widgets")({
   component: WidgetLibraryPage,
 });
 
-const LIVE_IDS = new Set<WidgetId>(DEMO_WIDGET_IDS);
-
-// The four widgets that trigger session-gated server mutations (see
-// demoWidgets.ts) — shown as placeholders here, never live-rendered.
-const GATED_DESCRIPTIONS: Partial<Record<WidgetId, string>> = {
-  ingestion:
-    "Trigger an Akahu sync and watch bank transactions post into your ledger.",
-  "manual-accounts":
-    "Track what banks can't see — KiwiSaver, property, vehicles — with manual balances.",
-  "source-systems":
-    "Map each connected account to the ledger and keep an eye on feed health.",
-  "suspense-queue":
-    "Clear transactions the classifier could not route by posting them to the right account.",
-};
-
 // Registry heights are dashboard row units; cap the tallest (balance sheet,
 // journal) so catalogue panels stay browsable and scroll internally instead.
 const MAX_LIVE_ROWS = 8;
-const MAX_GATED_ROWS = 3;
 
 // Catalogue-only size tweaks where a registry default clips content in a
 // static, non-resizable panel: the liquidity list needs one extra column, the
@@ -102,24 +85,8 @@ function LiveWidget({ def }: { def: WidgetDefinition }) {
   );
 }
 
-function GatedWidget({ def }: { def: WidgetDefinition }) {
-  return (
-    <article
-      className="wl-item wl-locked"
-      style={itemStyle(def.defaultW, Math.min(def.defaultH, MAX_GATED_ROWS))}
-    >
-      <header className="wl-locked__head">
-        <h2 className="wl-locked__label">{def.label}</h2>
-        <span className="wl-locked__tag">Connects to your live account</span>
-      </header>
-      <p className="wl-locked__desc">{GATED_DESCRIPTIONS[def.id]}</p>
-    </article>
-  );
-}
-
 function WidgetLibraryPage() {
   useLightTheme();
-  const gatedCount = WIDGET_REGISTRY.length - DEMO_WIDGET_IDS.length;
 
   return (
     <div className="mk">
@@ -134,9 +101,7 @@ function WidgetLibraryPage() {
           </h1>
           <p className="wl-hero__sub">
             All {WIDGET_REGISTRY.length} dashboard widgets, rendered here on
-            realistic sample data and sized the way they land on your board. The{" "}
-            {gatedCount} that write to a real ledger wait until you connect an
-            account.
+            realistic sample data and sized the way they land on your board.
           </p>
         </section>
 
@@ -153,13 +118,9 @@ function WidgetLibraryPage() {
                 <span className="wl-cat__count">{defs.length}</span>
               </h2>
               <div className="wl-grid">
-                {defs.map((def) =>
-                  LIVE_IDS.has(def.id) ? (
-                    <LiveWidget def={def} key={def.id} />
-                  ) : (
-                    <GatedWidget def={def} key={def.id} />
-                  ),
-                )}
+                {defs.map((def) => (
+                  <LiveWidget def={def} key={def.id} />
+                ))}
               </div>
             </section>
           );

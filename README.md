@@ -9,54 +9,13 @@ Local-first Personal ERP and Akahu/BNZ Open Finance ledger engine.
 - Posts only settled transactions to a strict double-entry SQLite ledger.
 - Routes transactions through hot-reloadable YAML rules with NZFCC fallback and suspense safety.
 - Exports hledger-compatible plain text accounting journals.
-- Provides a local Streamlit BI dashboard for balance sheet and P&L reporting.
 
 See `docs/architecture_design.md` for the Phase 1 architecture design, `docs/persona_frontend_information_design.md` for the persona-led frontend, information model, and ingestion design, and `docs/research_competitors.md` for the competitor landscape, positioning, and pricing research.
 
 ## Quick start
 
-Everything is driven through one launcher, `./youinc`. One-time setup creates the
-Python virtualenv, installs the package and frontend deps, writes `.env`, and
-initializes the local SQLite ledger:
-
-```sh
-./youinc setup
-```
-
-Then use any of:
-
-```sh
-./youinc accounts                                  # list Akahu source accounts
-./youinc sync --account-id acc_your_id --start-date 2026-06-01
-./youinc reclassify
-./youinc export-journal --output ledger.journal
-./youinc frontend                                  # React dashboard on :3000
-./youinc dashboard                                 # Streamlit BI dashboard
-./youinc test                                      # run the test suite
-./youinc cli --help                                # full CLI reference
-./youinc help                                      # all launcher commands
-```
-
-`./youinc <cli-command>` forwards straight to the Python CLI. The launcher
-auto-activates `.venv` and strips stale local proxy vars for you.
-
-<details>
-<summary>Manual equivalent (without the launcher)</summary>
-
-```sh
-python -m venv .venv
-. .venv/bin/activate
-pip install -e '.[dev]'
-cp .env.example .env
-python -m youinc_ledger.cli init-db
-python -m youinc_ledger.cli accounts
-python -m youinc_ledger.cli sync --account-id acc_your_akahu_account_id --start-date 2026-06-01
-python -m youinc_ledger.cli reclassify
-python -m youinc_ledger.cli export-journal --output ledger.journal
-python -m streamlit run src/youinc_ledger/bi_reporting/dashboard.py
-```
-
-</details>
+The TypeScript/Supabase-backed frontend in `frontend/` is the only implementation;
+see the section below to run it.
 
 ## TanStack Start frontend
 
@@ -68,7 +27,7 @@ localStorage key and never touch your real board), the bespoke-service page at
 `/custom-builds`, and a live widget catalogue at `/widgets`. Everything else is
 passkey-gated (see "Publishing the frontend publicly" below).
 
-The simplest way to run it is `./youinc frontend` from the repo root. To run it directly:
+To run it:
 
 ```sh
 cd frontend
@@ -87,7 +46,6 @@ Optional frontend ingestion environment variables:
 ```sh
 YOUINC_RULES_PATH=/absolute/path/to/rules.yaml
 YOUINC_PROJECT_ROOT=/absolute/path/to/YouInc
-YOUINC_PYTHON=/absolute/path/to/python
 AKAHU_CA_BUNDLE=/absolute/path/to/network-or-corporate-ca.pem
 ```
 
@@ -107,24 +65,17 @@ id/origin are derived from the request by default; override with `YOUINC_RP_ID`
 implementation.
 
 To actually host it, see `docs/deploy_fly.md` for a Fly.io setup that scales
-to zero (a `Dockerfile` at the repo root packages the built frontend plus
-the Python venv the CLI shell-outs need, backed by a Fly Volume for the
-SQLite ledger and `rules.yaml` — no changes to the local-first architecture).
+to zero (a `Dockerfile` at the repo root packages the built frontend, backed
+by a Fly Volume for the SQLite ledger and `rules.yaml` — no changes to the
+local-first architecture).
 
-If `pnpm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, run it with local proxy variables unset (the `./youinc` launcher already does this for you):
+If `pnpm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, run it with local proxy variables unset:
 
 ```sh
 env -u HTTPS_PROXY -u HTTP_PROXY -u ALL_PROXY -u https_proxy -u http_proxy -u all_proxy pnpm install
 ```
 
 Akahu sync ignores generic `REQUESTS_CA_BUNDLE`, `SSL_CERT_FILE`, and `CURL_CA_BUNDLE` values so local mitmproxy/corporate cert settings do not silently affect banking ingestion. If live sync must run on a TLS-inspecting network, set `AKAHU_CA_BUNDLE` to that network's PEM CA bundle and restart the frontend.
-
-If `pip install` fails with `ProxyError` against `127.0.0.1:8080`, your shell is configured to use a local proxy that is not running. Either start that proxy, or unset the proxy variables for this terminal session:
-
-```sh
-unset HTTPS_PROXY HTTP_PROXY ALL_PROXY https_proxy http_proxy all_proxy
-pip install -e '.[dev]'
-```
 
 ## Live Akahu sync
 
@@ -133,14 +84,6 @@ Set these in `.env` or as environment variables:
 - `AKAHU_BASE_URL`
 - `AKAHU_APP_TOKEN`
 - `AKAHU_USER_TOKEN`
-
-Then run:
-
-```sh
-python -m youinc_ledger.cli sync --account-id acc_bnz_your_account --start-date 2026-01-01 --end-date 2026-01-31
-```
-
-Use `--delta` for incremental sync using the stored last successful timestamp.
 
 ## Safety notes
 

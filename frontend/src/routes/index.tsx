@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   loader: async () => {
     const { authenticated } = await checkSession();
     if (authenticated) {
-      throw redirect({ to: "/dashboard" });
+      throw redirect({ to: "/workspace" });
     }
   },
   component: MarketingPage,

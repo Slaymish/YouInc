@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { z } from "zod";
+import { throwServerError } from "./serverError";
 
 const WaitlistSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
@@ -62,7 +63,7 @@ function notify(lead: WaitlistInput): void {
 export function recordLead(input: unknown): { ok: true } {
   const parsed = WaitlistSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Response("Please enter a valid email address.", { status: 400 });
+    throwServerError("Please enter a valid email address.", 400);
   }
   const lead = parsed.data;
   // Honeypot filled → pretend success, store nothing.

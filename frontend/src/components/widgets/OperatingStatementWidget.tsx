@@ -1,4 +1,4 @@
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 
 function shortMoney(cents: number): string {
   const d = cents / 100;

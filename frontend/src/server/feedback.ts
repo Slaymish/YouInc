@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { z } from "zod";
+import { throwServerError } from "./serverError";
 
 const FeedbackSchema = z.object({
   vote: z.enum(["up", "down"]),
@@ -59,7 +60,7 @@ function notify(feedback: FeedbackInput): void {
 export function recordFeedback(input: unknown): { ok: true } {
   const parsed = FeedbackSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Response("Invalid feedback payload.", { status: 400 });
+    throwServerError("Invalid feedback payload.", 400);
   }
   const feedback = parsed.data;
   db()

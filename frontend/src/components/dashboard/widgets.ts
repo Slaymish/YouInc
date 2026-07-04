@@ -19,12 +19,8 @@ export type WidgetId =
   | "expense-breakdown"
   | "income-breakdown"
   | "ledger-confidence"
-  | "ingestion"
   | "balance-sheet"
-  | "manual-accounts"
   | "journal"
-  | "suspense-queue"
-  | "source-systems"
   | "recurring"
   | "net-worth-velocity"
   | "income-concentration"
@@ -177,39 +173,12 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     minH: 4,
   },
   {
-    id: "ingestion",
-    label: "Ingestion",
-    category: "actions",
-    defaultW: 5,
-    defaultH: 4,
-    minW: 3,
-    minH: 4,
-  },
-  {
-    id: "manual-accounts",
-    label: "Manual Accounts",
-    category: "data",
-    defaultW: 5,
-    defaultH: 6,
-    minW: 3,
-    minH: 4,
-  },
-  {
     id: "journal",
     label: "Journal",
     category: "data",
     defaultW: 7,
     defaultH: 10,
     minW: 4,
-    minH: 4,
-  },
-  {
-    id: "source-systems",
-    label: "Source Systems",
-    category: "data",
-    defaultW: 5,
-    defaultH: 4,
-    minW: 3,
     minH: 4,
   },
   {
@@ -272,15 +241,6 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     category: "finance",
     defaultW: 5,
     defaultH: 5,
-    minW: 3,
-    minH: 4,
-  },
-  {
-    id: "suspense-queue",
-    label: "Suspense Queue",
-    category: "data",
-    defaultW: 5,
-    defaultH: 4,
     minW: 3,
     minH: 4,
   },

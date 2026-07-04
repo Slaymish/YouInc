@@ -18,6 +18,7 @@
 // read here yet — a fresh self-serve tenant has none until sync lands.
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { accountType } from "./accountType";
+import { throwServerError } from "./serverError";
 import {
   combineBalances,
   type AccountBalance,
@@ -69,7 +70,7 @@ interface TenantContext {
 async function requireTenant(): Promise<TenantContext> {
   const user = await getServerUser();
   if (!user) {
-    throw new Response("You must be signed in.", { status: 401 });
+    throwServerError("You must be signed in.", 401);
   }
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
@@ -78,16 +79,12 @@ async function requireTenant(): Promise<TenantContext> {
     .order("created_at", { ascending: true })
     .limit(1);
   if (error) {
-    throw new Response(error.message || "Could not load your workspace.", {
-      status: 400,
-    });
+    throwServerError(error.message || "Could not load your workspace.", 400);
   }
   const row = data?.[0] as { id: string; default_currency: string } | undefined;
   if (!row) {
     // Signed in but no tenant yet — onboarding not finished.
-    throw new Response("No workspace found. Finish onboarding first.", {
-      status: 409,
-    });
+    throwServerError("No workspace found. Finish onboarding first.", 409);
   }
   return { tenantId: row.id, currency: row.default_currency };
 }
@@ -159,14 +156,10 @@ export async function getWorkspaceLedger(): Promise<WorkspaceLedgerSummary> {
       .eq("tenant_id", tenant.tenantId),
   ]);
   if (manualRes.error) {
-    throw new Response(manualRes.error.message || "Could not load balances.", {
-      status: 400,
-    });
+    throwServerError(manualRes.error.message || "Could not load balances.", 400);
   }
   if (journalRes.error) {
-    throw new Response(journalRes.error.message || "Could not load ledger.", {
-      status: 400,
-    });
+    throwServerError(journalRes.error.message || "Could not load ledger.", 400);
   }
   return summarize(
     tenant,
@@ -195,13 +188,13 @@ export async function upsertWorkspaceBalance(
 
   const account = input.account.trim();
   if (!account.includes(":")) {
-    throw new Response(
+    throwServerError(
       "Use a namespaced account, e.g. Assets:Bank:Everyday or Liabilities:Card.",
-      { status: 400 },
+      400,
     );
   }
   if (!Number.isFinite(input.balanceCents)) {
-    throw new Response("Enter a valid balance.", { status: 400 });
+    throwServerError("Enter a valid balance.", 400);
   }
   const balanceCents = Math.round(input.balanceCents);
   const asOfDate = input.asOfDate ?? new Date().toISOString().slice(0, 10);
@@ -218,9 +211,7 @@ export async function upsertWorkspaceBalance(
     { onConflict: "tenant_id,account" },
   );
   if (error) {
-    throw new Response(error.message || "Could not save the balance.", {
-      status: 400,
-    });
+    throwServerError(error.message || "Could not save the balance.", 400);
   }
   return getWorkspaceLedger();
 }
@@ -237,9 +228,7 @@ export async function deleteWorkspaceBalance(
     .eq("tenant_id", tenant.tenantId)
     .eq("account", account.trim());
   if (error) {
-    throw new Response(error.message || "Could not remove the account.", {
-      status: 400,
-    });
+    throwServerError(error.message || "Could not remove the account.", 400);
   }
   return getWorkspaceLedger();
 }

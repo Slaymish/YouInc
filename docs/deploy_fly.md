@@ -1,10 +1,9 @@
 # Deploying to Fly.io
 
-This app is local-first: the frontend opens a SQLite file directly and shells
-out to the Python CLI for sync/reclassify/account-mapping. Fly.io Machines
-support both an ephemeral scale-to-zero compute layer *and* a persistent
-volume attached to the same container, so this deployment keeps the existing
-architecture unchanged — no database migration, no rewrite.
+This app is local-first: the frontend opens a SQLite file directly. Fly.io
+Machines support both an ephemeral scale-to-zero compute layer *and* a
+persistent volume attached to the same container, so this deployment keeps
+the existing architecture unchanged — no database migration, no rewrite.
 
 ## What gets deployed
 
@@ -12,14 +11,11 @@ One Docker image (see `Dockerfile`) containing:
 
 - The built TanStack Start frontend (`frontend/.output`), including the
   traced `better-sqlite3` native module.
-- A Python venv at `/app/.venv` with the `youinc_ledger` package installed,
-  used by the frontend's `execFile` shell-outs.
 
 A single Fly Machine runs this image, with a **Fly Volume mounted at
 `/data`** holding the SQLite ledger and `config/rules.yaml`. On first boot,
-`docker/entrypoint.sh` seeds `/data/rules.yaml` from the image default and
-runs `init-db` if the ledger doesn't exist yet. On every later boot it reuses
-whatever is already on the volume.
+`docker/entrypoint.sh` seeds `/data/rules.yaml` from the image default. On
+every later boot it reuses whatever is already on the volume.
 
 `fly.toml` sets `min_machines_running = 0` with `auto_stop_machines = "stop"`
 / `auto_start_machines = true` — the Machine suspends when idle and Fly Proxy
@@ -77,9 +73,9 @@ container image changes.
 
 ## Continuous deployment (GitHub Actions)
 
-`.github/workflows/ci.yml` runs the Python test suite and the frontend build
-+ tests on every push/PR, then deploys to Fly.io automatically on every push
-to `main` once both test jobs pass.
+`.github/workflows/ci.yml` runs the frontend build + tests on every push/PR,
+then deploys to Fly.io automatically on every push to `main` once the test
+job passes.
 
 One-time setup:
 
@@ -104,8 +100,7 @@ auth session, not the CI secret.
 ## Day-to-day operations
 
 - **Logs**: `fly logs`
-- **SSH into the running Machine** (e.g. to run a one-off CLI command):
-  `fly ssh console`, then `cd /app && .venv/bin/python -m youinc_ledger.cli --help`
+- **SSH into the running Machine**: `fly ssh console`
 - **Check volume usage**: `fly ssh console -C "df -h /data"`
 - **Manually wake the Machine**: just hit the URL — `auto_start_machines`
   handles it.
@@ -116,9 +111,7 @@ auth session, not the CI secret.
 
 The volume has scheduled daily snapshots enabled by default (5-day
 retention). For an off-Fly backup, use `fly ssh sftp` or `fly ssh console` to
-pull `/data/youinc-ledger.sqlite3` and `/data/rules.yaml` periodically, or
-export the hledger journal (`./youinc export-journal`) and commit it, as
-you're already doing locally.
+pull `/data/youinc-ledger.sqlite3` and `/data/rules.yaml` periodically.
 
 ## Updating the Basic Auth credentials
 

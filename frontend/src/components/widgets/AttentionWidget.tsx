@@ -1,4 +1,4 @@
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import {
   buildAttentionItems,
   type AttentionSeverity,

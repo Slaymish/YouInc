@@ -1,4 +1,4 @@
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import { formatMoney, formatPercent, leafAccount } from "./format";
 import { NoData } from "./NoData";
 import { spendingAnomalies } from "./derive";

@@ -1,4 +1,4 @@
-import type { LedgerDashboardData, LiquidityTier } from "~/server/ledger";
+import type { LedgerDashboardData, LiquidityTier } from "~/components/dashboard/dashboardData";
 import { formatMoney, formatPercent } from "./format";
 import { NoData } from "./NoData";
 import { assetMix } from "./derive";

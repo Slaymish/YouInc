@@ -18,6 +18,7 @@ import type { LedgerStore } from "./ledger-engine/pipeline";
 import { LedgerPipeline, type PipelineResult } from "./ledger-engine/pipeline";
 import { RulesRouter, type RulesConfig } from "./ledger-engine/rulesRouter";
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
+import { throwServerError } from "./serverError";
 
 interface TenantContext {
   tenantId: string;
@@ -25,16 +26,16 @@ interface TenantContext {
 
 async function requireTenant(): Promise<TenantContext> {
   const user = await getServerUser();
-  if (!user) throw new Response("You must be signed in.", { status: 401 });
+  if (!user) throwServerError("You must be signed in.", 401);
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tenants")
     .select("id")
     .order("created_at", { ascending: true })
     .limit(1);
-  if (error) throw new Response(error.message, { status: 400 });
+  if (error) throwServerError(error.message, 400);
   const row = data?.[0] as { id: string } | undefined;
-  if (!row) throw new Response("No workspace found. Finish onboarding first.", { status: 409 });
+  if (!row) throwServerError("No workspace found. Finish onboarding first.", 409);
   return { tenantId: row.id };
 }
 
@@ -95,7 +96,7 @@ async function loadTenantRules(tenantId: string): Promise<RulesConfig> {
   ]);
 
   for (const res of [rulesRes, mappingsRes, nzfccRes, tenantRes]) {
-    if (res.error) throw new Response(res.error.message, { status: 400 });
+    if (res.error) throwServerError(res.error.message, 400);
   }
 
   const rules = ((rulesRes.data ?? []) as RuleRow[]).map((r) => {
@@ -209,7 +210,7 @@ export async function ingestTenantPayloads(
     loadTenantRules(tenant.tenantId),
   ]);
   for (const res of [rawRes, journalRes, manualRes]) {
-    if (res.error) throw new Response(res.error.message, { status: 400 });
+    if (res.error) throwServerError(res.error.message, 400);
   }
 
   const existingRawHashes = new Set(
@@ -265,7 +266,7 @@ async function persistDeltas(
     const { error } = await supabase
       .from("raw_transactions")
       .upsert(rows, { onConflict: "tenant_id,idempotency_hash" });
-    if (error) throw new Response(error.message, { status: 400 });
+    if (error) throwServerError(error.message, 400);
   }
 
   // Insert journal headers, then their entries (composite FK pins entries to
@@ -287,7 +288,7 @@ async function persistDeltas(
       )
       .select("id")
       .limit(1);
-    if (error) throw new Response(error.message, { status: 400 });
+    if (error) throwServerError(error.message, 400);
     const journalId = (data?.[0] as { id: string } | undefined)?.id;
     if (!journalId) continue;
 
@@ -300,6 +301,6 @@ async function persistDeltas(
       currency: p.currency,
     }));
     const { error: entryError } = await supabase.from("journal_entries").insert(entryRows);
-    if (entryError) throw new Response(entryError.message, { status: 400 });
+    if (entryError) throwServerError(entryError.message, 400);
   }
 }

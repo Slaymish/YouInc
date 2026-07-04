@@ -16,6 +16,7 @@ import type {
   RegistrationResponseJSON,
 } from "@simplewebauthn/server";
 import { getCookie, getRequest, setCookie } from "@tanstack/react-start/server";
+import { throwServerError } from "./serverError";
 
 async function webauthn() {
   if (!REFLECT_METADATA_LOADED) {
@@ -174,7 +175,7 @@ export function isValidSession(token: string | undefined | null): boolean {
 /** Guard for server functions: throws 401 unless the caller has a live session. */
 export function requireSession(): void {
   if (!isValidSession(getCookie(SESSION_COOKIE))) {
-    throw new Response("Unauthorized", { status: 401 });
+    throwServerError("Unauthorized", 401);
   }
 }
 
@@ -216,7 +217,7 @@ export async function beginRegistration(
   enrollmentToken: string,
 ): Promise<PublicKeyCredentialCreationOptionsJSON> {
   if (!enrollmentAllowed(enrollmentToken)) {
-    throw new Response("Registration is disabled.", { status: 403 });
+    throwServerError("Registration is disabled.", 403);
   }
   const { generateRegistrationOptions } = await webauthn();
   const { rpID } = resolveRp();
@@ -238,11 +239,11 @@ export async function finishRegistration(
   enrollmentToken: string,
 ): Promise<{ verified: boolean }> {
   if (!enrollmentAllowed(enrollmentToken)) {
-    throw new Response("Registration is disabled.", { status: 403 });
+    throwServerError("Registration is disabled.", 403);
   }
   const { verifyRegistrationResponse } = await webauthn();
   const expectedChallenge = takeChallenge("register");
-  if (!expectedChallenge) throw new Response("Challenge expired.", { status: 400 });
+  if (!expectedChallenge) throwServerError("Challenge expired.", 400);
   const { rpID, origin } = resolveRp();
 
   const verification = await verifyRegistrationResponse({
@@ -295,7 +296,7 @@ export async function finishAuthentication(
 ): Promise<{ verified: boolean }> {
   const { verifyAuthenticationResponse } = await webauthn();
   const expectedChallenge = takeChallenge("authenticate");
-  if (!expectedChallenge) throw new Response("Challenge expired.", { status: 400 });
+  if (!expectedChallenge) throwServerError("Challenge expired.", 400);
 
   const credential = listCredentials().find((c) => c.id === response.id);
   if (!credential) return { verified: false };

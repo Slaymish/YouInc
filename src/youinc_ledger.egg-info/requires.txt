@@ -1,8 +1,0 @@
-certifi>=2024.8.30
-python-dotenv>=1.0.1
-PyYAML>=6.0.2
-requests>=2.32.0
-streamlit>=1.36.0
-
-[dev]
-pytest>=8.2.0

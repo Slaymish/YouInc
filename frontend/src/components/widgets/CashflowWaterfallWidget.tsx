@@ -1,4 +1,4 @@
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import { formatMoney, shortMoney, leafAccount } from "./format";
 import { NoData } from "./NoData";
 import { cashflowWaterfall, type WaterfallStep } from "./derive";

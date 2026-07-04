@@ -491,3 +491,92 @@
   font-size: 0.85rem;
   color: var(--accent-strong, #0e8a44);
 }
+
+/* ── Rules editor ───────────────────────────────────────────────────── */
+.rules-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rules-editor__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.rules-table .rule-cond {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.rule-row--disabled {
+  opacity: 0.5;
+}
+
+.rules-editor__add {
+  align-self: flex-start;
+  padding: 0.55rem 1rem;
+}
+
+.rule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border: 1px solid var(--line-subtle);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--surface-muted, var(--code-bg));
+}
+
+.rule-form__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+}
+
+.rule-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.rule-form input {
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.rule-form__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.rule-form__actions .auth-primary,
+.rule-form__actions .auth-secondary {
+  padding: 0.55rem 1rem;
+}
+
+/* ── Dashboard grid (Phase 1: DashboardGrid on per-tenant data) ──────────── */
+.ws-dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ws-section-heading {
+  margin: 0;
+  font-size: 1.05rem;
+}

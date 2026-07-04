@@ -1,11 +1,10 @@
 import type { WidgetId } from "../dashboard/widgets";
 
-// Every widget except ingestion / manual-accounts / source-systems /
-// suspense-queue, which trigger session-gated server mutations that would
-// 401 on the public demo (see the *Widget.tsx files for the createServerFn
-// calls). Everything else only reads the `dashboard` prop, so it's safe to
-// offer on /demo — this is the `allowedWidgetIds` passed to DashboardGrid,
-// letting the public demo mirror the real dashboard's tabs almost 1:1.
+// Every registered widget. All of them only read the `dashboard` prop (the
+// old SQLite-mutation widgets — ingestion / manual-accounts / source-systems
+// / suspense-queue — were removed along with the retired single-tenant
+// `/dashboard` and `server/ledger.ts`), so it's safe to offer all of them on
+// /demo — this is the `allowedWidgetIds` passed to DashboardGrid.
 export const DEMO_WIDGET_IDS: WidgetId[] = [
   "attention",
   "control-brief",

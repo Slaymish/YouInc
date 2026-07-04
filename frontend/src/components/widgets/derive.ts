@@ -6,7 +6,7 @@ import type {
   LedgerDashboardData,
   LiquidityTier,
   NetWorthPoint,
-} from "~/server/ledger";
+} from "~/components/dashboard/dashboardData";
 import {
   formatMoney,
   formatMonths,

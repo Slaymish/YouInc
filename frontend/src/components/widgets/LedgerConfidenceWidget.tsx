@@ -1,4 +1,4 @@
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 
 function formatPercent(value: number | null) {
   if (value === null || Number.isNaN(value)) return "n/a";

@@ -12,7 +12,7 @@ import type {
   RecurringPayment,
   CategoryMonthPoint,
   DailySpendPoint,
-} from "~/server/ledger";
+} from "~/components/dashboard/dashboardData";
 
 const ASSETS = 18_900_000; // $189,000
 const LIABILITIES = 4_662_000; // $46,620

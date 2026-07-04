@@ -1,5 +1,5 @@
 import type { WidgetId } from "./widgets";
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "./dashboardData";
 import type { AttentionTargetView } from "../widgets/derive";
 
 import { AttentionWidget } from "../widgets/AttentionWidget";
@@ -7,18 +7,14 @@ import { ControlBriefWidget } from "../widgets/ControlBriefWidget";
 import { MetricWidget } from "../widgets/MetricWidget";
 import { OperatingStatementWidget } from "../widgets/OperatingStatementWidget";
 import { LedgerConfidenceWidget } from "../widgets/LedgerConfidenceWidget";
-import { IngestionWidget } from "../widgets/IngestionWidget";
 import { BalanceSheetWidget } from "../widgets/BalanceSheetWidget";
-import { ManualAccountsWidget } from "../widgets/ManualAccountsWidget";
 import { JournalWidget } from "../widgets/JournalWidget";
-import { SourceSystemsWidget } from "../widgets/SourceSystemsWidget";
 import {
   LiquidityWidget,
   CreditFacilityWidget,
 } from "../widgets/LiquidityWidget";
 import { ExpenseBreakdownWidget } from "../widgets/ExpenseBreakdownWidget";
 import { IncomeBreakdownWidget } from "../widgets/IncomeBreakdownWidget";
-import { SuspenseQueueWidget } from "../widgets/SuspenseQueueWidget";
 import { MonthPulseWidget } from "../widgets/MonthPulseWidget";
 import { AssetMixWidget } from "../widgets/AssetMixWidget";
 import { RollingAverageWidget } from "../widgets/RollingAverageWidget";
@@ -58,16 +54,10 @@ export function renderWidgetContent(
       return <OperatingStatementWidget dashboard={dashboard} />;
     case "ledger-confidence":
       return <LedgerConfidenceWidget dashboard={dashboard} />;
-    case "ingestion":
-      return <IngestionWidget dashboard={dashboard} />;
     case "balance-sheet":
       return <BalanceSheetWidget dashboard={dashboard} />;
-    case "manual-accounts":
-      return <ManualAccountsWidget dashboard={dashboard} />;
     case "journal":
       return <JournalWidget dashboard={dashboard} />;
-    case "source-systems":
-      return <SourceSystemsWidget dashboard={dashboard} />;
     case "liquidity":
       return <LiquidityWidget dashboard={dashboard} />;
     case "credit-facility":
@@ -76,8 +66,6 @@ export function renderWidgetContent(
       return <ExpenseBreakdownWidget dashboard={dashboard} />;
     case "income-breakdown":
       return <IncomeBreakdownWidget dashboard={dashboard} />;
-    case "suspense-queue":
-      return <SuspenseQueueWidget dashboard={dashboard} />;
     case "month-pulse":
       return <MonthPulseWidget dashboard={dashboard} />;
     case "asset-mix":

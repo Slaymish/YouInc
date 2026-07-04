@@ -23,7 +23,7 @@ export interface RecurringPayment {
   lastDate: string;
 }
 
-type RecurringQueryRow = {
+export type RecurringQueryRow = {
   date: string;
   description: string;
   account: string | null;
@@ -157,37 +157,107 @@ export function detectRecurring(rows: RecurringQueryRow[]): RecurringPayment[] {
     .slice(0, MAX_RECURRING_RESULTS);
 }
 
+/**
+ * One Expenses:%/debit posting for a non-manual transaction, ungrouped. Feeds
+ * `computeRecurringGroups`, which does the per-transaction (max-account-pick
+ * + sum) grouping in JS that the SQLite query used to do via a correlated
+ * subquery + GROUP BY. Shared so the Postgres workspace path
+ * (workspaceRecurring.ts) computes recurring payments off the identical
+ * grouping logic instead of a divergent reimplementation.
+ */
+export interface RecurringEntryRow {
+  /** Groups postings into one transaction; any stable per-transaction key. */
+  transactionId: string;
+  date: string;
+  description: string;
+  account: string;
+  amountCents: number;
+}
+
+/**
+ * Groups Expenses:%/debit postings by transaction, summing to a per-transaction
+ * spend total and picking the largest-amount leg as the representative
+ * account (ties broken by first-seen order) — verbatim semantics of the old
+ * `GROUP BY jt.id` + correlated-subquery SQL, just expressed in JS so both
+ * backends share it.
+ */
+export function computeRecurringGroups(
+  rows: readonly RecurringEntryRow[],
+): RecurringQueryRow[] {
+  const groups = new Map<
+    string,
+    { date: string; description: string; topAccount: string; topAmount: number; spendCents: number }
+  >();
+
+  for (const row of rows) {
+    const group = groups.get(row.transactionId) ?? {
+      date: row.date,
+      description: row.description,
+      topAccount: row.account,
+      topAmount: row.amountCents,
+      spendCents: 0,
+    };
+    group.spendCents += row.amountCents;
+    if (row.amountCents > group.topAmount) {
+      group.topAmount = row.amountCents;
+      group.topAccount = row.account;
+    }
+    groups.set(row.transactionId, group);
+  }
+
+  return Array.from(groups.values())
+    .filter((group) => group.spendCents > 0)
+    .map((group) => ({
+      date: group.date,
+      description: group.description,
+      account: group.topAccount,
+      spend_cents: group.spendCents,
+    }));
+}
+
+/** Composed: group raw postings into per-transaction spend, then detect recurrence. */
+export function computeRecurringPayments(
+  rows: readonly RecurringEntryRow[],
+): RecurringPayment[] {
+  return detectRecurring(computeRecurringGroups(rows));
+}
+
+type RawRecurringQueryRow = {
+  transaction_id: number | string;
+  date: string;
+  description: string;
+  account: string;
+  amount_cents: number;
+};
+
 export function readRecurringPayments(db: DB): RecurringPayment[] {
   const rows = db
     .prepare(
       `
       SELECT
+        jt.id AS transaction_id,
         jt.transaction_date AS date,
         jt.description AS description,
-        (
-          SELECT je2.account
-          FROM journal_entries je2
-          WHERE je2.journal_transaction_id = jt.id
-            AND je2.account LIKE 'Expenses:%'
-            AND je2.side = 'debit'
-          ORDER BY je2.amount_cents DESC
-          LIMIT 1
-        ) AS account,
-        SUM(
-          CASE WHEN je.account LIKE 'Expenses:%' AND je.side = 'debit'
-            THEN je.amount_cents ELSE 0 END
-        ) AS spend_cents
+        je.account AS account,
+        je.amount_cents AS amount_cents
       FROM journal_transactions jt
       JOIN journal_entries je ON je.journal_transaction_id = jt.id
-      WHERE jt.source_account_id != 'manual'
-      GROUP BY jt.id
-      HAVING spend_cents > 0
-      ORDER BY jt.transaction_date
+      WHERE je.account LIKE 'Expenses:%'
+        AND je.side = 'debit'
+        AND jt.source_account_id != 'manual'
     `,
     )
-    .all() as RecurringQueryRow[];
+    .all() as RawRecurringQueryRow[];
 
-  return detectRecurring(rows);
+  return computeRecurringPayments(
+    rows.map((row) => ({
+      transactionId: String(row.transaction_id),
+      date: row.date,
+      description: row.description,
+      account: row.account,
+      amountCents: Number(row.amount_cents),
+    })),
+  );
 }
 
 // ── Per-category monthly spend (for anomaly detection) ─────────────────────
@@ -200,10 +270,53 @@ export interface CategoryMonthPoint {
   amountCents: number;
 }
 
-type CategoryMonthQueryRow = {
+/**
+ * One Expenses:% posting, ungrouped. Feeds `computeCategoryMonthly`, which
+ * does the (month, account) grouping in JS — shared so the Postgres
+ * workspace path (workspaceSpending.ts) computes this off identical logic.
+ */
+export interface CategoryMonthlyEntryRow {
   month: string;
   account: string;
-  amount_cents: number | null;
+  side: "debit" | "credit";
+  amountCents: number;
+}
+
+/**
+ * Nets debit-positive/credit-negative postings per (month, account), drops
+ * zero-sum groups, sorts by month then account. Verbatim semantics of the
+ * old `GROUP BY month, je.account` SQL — summing is associative, so grouping
+ * here instead of in SQL yields identical totals.
+ */
+export function computeCategoryMonthly(
+  rows: readonly CategoryMonthlyEntryRow[],
+): CategoryMonthPoint[] {
+  const totals = new Map<string, number>();
+  for (const row of rows) {
+    const key = `${row.month} ${row.account}`;
+    const delta = row.side === "debit" ? row.amountCents : -row.amountCents;
+    totals.set(key, (totals.get(key) ?? 0) + delta);
+  }
+
+  return Array.from(totals.entries())
+    .map(([key, amountCents]) => {
+      const [month, ...accountParts] = key.split(" ");
+      const account = accountParts.join(" ");
+      return { month, account, amountCents };
+    })
+    .filter((row) => row.amountCents !== 0)
+    .sort((a, b) =>
+      a.month === b.month
+        ? a.account.localeCompare(b.account)
+        : a.month.localeCompare(b.month),
+    );
+}
+
+type RawCategoryMonthlyRow = {
+  month: string;
+  account: string;
+  side: "debit" | "credit";
+  amount_cents: number;
 };
 
 export function readCategoryMonthly(db: DB): CategoryMonthPoint[] {
@@ -213,23 +326,23 @@ export function readCategoryMonthly(db: DB): CategoryMonthPoint[] {
       SELECT
         substr(jt.transaction_date, 1, 7) AS month,
         je.account AS account,
-        SUM(CASE WHEN je.side = 'debit' THEN je.amount_cents ELSE -je.amount_cents END) AS amount_cents
+        je.side AS side,
+        je.amount_cents AS amount_cents
       FROM journal_entries je
       JOIN journal_transactions jt ON jt.id = je.journal_transaction_id
       WHERE je.account LIKE 'Expenses:%'
-      GROUP BY month, je.account
-      ORDER BY month, je.account
     `,
     )
-    .all() as CategoryMonthQueryRow[];
+    .all() as RawCategoryMonthlyRow[];
 
-  return rows
-    .map((row) => ({
-      account: row.account,
+  return computeCategoryMonthly(
+    rows.map((row) => ({
       month: row.month,
-      amountCents: Number(row.amount_cents ?? 0),
-    }))
-    .filter((row) => row.amountCents !== 0);
+      account: row.account,
+      side: row.side,
+      amountCents: Number(row.amount_cents),
+    })),
+  );
 }
 
 // ── Daily spend (for the calendar heatmap) ─────────────────────────────────
@@ -243,11 +356,71 @@ export interface DailySpendPoint {
   count: number;
 }
 
-type DailySpendQueryRow = {
+/**
+ * One posting for a non-manual transaction (ANY account, not just
+ * Income:%/Expenses:%) — the distinct-transaction count needs every
+ * transaction represented, even pure transfers with no Income/Expense leg,
+ * to match the SQL's `COUNT(DISTINCT jt.id)` over the full join. Feeds
+ * `computeDailySpend`. Shared so the Postgres workspace path
+ * (workspaceSpending.ts) computes this off identical logic.
+ */
+export interface DailySpendEntryRow {
+  /** YYYY-MM-DD */
   date: string;
-  spend_cents: number | null;
-  income_cents: number | null;
-  count: number | null;
+  /** Groups postings into one transaction; any stable per-transaction key. */
+  transactionId: string;
+  account: string;
+  side: "debit" | "credit";
+  amountCents: number;
+}
+
+/**
+ * Sums Expenses:%/Income:% postings per day and counts DISTINCT transactions
+ * per day (including transfer-only transactions with no Income/Expense leg —
+ * mirrors `COUNT(DISTINCT jt.id)` over the unfiltered join). Verbatim
+ * semantics of the old `GROUP BY jt.transaction_date` SQL.
+ */
+export function computeDailySpend(
+  rows: readonly DailySpendEntryRow[],
+): DailySpendPoint[] {
+  const byDate = new Map<
+    string,
+    { spendCents: number; incomeCents: number; transactionIds: Set<string> }
+  >();
+
+  for (const row of rows) {
+    const bucket = byDate.get(row.date) ?? {
+      spendCents: 0,
+      incomeCents: 0,
+      transactionIds: new Set<string>(),
+    };
+    if (row.account.startsWith("Expenses:")) {
+      bucket.spendCents += row.side === "debit" ? row.amountCents : -row.amountCents;
+    }
+    if (row.account.startsWith("Income:")) {
+      bucket.incomeCents += row.side === "credit" ? row.amountCents : -row.amountCents;
+    }
+    bucket.transactionIds.add(row.transactionId);
+    byDate.set(row.date, bucket);
+  }
+
+  return Array.from(byDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, bucket]) => ({
+      date,
+      spendCents: bucket.spendCents,
+      incomeCents: bucket.incomeCents,
+      netCents: bucket.incomeCents - bucket.spendCents,
+      count: bucket.transactionIds.size,
+    }));
+}
+
+type RawDailySpendRow = {
+  transaction_id: number | string;
+  date: string;
+  account: string;
+  side: "debit" | "credit";
+  amount_cents: number;
 };
 
 export function readDailySpend(db: DB): DailySpendPoint[] {
@@ -255,36 +428,25 @@ export function readDailySpend(db: DB): DailySpendPoint[] {
     .prepare(
       `
       SELECT
+        jt.id AS transaction_id,
         jt.transaction_date AS date,
-        SUM(
-          CASE WHEN je.account LIKE 'Expenses:%'
-            THEN (CASE WHEN je.side = 'debit' THEN je.amount_cents ELSE -je.amount_cents END)
-            ELSE 0 END
-        ) AS spend_cents,
-        SUM(
-          CASE WHEN je.account LIKE 'Income:%'
-            THEN (CASE WHEN je.side = 'credit' THEN je.amount_cents ELSE -je.amount_cents END)
-            ELSE 0 END
-        ) AS income_cents,
-        COUNT(DISTINCT jt.id) AS count
+        je.account AS account,
+        je.side AS side,
+        je.amount_cents AS amount_cents
       FROM journal_transactions jt
       JOIN journal_entries je ON je.journal_transaction_id = jt.id
       WHERE jt.source_account_id != 'manual'
-      GROUP BY jt.transaction_date
-      ORDER BY jt.transaction_date
     `,
     )
-    .all() as DailySpendQueryRow[];
+    .all() as RawDailySpendRow[];
 
-  return rows.map((row) => {
-    const spendCents = Number(row.spend_cents ?? 0);
-    const incomeCents = Number(row.income_cents ?? 0);
-    return {
+  return computeDailySpend(
+    rows.map((row) => ({
       date: row.date,
-      spendCents,
-      incomeCents,
-      netCents: incomeCents - spendCents,
-      count: Number(row.count ?? 0),
-    };
-  });
+      transactionId: String(row.transaction_id),
+      account: row.account,
+      side: row.side,
+      amountCents: Number(row.amount_cents),
+    })),
+  );
 }

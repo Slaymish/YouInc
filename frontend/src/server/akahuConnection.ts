@@ -12,6 +12,7 @@
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { AkahuClient, AkahuApiError } from "./akahuClient";
 import { ingestTenantPayloads, type IngestResult } from "./tenantIngestion";
+import { throwServerError } from "./serverError";
 
 function appToken(): string | null {
   return process.env.AKAHU_APP_TOKEN?.trim() || null;
@@ -22,16 +23,16 @@ function akahuBaseUrl(): string {
 
 async function requireTenantId(): Promise<string> {
   const user = await getServerUser();
-  if (!user) throw new Response("You must be signed in.", { status: 401 });
+  if (!user) throwServerError("You must be signed in.", 401);
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tenants")
     .select("id")
     .order("created_at", { ascending: true })
     .limit(1);
-  if (error) throw new Response(error.message, { status: 400 });
+  if (error) throwServerError(error.message, 400);
   const row = data?.[0] as { id: string } | undefined;
-  if (!row) throw new Response("No workspace found. Finish onboarding first.", { status: 409 });
+  if (!row) throwServerError("No workspace found. Finish onboarding first.", 409);
   return row.id;
 }
 
@@ -52,7 +53,7 @@ export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus>
     .select("status, connected_at, last_synced_at")
     .eq("tenant_id", tenantId)
     .limit(1);
-  if (error) throw new Response(error.message, { status: 400 });
+  if (error) throwServerError(error.message, 400);
   const row = data?.[0] as
     | { status: string; connected_at: string | null; last_synced_at: string | null }
     | undefined;
@@ -69,14 +70,14 @@ export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus>
 export async function connectAkahu(userToken: string): Promise<AkahuConnectionStatus> {
   const tenantId = await requireTenantId();
   const clean = userToken.trim();
-  if (!clean) throw new Response("Enter your Akahu user token.", { status: 400 });
+  if (!clean) throwServerError("Enter your Akahu user token.", 400);
 
   const supabase = getSupabaseServerClient();
   const { error } = await supabase.rpc("connect_akahu", {
     target_tenant: tenantId,
     user_token: clean,
   });
-  if (error) throw new Response(error.message || "Could not save your Akahu connection.", { status: 400 });
+  if (error) throwServerError(error.message || "Could not save your Akahu connection.", 400);
   return getAkahuConnectionStatus();
 }
 
@@ -85,25 +86,25 @@ export async function disconnectAkahu(): Promise<AkahuConnectionStatus> {
   const tenantId = await requireTenantId();
   const supabase = getSupabaseServerClient();
   const { error } = await supabase.rpc("disconnect_akahu", { target_tenant: tenantId });
-  if (error) throw new Response(error.message || "Could not disconnect.", { status: 400 });
+  if (error) throwServerError(error.message || "Could not disconnect.", 400);
   return getAkahuConnectionStatus();
 }
 
 async function userTokenFor(tenantId: string): Promise<string> {
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase.rpc("get_akahu_user_token", { target_tenant: tenantId });
-  if (error) throw new Response(error.message, { status: 400 });
+  if (error) throwServerError(error.message, 400);
   const token = typeof data === "string" ? data : null;
-  if (!token) throw new Response("Akahu is not connected. Connect your account first.", { status: 409 });
+  if (!token) throwServerError("Akahu is not connected. Connect your account first.", 409);
   return token;
 }
 
 function buildClient(userToken: string): AkahuClient {
   const app = appToken();
   if (!app) {
-    throw new Response(
+    throwServerError(
       "Live Akahu sync is not configured on this server (missing AKAHU_APP_TOKEN).",
-      { status: 503 },
+      503,
     );
   }
   return new AkahuClient({ baseUrl: akahuBaseUrl(), appToken: app, userToken });
@@ -124,7 +125,7 @@ export async function listConnectedAccounts(): Promise<AkahuAccountSummary[]> {
   try {
     raw = await client.listAccounts();
   } catch (err) {
-    if (err instanceof AkahuApiError) throw new Response(err.message, { status: 502 });
+    if (err instanceof AkahuApiError) throwServerError(err.message, 502);
     throw err;
   }
   return raw
@@ -156,7 +157,7 @@ export async function syncAkahuAccount(
 ): Promise<AkahuSyncResult> {
   const tenantId = await requireTenantId();
   const cleanAccount = accountId.trim();
-  if (!cleanAccount) throw new Response("Choose an account to sync.", { status: 400 });
+  if (!cleanAccount) throwServerError("Choose an account to sync.", 400);
 
   const token = await userTokenFor(tenantId);
   const client = buildClient(token);
@@ -170,7 +171,7 @@ export async function syncAkahuAccount(
       payloads.push(txn);
     }
   } catch (err) {
-    if (err instanceof AkahuApiError) throw new Response(err.message, { status: 502 });
+    if (err instanceof AkahuApiError) throwServerError(err.message, 502);
     throw err;
   }
 

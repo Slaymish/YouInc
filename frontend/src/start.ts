@@ -7,16 +7,19 @@ import {
 const SESSION_COOKIE = "youinc_session";
 const LOGIN_PATH = "/login";
 
-// The passkey session gate protects ONLY the local owner's private SQLite
-// dashboard surface. Everything else — the marketing site, the trust/resource
-// static pages, the public demo, and the self-service Supabase auth flow
-// (`/signup`, `/signin`, `/onboarding`, `/workspace`) — is public by default.
+// The passkey session gate used to protect ONLY the local owner's private
+// SQLite dashboard surface (`/dashboard`), which has been retired along with
+// `server/ledger.ts` — the owner now uses the self-service Supabase-backed
+// `/workspace` like any other tenant. Nothing is currently listed here, so
+// this gate is a no-op; `/login`'s passkey ceremony and `server/auth.ts`
+// remain in place (unused) rather than being torn out in the same change
+// that retires the dashboard.
 //
 // This is a protected-prefix model, deliberately inverted from an allowlist:
 // adding a new public page must never require touching this file (the old
 // allowlist silently 302'd any un-listed route to /login). The Supabase-gated
 // routes gate themselves on the Supabase session inside their own loaders.
-const PROTECTED_PREFIXES = ["/dashboard"];
+const PROTECTED_PREFIXES: string[] = [];
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(

@@ -1,4 +1,4 @@
-import type { LedgerDashboardData, RecurringCadence } from "~/server/ledger";
+import type { LedgerDashboardData, RecurringCadence } from "~/components/dashboard/dashboardData";
 import { formatMoney, leafAccount } from "./format";
 import { NoData } from "./NoData";
 

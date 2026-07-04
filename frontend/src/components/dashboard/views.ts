@@ -96,20 +96,13 @@ const VIEW_BLUEPRINTS: ViewBlueprint[] = [
       "credit-facility",
       "asset-mix",
       "balance-sheet",
-      "manual-accounts",
     ],
   },
   {
     // "Are my numbers trustworthy?"
     id: "books",
     name: "Books",
-    ids: [
-      "ledger-confidence",
-      "suspense-queue",
-      "ingestion",
-      "source-systems",
-      "journal",
-    ],
+    ids: ["ledger-confidence", "journal"],
   },
 ];
 

@@ -49,14 +49,17 @@ describe("recordLead", () => {
     expect(countRows()).toBe(1);
   });
 
-  it("rejects an invalid email with a 400 Response", async () => {
+  it("rejects an invalid email with a catchable 400 ServerFnError", async () => {
     const { recordLead } = await freshModule();
     try {
       recordLead({ email: "not-an-email" });
       expect.unreachable("should have thrown");
     } catch (err) {
-      expect(err).toBeInstanceOf(Response);
-      expect((err as Response).status).toBe(400);
+      // A catchable Error (not a raw Response — see server/serverError.ts),
+      // carrying the original status as a plain own property.
+      expect(err).toBeInstanceOf(Error);
+      expect((err as Error).name).toBe("ServerFnError");
+      expect((err as Error & { status: number }).status).toBe(400);
     }
     expect(countRows()).toBe(0);
   });
@@ -74,14 +77,15 @@ describe("recordLead", () => {
     expect(countRows()).toBe(0);
   });
 
-  it("rejects a honeypot value over 200 chars with a 400 Response", async () => {
+  it("rejects a honeypot value over 200 chars with a catchable 400 ServerFnError", async () => {
     const { recordLead } = await freshModule();
     try {
       recordLead({ email: "bot@b.com", company: "x".repeat(201) });
       expect.unreachable("should have thrown");
     } catch (err) {
-      expect(err).toBeInstanceOf(Response);
-      expect((err as Response).status).toBe(400);
+      expect(err).toBeInstanceOf(Error);
+      expect((err as Error).name).toBe("ServerFnError");
+      expect((err as Error & { status: number }).status).toBe(400);
     }
     expect(countRows()).toBe(0);
   });

@@ -27,7 +27,6 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DataDeletionRouteImport } from './routes/data-deletion'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomBuildsRouteImport } from './routes/custom-builds'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CompareRouteImport } from './routes/compare'
@@ -125,11 +124,6 @@ const DataDeletionRoute = DataDeletionRouteImport.update({
   path: '/data-deletion',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CustomBuildsRoute = CustomBuildsRouteImport.update({
   id: '/custom-builds',
   path: '/custom-builds',
@@ -168,7 +162,6 @@ export interface FileRoutesByFullPath {
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/custom-builds': typeof CustomBuildsRoute
-  '/dashboard': typeof DashboardRoute
   '/data-deletion': typeof DataDeletionRoute
   '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
@@ -195,7 +188,6 @@ export interface FileRoutesByTo {
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/custom-builds': typeof CustomBuildsRoute
-  '/dashboard': typeof DashboardRoute
   '/data-deletion': typeof DataDeletionRoute
   '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
@@ -223,7 +215,6 @@ export interface FileRoutesById {
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/custom-builds': typeof CustomBuildsRoute
-  '/dashboard': typeof DashboardRoute
   '/data-deletion': typeof DataDeletionRoute
   '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
@@ -252,7 +243,6 @@ export interface FileRouteTypes {
     | '/compare'
     | '/contact'
     | '/custom-builds'
-    | '/dashboard'
     | '/data-deletion'
     | '/demo'
     | '/docs'
@@ -279,7 +269,6 @@ export interface FileRouteTypes {
     | '/compare'
     | '/contact'
     | '/custom-builds'
-    | '/dashboard'
     | '/data-deletion'
     | '/demo'
     | '/docs'
@@ -306,7 +295,6 @@ export interface FileRouteTypes {
     | '/compare'
     | '/contact'
     | '/custom-builds'
-    | '/dashboard'
     | '/data-deletion'
     | '/demo'
     | '/docs'
@@ -334,7 +322,6 @@ export interface RootRouteChildren {
   CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   CustomBuildsRoute: typeof CustomBuildsRoute
-  DashboardRoute: typeof DashboardRoute
   DataDeletionRoute: typeof DataDeletionRoute
   DemoRoute: typeof DemoRoute
   DocsRoute: typeof DocsRoute
@@ -483,13 +470,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DataDeletionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/custom-builds': {
       id: '/custom-builds'
       path: '/custom-builds'
@@ -542,7 +522,6 @@ const rootRouteChildren: RootRouteChildren = {
   CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   CustomBuildsRoute: CustomBuildsRoute,
-  DashboardRoute: DashboardRoute,
   DataDeletionRoute: DataDeletionRoute,
   DemoRoute: DemoRoute,
   DocsRoute: DocsRoute,

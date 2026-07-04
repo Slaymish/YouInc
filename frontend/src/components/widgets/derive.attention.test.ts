@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { LedgerDashboardData } from "~/server/ledger";
+import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import { buildAttentionItems } from "./derive";
 
 const NOW = new Date("2026-06-30T00:00:00Z");
