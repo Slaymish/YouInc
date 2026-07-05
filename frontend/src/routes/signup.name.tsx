@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { checkAuthed, loadFlow, advanceFlow } from "~/lib/authServerFns";
 
@@ -117,6 +118,8 @@ function SignupNamePage() {
         >
           Skip for now
         </button>
+
+        <AuthCardFooter />
       </section>
     </AuthShell>
   );

@@ -24,11 +24,6 @@ export function AuthShell({ children, aside }: AuthShellProps) {
       </header>
       <main className="auth-main">{children}</main>
       <footer className="auth-footer">
-        <nav className="auth-footer__links" aria-label="Legal">
-          <Link to="/help">Help</Link>
-          <Link to="/privacy">Privacy</Link>
-          <Link to="/terms">Terms</Link>
-        </nav>
         <span className="auth-footer__copyright">
           © {new Date().getFullYear()} {PRODUCT.name}
         </span>

@@ -13,6 +13,21 @@ import type {
 } from "@simplewebauthn/server";
 import { PRODUCT } from "~/components/marketing/config";
 
+/** Lazily import @simplewebauthn/server so its native/crypto/x509 code never
+ * lands in the client bundle.
+ *
+ * NOTE: @simplewebauthn/server → @peculiar/x509 → tsyringe run decorators AT
+ * IMPORT TIME that read the global `Reflect.getMetadata`. That global is
+ * installed by the reflect-metadata polyfill, which the prod build tree-shakes
+ * out of the bundle — so it is preloaded at the Node process level instead
+ * (see `docker/entrypoint.sh` / the `start` script's `--require`, and
+ * `scripts/stage-reflect-polyfill.mjs`, run by `pnpm build`, which stages the
+ * polyfill into `.output`).
+ * Dev works without the preload because Vite serves x509 unbundled. */
+function importWebAuthnServer() {
+  return import("@simplewebauthn/server");
+}
+
 export interface RelyingParty {
   rpID: string;
   origin: string;
@@ -49,9 +64,7 @@ export async function buildRegistrationOptions(params: {
   email: string;
   displayName?: string | null;
 }) {
-  const { generateRegistrationOptions } = await import(
-    "@simplewebauthn/server"
-  );
+  const { generateRegistrationOptions } = await importWebAuthnServer();
   const { rpID } = resolveRelyingParty();
   return generateRegistrationOptions({
     rpName: PRODUCT.name,
@@ -71,9 +84,7 @@ export async function buildRegistrationOptions(params: {
 /** Authentication options for a signin ceremony. Empty allowCredentials =
  * discoverable-credential / conditional-UI friendly. */
 export async function buildAuthenticationOptions() {
-  const { generateAuthenticationOptions } = await import(
-    "@simplewebauthn/server"
-  );
+  const { generateAuthenticationOptions } = await importWebAuthnServer();
   const { rpID } = resolveRelyingParty();
   return generateAuthenticationOptions({
     rpID,
@@ -94,9 +105,7 @@ export async function verifyRegistration(params: {
   response: RegistrationResponseJSON;
   expectedChallenge: string;
 }): Promise<VerifiedRegistration> {
-  const { verifyRegistrationResponse } = await import(
-    "@simplewebauthn/server"
-  );
+  const { verifyRegistrationResponse } = await importWebAuthnServer();
   const { rpID, origin } = resolveRelyingParty();
   const verification = await verifyRegistrationResponse({
     response: params.response,
@@ -133,9 +142,7 @@ export async function verifyAuthentication(params: {
     transports?: AuthenticatorTransportFuture[];
   };
 }): Promise<VerifiedAuthentication> {
-  const { verifyAuthenticationResponse } = await import(
-    "@simplewebauthn/server"
-  );
+  const { verifyAuthenticationResponse } = await importWebAuthnServer();
   const { rpID, origin } = resolveRelyingParty();
   const verification = await verifyAuthenticationResponse({
     response: params.response,

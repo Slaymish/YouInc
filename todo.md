@@ -150,6 +150,7 @@ Done:
 - [X] Ensure the state where the user tries to sign in but isn't reverified yet is handled
 - [X] Allow the user to resend the verification email, so they don't get stuck
 - [ ] Integrate Affiliate Tracking with Stripe Webhooks: Update the signup/checkout workflow to grab the ref URL parameter from local storage and pass it as affiliate_id inside the Stripe Checkout Session metadata object; then, create a /api/webhooks/stripe endpoint that listens for the invoice.paid event, extracts the affiliate_id, calculates the 50% commission split from the total amount paid, and logs the pending payout into a new commissions database ledger with a 30-day payout delay buffer.
+- [ ] Feature: AI create classification rules based on transaction history. (opt in, in self serve/concierge, selling point, background update). Categories are tree based (eg broad category with subcategories). Would need to handle PII well. Also don't know what AI provider I would use. Could just be openrouter or smth, but would need to handle PII well.
 
 ***
 

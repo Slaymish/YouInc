@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { useResendVerification } from "~/hooks/useResendVerification";
 import { classifyAuthError } from "~/lib/authResend";
@@ -160,6 +161,16 @@ function SigninPasswordPage() {
             onSubmit={handlePasswordSubmit}
             noValidate
           >
+            {/* Hidden username field so password managers pair the password
+                with this email (it was entered on the previous step). */}
+            <input
+              type="email"
+              name="username"
+              autoComplete="username"
+              value={email}
+              readOnly
+              hidden
+            />
             <div className="auth-field">
               <label htmlFor="signin-password">Password</label>
               <input
@@ -213,6 +224,8 @@ function SigninPasswordPage() {
         <Link className="auth-back" to="/signin">
           ← Use a different email
         </Link>
+
+        <AuthCardFooter />
       </section>
     </AuthShell>
   );

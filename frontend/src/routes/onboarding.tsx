@@ -7,6 +7,7 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import type { AccountState, TenantSummary } from "~/server/accounts";
 
 // --- Server functions --------------------------------------------------------
@@ -248,6 +249,8 @@ function OnboardingPage() {
             </p>
           </>
         )}
+
+        <AuthCardFooter />
       </section>
     </AuthShell>
   );

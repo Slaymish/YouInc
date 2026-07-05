@@ -2,6 +2,7 @@ import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-rout
 import { useEffect, useRef, useState } from "react";
 import type { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import {
   checkAuthed,
@@ -145,13 +146,7 @@ function SigninEmailPage() {
   }
 
   return (
-    <AuthShell
-      aside={
-        <>
-          New here? <Link to="/signup">Create an account</Link>
-        </>
-      }
-    >
+    <AuthShell>
       <section className="auth-card" aria-labelledby="signin-heading">
         <AuthStepper index={0} count={2} />
         <p className="auth-eyebrow">Welcome back</p>
@@ -192,9 +187,13 @@ function SigninEmailPage() {
           </button>
         </form>
 
-        <p className="auth-note">
-          New here? <Link to="/signup">Create your workspace →</Link>
-        </p>
+        <AuthCardFooter
+          prompt={
+            <>
+              New here? <Link to="/signup">Create an account</Link>
+            </>
+          }
+        />
       </section>
     </AuthShell>
   );

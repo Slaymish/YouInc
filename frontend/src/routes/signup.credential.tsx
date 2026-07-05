@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import {
   checkAuthed,
@@ -115,13 +116,7 @@ function SignupCredentialPage() {
 
   if (pendingEmail) {
     return (
-      <AuthShell
-        aside={
-          <>
-            Already confirmed? <Link to="/signin">Sign in</Link>
-          </>
-        }
-      >
+      <AuthShell>
         <section className="auth-card" aria-labelledby="confirm-heading">
           <p className="auth-eyebrow">Almost there</p>
           <h1 id="confirm-heading">Check your email</h1>
@@ -136,6 +131,13 @@ function SignupCredentialPage() {
           >
             Go to sign in →
           </Link>
+          <AuthCardFooter
+            prompt={
+              <>
+                Already confirmed? <Link to="/signin">Sign in</Link>
+              </>
+            }
+          />
         </section>
       </AuthShell>
     );
@@ -198,6 +200,16 @@ function SignupCredentialPage() {
               onSubmit={submitFallbackPassword}
               noValidate
             >
+              {/* Hidden username field so password managers save the password
+                  against this email (it was entered on an earlier step). */}
+              <input
+                type="email"
+                name="email"
+                autoComplete="username"
+                value={flow.email ?? ""}
+                readOnly
+                hidden
+              />
               <div className="auth-field">
                 <label htmlFor="signup-password">Password</label>
                 <input
@@ -226,6 +238,8 @@ function SignupCredentialPage() {
             </form>
           </>
         )}
+
+        <AuthCardFooter />
       </section>
     </AuthShell>
   );

@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { checkAuthed, startSignupFlow, advanceFlow } from "~/lib/authServerFns";
 import { isValidEmail } from "~/server/authFlowSteps";
@@ -82,13 +83,7 @@ function SignupEmailPage() {
   }
 
   return (
-    <AuthShell
-      aside={
-        <>
-          Already have an account? <Link to="/signin">Sign in</Link>
-        </>
-      }
-    >
+    <AuthShell>
       <section className="auth-card" aria-labelledby="signup-heading">
         <AuthStepper index={0} count={3} />
         <p className="auth-eyebrow">Start free</p>
@@ -135,6 +130,14 @@ function SignupEmailPage() {
         <p className="auth-note">
           Just looking? <Link to="/demo">Open the live demo →</Link>
         </p>
+
+        <AuthCardFooter
+          prompt={
+            <>
+              Already have an account? <Link to="/signin">Sign in</Link>
+            </>
+          }
+        />
       </section>
     </AuthShell>
   );

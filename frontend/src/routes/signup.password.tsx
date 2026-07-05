@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { useResendVerification } from "~/hooks/useResendVerification";
 import { checkAuthed, loadFlow, signupWithPassword } from "~/lib/authServerFns";
@@ -75,13 +76,7 @@ function SignupPasswordPage() {
 
   if (pendingEmail) {
     return (
-      <AuthShell
-        aside={
-          <>
-            Already confirmed? <Link to="/signin">Sign in</Link>
-          </>
-        }
-      >
+      <AuthShell>
         <section className="auth-card" aria-labelledby="confirm-heading">
           <p className="auth-eyebrow">Almost there</p>
           <h1 id="confirm-heading">Check your email</h1>
@@ -113,6 +108,13 @@ function SignupPasswordPage() {
             .
           </p>
           {resend.message ? <p className="auth-note">{resend.message}</p> : null}
+          <AuthCardFooter
+            prompt={
+              <>
+                Already confirmed? <Link to="/signin">Sign in</Link>
+              </>
+            }
+          />
         </section>
       </AuthShell>
     );
@@ -129,6 +131,16 @@ function SignupPasswordPage() {
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          {/* Hidden username field so password managers save the password
+              against this email (it was entered on an earlier step). */}
+          <input
+            type="email"
+            name="email"
+            autoComplete="username"
+            value={flow.email ?? ""}
+            readOnly
+            hidden
+          />
           <div className="auth-field">
             <label htmlFor="signup-password">Password</label>
             <input
@@ -170,6 +182,8 @@ function SignupPasswordPage() {
         >
           ← Back to passkey
         </Link>
+
+        <AuthCardFooter />
       </section>
     </AuthShell>
   );
