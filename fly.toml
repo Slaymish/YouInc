@@ -1,39 +1,34 @@
-# Fly.io app configuration for YouInc Ledger.
+# fly.toml app configuration file generated for youinc on 2026-07-05T05:29:06Z
 #
-# Deploy with:
-#   fly launch --no-deploy       # first time only, creates the app + this file's app name
-#   fly volumes create youinc_data --region <region> --size 1
-#   fly secrets set YOUINC_BASIC_AUTH_USERNAME=... YOUINC_BASIC_AUTH_PASSWORD=...
-#   fly deploy
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
-# See docs/deploy_fly.md for the full walkthrough.
 
-app = "youinc-ledger"          # change to a globally-unique name before first deploy
-primary_region = "syd"         # closest Fly region to NZ; change if you prefer another
+app = 'youinc'
+primary_region = 'syd'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  NODE_ENV = "production"
-  PORT = "3000"
+  NODE_ENV = 'production'
+  PORT = '3000'
 
 [[mounts]]
-  source = "youinc_data"
-  destination = "/data"
+  source = 'youinc_data'
+  destination = '/data'
 
 [http_service]
-  internal_port = 3000
+  internal_port = 8080
   force_https = true
-  auto_stop_machines = "stop"
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
 
   [http_service.concurrency]
-    type = "requests"
-    soft_limit = 200
+    type = 'requests'
     hard_limit = 250
+    soft_limit = 200
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "512mb"
+  size = 'shared-cpu-1x'
+  memory = '512mb'
