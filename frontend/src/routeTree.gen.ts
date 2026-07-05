@@ -33,6 +33,8 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
+import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
+import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
 
 const WorkspaceRoute = WorkspaceRouteImport.update({
   id: '/workspace',
@@ -154,6 +156,16 @@ const AuthConfirmRoute = AuthConfirmRouteImport.update({
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAkahuCallbackRoute = ApiAkahuCallbackRouteImport.update({
+  id: '/api/akahu/callback',
+  path: '/api/akahu/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAkahuOauthStartRoute = ApiAkahuOauthStartRouteImport.update({
+  id: '/api/akahu/oauth/start',
+  path: '/api/akahu/oauth/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -180,6 +192,8 @@ export interface FileRoutesByFullPath {
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/api/akahu/callback': typeof ApiAkahuCallbackRoute
+  '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -206,6 +220,8 @@ export interface FileRoutesByTo {
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/api/akahu/callback': typeof ApiAkahuCallbackRoute
+  '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -233,6 +249,8 @@ export interface FileRoutesById {
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/api/akahu/callback': typeof ApiAkahuCallbackRoute
+  '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -261,6 +279,8 @@ export interface FileRouteTypes {
     | '/widgets'
     | '/workspace'
     | '/auth/confirm'
+    | '/api/akahu/callback'
+    | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -287,6 +307,8 @@ export interface FileRouteTypes {
     | '/widgets'
     | '/workspace'
     | '/auth/confirm'
+    | '/api/akahu/callback'
+    | '/api/akahu/oauth/start'
   id:
     | '__root__'
     | '/'
@@ -313,6 +335,8 @@ export interface FileRouteTypes {
     | '/widgets'
     | '/workspace'
     | '/auth/confirm'
+    | '/api/akahu/callback'
+    | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -340,6 +364,8 @@ export interface RootRouteChildren {
   WidgetsRoute: typeof WidgetsRoute
   WorkspaceRoute: typeof WorkspaceRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
+  ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
+  ApiAkahuOauthStartRoute: typeof ApiAkahuOauthStartRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -512,6 +538,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/akahu/callback': {
+      id: '/api/akahu/callback'
+      path: '/api/akahu/callback'
+      fullPath: '/api/akahu/callback'
+      preLoaderRoute: typeof ApiAkahuCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/akahu/oauth/start': {
+      id: '/api/akahu/oauth/start'
+      path: '/api/akahu/oauth/start'
+      fullPath: '/api/akahu/oauth/start'
+      preLoaderRoute: typeof ApiAkahuOauthStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -540,6 +580,8 @@ const rootRouteChildren: RootRouteChildren = {
   WidgetsRoute: WidgetsRoute,
   WorkspaceRoute: WorkspaceRoute,
   AuthConfirmRoute: AuthConfirmRoute,
+  ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,
+  ApiAkahuOauthStartRoute: ApiAkahuOauthStartRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

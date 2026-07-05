@@ -52,11 +52,19 @@ Done:
   `20260704120006` adds Vault-backed `SECURITY DEFINER` token RPCs (verified by
   `supabase/tests/akahu_connection.sql`). Frontend TS Akahu client
   (`server/akahuClient.ts`), connect/list/sync/disconnect orchestration
-  (`server/akahuConnection.ts`), and the `/workspace` `AkahuConnectPanel`. Users
-  paste their Akahu user token (stored encrypted in Vault, never returned to the
-  browser), list accounts, and sync transactions into their per-tenant ledger.
-  E2E-covered against a mock Akahu API (connect → list → sync → idempotent →
-  disconnect).
+  (`server/akahuConnection.ts`), and the `/workspace` `AkahuConnectPanel`. Replaced
+  manual token paste with OAuth2 authorization-code flow: users click "Connect with
+  Akahu" → hosted consent → callback receives enduring user token (stored encrypted
+  in Vault, never returned to the browser), list accounts, and sync transactions
+  into their per-tenant ledger. E2E-covered against a mock Akahu API (connect → list
+  → sync → idempotent → disconnect).
+  - **FOLLOW-UP (blocking live use):** OAuth token exchange is only available on
+    Akahu "Full Apps" with OAuth enabled, not Personal Apps. User must (1) contact
+    Akahu to verify app is upgraded to Full App with OAuth enabled, (2) supply
+    `AKAHU_APP_SECRET` and `AKAHU_OAUTH_REDIRECT_URI` env vars, and (3) register both
+    redirect URIs (`http://localhost:3000/api/akahu/callback` for local,
+    `https://youinc.hamishburke.dev/api/akahu/callback` for prod) on the Akahu
+    dashboard. Flow fails gracefully until prerequisites met.
 - [x] Self-service follow-ups (rest of Phase 2), part (b): per-tenant rules/classification
   editing UI (`components/workspace/RulesEditor.tsx` + `server/tenantRules.ts` CRUD, wired into
   `routes/workspace.tsx`) — shipped in the Python-removal refactor commit but not logged here at
@@ -135,3 +143,158 @@ Done:
   files untouched as the source of truth until parity is verified"), so this may have been the
   only copy of ~170 real transactions. Flagged to the user; holding here pending their call on
   recovery/acceptance before this line is trusted as done.
+- [ ] Improve SEO/GEO for whole site. Make it act as a knowledge graph, using Json-LD schema.org types to define the site's structure and content, and link to other pages from others. This includes making auto generated sitemap.xml, llms.txt
+- [ ] Change the free mode to be different to the demo. The 'free' tier should also provide all the widgets, but only manual accounts can be used. Essentially the self-serve tier is paying for that live connection.
+- [ ] Maybe make the email confirmation send a 6-digit code to the user's email address instead of a link, and then the confirm email screen allows them to enter it there. Ensure the state where the user tries to sign in but isn't reverified yet is handled (eg allow the to resend the verification email, so they don't get stuck)
+
+***
+
+## IN PROGRESS: Variant voting — make it useful (2026-07-05)
+
+> Cold-start note: if picking this up fresh after an interruption, read "Design decisions"
+> then jump to the first unchecked `[ ]` below. Status legend per file: not started / in
+> progress / done / needs verification.
+
+### Design decisions (locked — do not re-derive) — REVISED after T1 recon
+
+**T1 findings that changed the plan:**
+- `/dashboard` does not exist at all (fully removed, not a redirect stub). No owner/admin
+  concept exists anywhere in `frontend/src` (grepped, zero hits).
+- **No service_role client is used anywhere in this codebase.** Every server fn uses
+  `getSupabaseServerClient()` (`frontend/src/server/supabaseServer.ts`) — anon key +
+  cookie session, RLS-scoped. Privileged ops go through SECURITY DEFINER RPCs that run
+  as postgres but are called via the ordinary session client. A service_role design
+  would be inconsistent with the whole app and was dropped.
+- Migration convention: `supabase/migrations/YYYYMMDDHHMMSS_slug.sql` (14-digit ts).
+  Table lockdown pattern (copy exactly): `revoke all on public.<table> from anon, authenticated;`
+  Function grant pattern: `revoke execute on function public.<fn>(<args>) from public;`
+  then `grant execute on function public.<fn>(<args>) to <role>;`
+- `supabase/tests/*.sql` are plain SQL (not pgTAP), `begin...rollback`, `set local role anon;`
+  to simulate privilege levels, `do $$ ... assert ...; raise notice 'PASS: ...'; end $$;`
+  blocks. Run manually: `docker exec -i supabase_db_YouInc psql -U postgres -d postgres
+  -v ON_ERROR_STOP=1 < supabase/tests/<file>.sql`. Not wired into CI — matches existing
+  `leads_feedback.sql`, follow that file's shape exactly.
+- `/workspace` auth pattern (mirror for the new admin route): loader calls
+  `getAccountState()` (from `~/server/accounts`), `throw redirect({ to: "/signin" })` if
+  `!data.account`. No tenant requirement needed for the admin route (admin-ness is
+  enforced in Postgres, not by tenant status).
+
+1. **New RPC:** `public.feedback_variant_stats(p_since timestamptz default null)`
+   (SECURITY DEFINER, `set search_path = public`), returns aggregated rows grouped by
+   `variant`, `source`, `path`: `up_count bigint, down_count bigint, total bigint,
+   up_rate numeric`. Aggregates only — no raw `note` text, no per-row data.
+   - **Self-enforced authorization inside the function body**: first calls a new helper
+     `public.is_app_admin() returns boolean` (SECURITY DEFINER, STABLE) which checks
+     `exists (select 1 from public.app_admins where user_id = auth.uid())`. If not admin,
+     `raise exception 'insufficient_privilege' using errcode = '42501';` before touching
+     `feedback`.
+   - **New locked-down table `public.app_admins (user_id uuid primary key references
+     auth.users(id))`** — RLS enabled, zero policies, `revoke all on public.app_admins
+     from anon, authenticated;` (same pattern as `leads`/`feedback`). Only readable via
+     `is_app_admin()`. Migration best-effort-seeds the current owner:
+     `insert into app_admins (user_id) select id from auth.users where email =
+     'hamish@paychase.co.nz' on conflict do nothing;` — safe no-op if that user doesn't
+     exist yet in a given environment (e.g. fresh test DB); document that a fresh
+     environment needs a manual insert to grant the first admin.
+   - **Grants:** `revoke execute on function public.feedback_variant_stats(timestamptz)
+     from public;` then `grant execute ... to authenticated;` — **not** anon (aggregated
+     stats are never anon-callable; least privilege, and doubly enforced by
+     `is_app_admin()` returning false for anon's null `auth.uid()` anyway).
+2. **Access boundary:** RPC is invoked via the existing `getSupabaseServerClient()`
+   (anon key + session) from a new server-only fn `frontend/src/server/feedbackStats.ts`
+   (`getFeedbackVariantStats`). Authorization is enforced **in Postgres** by
+   `is_app_admin()`, not by any app-layer secret. The app-layer route just needs the
+   user to be signed in (mirrors `/workspace`'s `getAccountState()` check); a
+   non-admin signed-in tenant hitting the route gets a clean 403 from the RPC (defense
+   in depth — two independent layers must agree).
+3. **Where the view lives:** new route `frontend/src/routes/admin.feedback.tsx`
+   (`/admin/feedback`), gated the same way `/workspace` gates on `getAccountState()`
+   (redirect to `/signin` if no account) — then relies on the RPC's own admin check for
+   the actual authorization boundary. Not `/workspace` (tenant self-service, wrong
+   audience) and not a bare script (this project already has zero CI wiring for
+   `supabase/tests/*.sql`, so a UI is more useful here for one person than a script).
+4. **Statistics:** pure logic in `frontend/src/lib/variantStats.ts` (testable without
+   Supabase): up-rate, Wilson score interval per variant, two-proportion z-test between
+   variant A vs B per source. Constant `MIN_SAMPLE_SIZE_PER_VARIANT` (e.g. 30) guards
+   against calling small samples significant.
+5. **Promotion strategy — decision:** do NOT auto-promote a winning variant this pass.
+   Assignment is 100% client-side (`Math.random()` in `FeedbackWidget.tsx`); promoting a
+   winner would need server-side assignment or a config read at render time — out of
+   scope here. Instead the admin view **flags** the statistically-significant leader
+   (badge + plain note) when `total >= MIN_SAMPLE_SIZE_PER_VARIANT` per variant and
+   p < 0.05. Explicitly documented as deliberate follow-up: "wire a remote-config/
+   feature-flag read into FeedbackWidget variant assignment so a flagged winner can be
+   promoted to 100%" — not implemented.
+
+### File paths touched/created
+
+| Path | Status |
+|---|---|
+| `supabase/migrations/20260705140000_feedback_variant_stats_rpc.sql` (app_admins table + is_app_admin() + feedback_variant_stats()) | done |
+| `supabase/tests/feedback_variant_stats.sql` (follow `leads_feedback.sql` exactly) | done, passing locally |
+| `frontend/src/lib/variantStats.ts` | done, verified (Fable read + spot-checked) |
+| `frontend/src/lib/variantStats.test.ts` | done (16 tests pass) |
+| `frontend/src/server/feedbackStats.ts` | done, verified — plain async fn, no `createServerFn` wrapper (correct: repo convention wraps at the route, see CLAUDE.md) |
+| `frontend/src/server/feedbackStats.test.ts` | done (7 tests pass) |
+| `frontend/src/routes/admin.feedback.tsx` | done, verified (Fable read directly) |
+| `frontend/src/styles/workspace.css` (+ `.admin-callout` styles) | done |
+| `README.md` (+ "Feedback & variant voting" section) | done |
+| this todo.md section | DONE |
+
+### Checklist
+
+**T1 — Recon (Explore agent, read-only)** — DONE
+- [x] Confirm exact migration file naming/location pattern
+- [x] Confirm `supabase/tests/` pattern (plain SQL, `begin/rollback`, `set local role`, manual `docker exec psql` runner — see above)
+- [x] Confirm no admin/dashboard surface exists (confirmed: none, fully removed)
+- [x] Confirm Supabase client convention (anon key + session only, no service_role anywhere — changed the design, see above)
+- [x] Report absorbed into design decisions above
+
+**T2 — Design decisions (Fable, no spawn)** — DONE, REVISED post-T1
+- [x] RPC name/signature decided (`feedback_variant_stats`, self-checks `is_app_admin()`)
+- [x] Access boundary decided (Postgres-side `app_admins` table + SECURITY DEFINER check, no service_role)
+- [x] Admin view location finalized: `frontend/src/routes/admin.feedback.tsx`
+- [x] Promotion strategy decided (flag only, no auto-promote; documented above)
+
+**T3 — Migration: app_admins + is_app_admin() + aggregate RPC + grants + migration test (Sonnet)** — DONE
+- [x] Write migration SQL: `app_admins` table + `is_app_admin()` + `feedback_variant_stats()` function body (GROUP BY variant, source, path) — `supabase/migrations/20260705140000_feedback_variant_stats_rpc.sql`
+- [x] Add explicit REVOKE from PUBLIC/anon + GRANT EXECUTE to `authenticated` only (not service_role — no such client in this app, see revised design above). `is_app_admin()` gets no grant at all (only ever called from inside another SECURITY DEFINER function's body, where current_user is already the definer/postgres — verified this holds, see migration comment)
+- [x] Write migration test in `supabase/tests/feedback_variant_stats.sql` following existing pattern: asserts anon CANNOT execute, asserts non-admin authenticated user gets insufficient_privilege, asserts admin gets correct aggregates, asserts no raw row-level/`note` data leaks through
+- [x] Ran local Supabase test suite (`supabase_db_YouInc` container was already up): `docker exec -i supabase_db_YouInc psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/feedback_variant_stats.sql` — all 5 PASS notices, transaction rolled back
+- [ ] needs verification: confirm against hosted Supabase (only verified local; hosted/cloud not touched this pass)
+
+**T4 — Server fn + stats util + unit tests (Sonnet)** — DONE, VERIFIED (Fable read both source files directly)
+- [x] Write `frontend/src/lib/variantStats.ts`: Wilson score interval (own `erf` approx, no dep), two-proportion pooled z-test, `MIN_SAMPLE_SIZE_PER_VARIANT = 30`, `pickLeader()` (requires exactly 2 variants, both >= min sample, p < 0.05)
+- [x] Write `frontend/src/lib/variantStats.test.ts` — 16 tests, AAA style, incl. the "9-of-10 vs 1-of-29 must NOT flag despite looking significant" min-sample-size guard case
+- [x] Write `frontend/src/server/feedbackStats.ts`: `getFeedbackVariantStats(input?: { since?: string })` — plain async fn (not `createServerFn` — that wraps at the route per this repo's convention), calls `.rpc("feedback_variant_stats", { p_since })`, zod-validates snake_case wire shape, maps to camelCase, pools per-variant + calls `pickLeader`, throws 403 on Postgres `42501`, 500 otherwise
+- [x] Write `frontend/src/server/feedbackStats.test.ts` — 7 tests, mocks `getSupabaseServerClient` (new precedent in this codebase)
+- [x] `pnpm vitest run` → 20/20 new tests pass; full `pnpm test` → 289/289 pass; `tsc --noEmit` clean
+
+**T5 — Admin view (Sonnet)** — DONE, VERIFIED (Fable read the route file directly)
+- [x] Create `frontend/src/routes/admin.feedback.tsx`: `createServerFn({ method: "GET" })` wrapping a handler that catches the 403 from `getFeedbackVariantStats` and returns a discriminated `{status: "ok"|"forbidden"|"error"}` union — mirrors `workspace.tsx`'s `loadWorkspace` pattern
+- [x] Loader auth gate: `getAccountState()`, `throw redirect({ to: "/signin" })` if `!data.account` — no tenant check
+- [x] 403-from-RPC handled gracefully: "Not authorized" callout, no crash
+- [x] Table: variant × source × path with up/down/total/up-rate, reusing `ManualBalancesEditor`'s `mb-table`/`mb-numeric`/`mb-tag` classes and `formatPercent` — no new table CSS invented
+- [x] Leader callout (`.admin-callout--leader`) shown when `leader.isSignificant`, names variant + p-value, explicitly states auto-promotion is not implemented
+- [x] No nav entry added; confirmed `PROTECTED_PREFIXES`/`PUBLIC_PATHS` don't exist anymore (retired with passkey auth) — route is pure file-based via `routeTree.gen.ts`, auto-registered, zero manual wiring needed
+- [x] `pnpm build` (incl. `tsc --noEmit`) clean, exit 0
+
+**T6 — Verify + integrate (Fable)** — DONE
+- [x] Reviewed all diffs (`git diff --stat` on every task file) — confirmed only `EXECUTE` grant to `authenticated` on the new RPC, `feedback`/`app_admins` tables remain fully revoked from anon+authenticated, no direct table SELECT grant added anywhere
+- [x] Re-ran full test suite end to end: `pnpm vitest run` → 27 files / 289 tests pass; `supabase/tests/feedback_variant_stats.sql` → 5/5 PASS against live local Supabase; `supabase/tests/leads_feedback.sql` re-run too (no regression from the new migration) → 4/4 PASS
+- [x] Wrote promotion-assessment into `README.md` ("Feedback & variant voting" section, between "Live Akahu sync" and "Deployment"): documents the two RPCs, `/admin/feedback`, the significance test, and explicitly states promotion is NOT automated + why, with the manual-admin-seed SQL snippet
+- [x] This todo.md section updated — all tasks done
+- [x] Reporting final summary to coordinator now (no commit made — not asked)
+
+### Summary — feature is now functional end to end
+Write path (existing, untouched) → `feedback_variant_stats` RPC (admin-gated aggregate read,
+migration `20260705140000`) → `getFeedbackVariantStats` server fn (`frontend/src/server/feedbackStats.ts`,
++ `frontend/src/lib/variantStats.ts` for Wilson interval / two-proportion z-test / `pickLeader`)
+→ `/admin/feedback` route (owner-only view, not nav-linked). Promotion is deliberately not
+automated — flagged only, documented in README. No RLS/grant hardening was weakened; new
+surface is strictly additive and equally locked down (aggregates-only RPC, admin-checked
+in Postgres, `authenticated`-only grant, never `anon`).
+
+**Concurrent, unrelated work landed in the repo during this task** (Akahu OAuth flow —
+`akahuOAuth.ts`, `api.akahu.*` routes, README/`​.env.example` Akahu sections) — not touched or
+reviewed by this task, flagged here only so it isn't mistaken for variant-voting output.

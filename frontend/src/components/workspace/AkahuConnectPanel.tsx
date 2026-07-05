@@ -1,4 +1,4 @@
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
 import type {
   AkahuAccountSummary,
@@ -9,12 +9,12 @@ import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
 
 // --- Server functions --------------------------------------------------------
 
-const connectFn = createServerFn({ method: "POST" })
-  .validator((userToken: string) => userToken)
-  .handler(async ({ data: userToken }): Promise<AkahuConnectionStatus> => {
-    const { connectAkahu } = await import("~/server/akahuConnection");
-    return connectAkahu(userToken);
-  });
+const statusFn = createServerFn({ method: "GET" }).handler(
+  async (): Promise<AkahuConnectionStatus> => {
+    const { getAkahuConnectionStatus } = await import("~/server/akahuConnection");
+    return getAkahuConnectionStatus();
+  },
+);
 
 const disconnectFn = createServerFn({ method: "POST" }).handler(
   async (): Promise<AkahuConnectionStatus> => {
@@ -44,6 +44,18 @@ const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
+const AKAHU_OAUTH_ERROR_COPY: Record<string, string> = {
+  auth: "You need to be signed in to connect Akahu. Please sign in and try again.",
+  not_configured: "Akahu OAuth isn't configured on this server yet.",
+  denied: "Akahu authorization was cancelled or denied.",
+  state: "Couldn't verify the Akahu connection request. Please try again.",
+  exchange: "Couldn't complete the Akahu connection. Please try again.",
+};
+
+function akahuOAuthErrorMessage(code: string): string {
+  return AKAHU_OAUTH_ERROR_COPY[code] ?? "Something went wrong connecting to Akahu.";
+}
+
 function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (error && typeof error === "object" && "message" in error) {
@@ -67,7 +79,6 @@ function defaultFromDate(): string {
 
 export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSynced }: Props) {
   const [status, setStatus] = useState(initialStatus);
-  const [token, setToken] = useState("");
   const [accounts, setAccounts] = useState<AkahuAccountSummary[] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -75,21 +86,45 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
   const [fromDate, setFromDate] = useState(defaultFromDate());
   const [toDate, setToDate] = useState("");
 
-  function connect() {
-    if (!token.trim()) return;
-    setError(null);
-    setMessage(null);
+  // The OAuth callback (api.akahu.callback.ts) redirects the full browser
+  // back to /workspace with either ?akahu_connected=1 or ?akahu_error=<code>.
+  // Surface that as a banner once, strip it from the URL so a reload doesn't
+  // re-show it, and refetch the connection status the callback just changed.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const connected = params.get("akahu_connected");
+    const errorCode = params.get("akahu_error");
+    if (!connected && !errorCode) return;
+
+    if (connected) {
+      setError(null);
+      setMessage("Akahu connected. Load your accounts to sync.");
+    } else if (errorCode) {
+      setMessage(null);
+      setError(akahuOAuthErrorMessage(errorCode));
+    }
+
+    params.delete("akahu_connected");
+    params.delete("akahu_error");
+    const query = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + (query ? `?${query}` : ""),
+    );
+
     startTransition(async () => {
       try {
-        const next = await connectFn({ data: token.trim() });
-        setStatus(next);
-        setToken("");
-        setMessage("Akahu connected. Load your accounts to sync.");
-      } catch (err) {
-        setError(errorMessage(err));
+        setStatus(await statusFn());
+      } catch {
+        // Keep the banner even if the refetch fails; a manual reload will
+        // pick up the real status via the route loader.
       }
     });
-  }
+    // Intentionally run once on mount only — this reads the URL the browser
+    // just landed on after the OAuth redirect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function disconnect() {
     setError(null);
@@ -221,31 +256,27 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
             )
           ) : null}
         </>
-      ) : (
+      ) : status.oauthConfigured ? (
         <>
           <p className="akahu-panel__note">
-            Connect your bank through Akahu to sync transactions automatically. Paste
-            your Akahu <strong>user token</strong> from{" "}
-            <a href="https://my.akahu.io" target="_blank" rel="noopener noreferrer">
-              my.akahu.io
-            </a>
-            . It's stored encrypted and never shown again.
+            Connect your bank through Akahu to sync transactions automatically.
+            You'll be taken to Akahu to authorize access, then brought back
+            here — your token is stored encrypted and never shown again.
           </p>
           <div className="akahu-panel__connect">
-            <input
-              aria-label="Akahu user token"
-              type="password"
-              autoComplete="off"
-              placeholder="user_token_..."
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              disabled={pending}
-            />
-            <button className="auth-primary" type="button" onClick={connect} disabled={pending || !token.trim()}>
-              {pending ? "Connecting…" : "Connect Akahu"}
-            </button>
+            {/* Plain <a> (not TanStack Router's <Link>) so this is a real
+                full-page navigation to the server route, not a client-side
+                route match / fetch. */}
+            <a className="auth-primary akahu-panel__connect-link" href="/api/akahu/oauth/start">
+              Connect with Akahu
+            </a>
           </div>
         </>
+      ) : (
+        <p className="akahu-panel__note">
+          Akahu OAuth not configured — set AKAHU_APP_SECRET + AKAHU_OAUTH_REDIRECT_URI
+          and verify a Full App with OAuth enabled.
+        </p>
       )}
 
       {message ? <p className="akahu-panel__ok" role="status">{message}</p> : null}

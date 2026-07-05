@@ -13,13 +13,20 @@ import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { AkahuClient, AkahuApiError } from "./akahuClient";
 import { ingestTenantPayloads, type IngestResult } from "./tenantIngestion";
 import { throwServerError } from "./serverError";
+import { appToken, akahuBaseUrl, oauthConfigured } from "./akahuOAuth";
 
-function appToken(): string | null {
-  return process.env.AKAHU_APP_TOKEN?.trim() || null;
-}
-function akahuBaseUrl(): string {
-  return process.env.AKAHU_BASE_URL?.trim() || "https://api.akahu.io/v1";
-}
+// The OAuth authorize-URL / code-exchange logic lives in the pure,
+// path-alias-free akahuOAuth.ts (see its header comment for why) and is
+// re-exported here so the API routes have one server-module surface for the
+// whole Akahu connect feature, per the existing convention in this file.
+export {
+  oauthConfigured,
+  buildAkahuAuthorizeUrl,
+  exchangeAkahuOAuthCode,
+  resolveAkahuCallback,
+  AkahuOAuthError,
+} from "./akahuOAuth";
+export type { AkahuCallbackOutcome, AkahuCallbackQuery } from "./akahuOAuth";
 
 async function requireTenantId(): Promise<string> {
   const user = await getServerUser();
@@ -43,6 +50,8 @@ export interface AkahuConnectionStatus {
   lastSyncedAt: string | null;
   /** Whether the server has an app token configured (else live sync is unavailable). */
   appConfigured: boolean;
+  /** Whether the server has OAuth client creds configured (client id, secret, redirect uri). */
+  oauthConfigured: boolean;
 }
 
 export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus> {
@@ -63,6 +72,7 @@ export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus>
     connectedAt: row?.connected_at ?? null,
     lastSyncedAt: row?.last_synced_at ?? null,
     appConfigured: appToken() !== null,
+    oauthConfigured: oauthConfigured(),
   };
 }
 

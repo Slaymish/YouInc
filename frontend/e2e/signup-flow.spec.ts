@@ -165,12 +165,41 @@ test.describe(
     test("connect Akahu (Vault), list accounts, sync, and disconnect", async ({
       page,
     }) => {
-      // Mock the Akahu API on the port the dev server's AKAHU_BASE_URL points at
-      // (see playwright.config.ts). Serves one account and two settled txns.
+      // Mock the Akahu API on the port the dev server's AKAHU_BASE_URL /
+      // AKAHU_OAUTH_AUTHORIZE_URL point at (see playwright.config.ts). Serves
+      // the OAuth authorize redirect, the token exchange, one account, and
+      // two settled txns.
       const mock: Server = http.createServer((req, res) => {
         res.setHeader("content-type", "application/json");
         const url = req.url ?? "";
-        if (url.startsWith("/accounts/") && url.includes("/transactions")) {
+        if (url.startsWith("/authorize")) {
+          // Stand-in for the real `GET https://oauth.akahu.nz` consent
+          // screen: immediately "approve" and redirect back with a mock
+          // code, echoing the caller's `state` so the app's CSRF check
+          // passes. AKAHU_OAUTH_AUTHORIZE_URL points here (see
+          // playwright.config.ts) so this is a genuine server-to-server
+          // redirect chain, not a network-layer interception harness.
+          const state = new URL(req.url ?? "", "http://127.0.0.1").searchParams.get(
+            "state",
+          );
+          const callbackUrl = new URL("http://localhost:3000/api/akahu/callback");
+          callbackUrl.searchParams.set("code", "mock_code_123");
+          if (state) callbackUrl.searchParams.set("state", state);
+          res.writeHead(302, { Location: callbackUrl.toString() });
+          res.end();
+        } else if (url.startsWith("/token") && req.method === "POST") {
+          // The real exchange is grant_type=authorization_code with
+          // code/redirect_uri/client_id/client_secret in the form body; the
+          // mock doesn't need to validate it to prove the OAuth wiring works.
+          res.end(
+            JSON.stringify({
+              success: true,
+              access_token: "user_token_mock_abc",
+              token_type: "bearer",
+              scope: "ENDURING_CONSENT ACCOUNTS TRANSACTIONS",
+            }),
+          );
+        } else if (url.startsWith("/accounts/") && url.includes("/transactions")) {
           res.end(
             JSON.stringify({
               items: [
@@ -228,9 +257,16 @@ test.describe(
         await page.getByRole("button", { name: /go to my workspace/i }).click();
         await expect(page).toHaveURL(/\/workspace$/);
 
-        // Connect: token is stored encrypted in Vault via the connect_akahu RPC.
-        await page.getByLabel("Akahu user token").fill("user_token_mock_abc");
-        await page.getByRole("button", { name: /connect akahu/i }).click();
+        // Connect via OAuth: the "Connect with Akahu" link does a full
+        // navigation to GET /api/akahu/oauth/start, which 302s to the
+        // (mocked) authorize endpoint above, which 302s back to GET
+        // /api/akahu/callback with a mock code + the echoed state — a real
+        // end-to-end redirect chain, no network-layer interception. The
+        // callback exchanges the code against the mock /token above;
+        // connect_akahu then stores the resulting token in Vault, same as
+        // the old paste-a-token flow did.
+        await page.getByRole("link", { name: /connect with akahu/i }).click();
+        await expect(page).toHaveURL(/\/workspace\?akahu_connected=1$/);
         await expect(page.getByText(/connected to akahu/i)).toBeVisible();
 
         // List the authorized accounts (hits the mock /accounts).

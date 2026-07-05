@@ -79,15 +79,63 @@ docker exec -i supabase_db_YouInc psql -U postgres -d postgres \
 
 ## Live Akahu sync
 
-The Akahu **app** token is a server-wide secret; each user supplies their own
-**user** token via the `/workspace` connect form (stored encrypted in Vault).
-Set on the server (env / host secrets):
+Self-service tenants connect their bank via **OAuth2**: a "Connect with Akahu" button
+on the workspace launches the Akahu consent flow, returns an enduring user token to
+the callback, and the app stores it encrypted in Supabase Vault (never in the
+client bundle). The Akahu **app** is a server-wide secret.
 
-- `AKAHU_APP_TOKEN`
-- `AKAHU_BASE_URL` (optional, defaults to `https://api.akahu.io/v1`)
+**Prerequisites:** Your Akahu app must be upgraded to a **Full App** with OAuth2
+enabled. Personal Apps do not support OAuth token exchange. Contact Akahu support to
+verify your app tier and enable OAuth if needed.
 
-Without an app token the workspace shows a "live sync not enabled" note; manual
-accounts and sample data still work.
+**Required env vars** (server-side secrets only):
+- `AKAHU_APP_TOKEN` — App ID Token (also used as OAuth `client_id`)
+- `AKAHU_APP_SECRET` — App Secret (required for OAuth token exchange)
+- `AKAHU_OAUTH_REDIRECT_URI` — Registered callback URI
+
+**Optional overrides:**
+- `AKAHU_BASE_URL` (default: `https://api.akahu.io/v1`)
+- `AKAHU_APP_ID_TOKEN` (default: same as `AKAHU_APP_TOKEN`)
+- `AKAHU_OAUTH_AUTHORIZE_URL` (default: `https://oauth.akahu.nz`)
+- `AKAHU_OAUTH_SCOPES` (default: `ENDURING_CONSENT ACCOUNTS TRANSACTIONS`)
+
+**Registering redirect URIs:** On the Akahu app dashboard, register both:
+- Production: `https://youinc.hamishburke.dev/api/akahu/callback`
+- Local dev: `http://localhost:3000/api/akahu/callback`
+
+Without valid app credentials the workspace shows a "live sync not configured" note;
+manual accounts and sample data still work. If the Full App prerequisite is not met,
+the OAuth flow will fail gracefully with a user-friendly error.
+
+## Feedback & variant voting
+
+`FeedbackWidget.tsx` on the marketing pages randomly assigns each visitor variant A/B
+(client-side, persisted in `localStorage`) and records 👍/👎 votes into `public.feedback`
+via the anon-callable `record_feedback` RPC — write-only from the client's perspective.
+
+Aggregated results are readable through `public.feedback_variant_stats(p_since)`, a
+second SECURITY DEFINER RPC that self-enforces admin-only access (an `is_app_admin()`
+allowlist check inside the function — there is no `service_role` key anywhere in this
+app, so authorization has to live in Postgres, not app code). The signed-in owner views
+results at **`/admin/feedback`** (not linked from any nav — go there directly), which
+shows vote counts/up-rate per variant × source × path, and flags a statistically
+significant leader (two-proportion z-test, requires ≥30 samples per variant and p < 0.05)
+without acting on it.
+
+**Promotion is intentionally not automated.** Variant assignment is still 100%
+client-side `Math.random()`; there is no mechanism today to shift new visitors toward a
+flagged winner. Doing so would mean either moving assignment server-side or having
+`FeedbackWidget` read a remote config/feature-flag value at render time — reasonable
+future work, but out of scope here. For now, a human reads the `/admin/feedback` flag and
+manually edits `FeedbackWidget.tsx`'s variant copy/split if/when a result is convincing.
+
+To grant the first admin in a fresh environment (the migration seeds `hamish@paychase.co.nz`
+as a best-effort no-op if that user doesn't exist yet):
+
+```sql
+insert into public.app_admins (user_id)
+select id from auth.users where email = 'you@example.com';
+```
 
 ## Deployment
 
