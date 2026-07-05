@@ -9,6 +9,8 @@ import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
 import { useResendVerification } from "~/hooks/useResendVerification";
 import { getSupabaseBrowserClient } from "~/lib/supabaseBrowser";
+import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
+import { SITE_URL } from "~/lib/sitemap";
 
 // If the visitor already has a Supabase session, skip signup: send them to
 // onboarding (which itself forwards to the dashboard once a tenant exists).
@@ -18,7 +20,32 @@ const checkAuthed = createServerFn({ method: "GET" }).handler(async () => {
   return { authenticated: Boolean(user) };
 });
 
+const SIGNUP_DESCRIPTION =
+  "Create your YouInc account and set up your own workspace in a couple of minutes — no card required.";
+
+const SIGNUP_JSON_LD = jsonLdScript(
+  jsonLdGraph([
+    {
+      "@type": "WebPage",
+      name: "Create your YouInc account",
+      description: SIGNUP_DESCRIPTION,
+      url: `${SITE_URL}/signup`,
+    },
+    breadcrumbList(SITE_URL, [
+      { name: "Home", path: "/" },
+      { name: "Sign up", path: "/signup" },
+    ]),
+  ]),
+);
+
 export const Route = createFileRoute("/signup")({
+  head: () => ({
+    meta: [
+      { title: "Create your account — YouInc" },
+      { name: "description", content: SIGNUP_DESCRIPTION },
+    ],
+    scripts: [SIGNUP_JSON_LD],
+  }),
   loader: async () => {
     const { authenticated } = await checkAuthed();
     if (authenticated) throw redirect({ to: "/onboarding" });

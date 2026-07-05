@@ -5,6 +5,8 @@ import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
 import { DEMO_WIDGET_IDS } from "~/components/marketing/demoWidgets";
 import { BOOKING_URL } from "~/components/marketing/config";
+import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
+import { SITE_URL } from "~/lib/sitemap";
 import "~/components/dashboard/dashboard.css";
 import "~/components/marketing/marketing-tokens.css";
 import "~/components/marketing/marketing-shared.css";
@@ -15,7 +17,32 @@ import "~/components/marketing/demo.css";
 // saved layout — see useDashboardLayout's `storageKey` option.
 const DEMO_STORAGE_KEY = "youinc.demo.layout.v1";
 
+const DEMO_DESCRIPTION =
+  "Explore the full YouInc dashboard on sample data — the same shell and widgets you get once your accounts are connected, with no sign-up and no bank connection.";
+
+const DEMO_JSON_LD = jsonLdScript(
+  jsonLdGraph([
+    {
+      "@type": "WebPage",
+      name: "YouInc live demo",
+      description: DEMO_DESCRIPTION,
+      url: `${SITE_URL}/demo`,
+    },
+    breadcrumbList(SITE_URL, [
+      { name: "Home", path: "/" },
+      { name: "Live demo", path: "/demo" },
+    ]),
+  ]),
+);
+
 export const Route = createFileRoute("/demo")({
+  head: () => ({
+    meta: [
+      { title: "Live demo — YouInc" },
+      { name: "description", content: DEMO_DESCRIPTION },
+    ],
+    scripts: [DEMO_JSON_LD],
+  }),
   component: DemoPage,
 });
 

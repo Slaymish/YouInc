@@ -5,6 +5,8 @@ import { AuthShell } from "~/components/auth/AuthShell";
 import { useResendVerification } from "~/hooks/useResendVerification";
 import { classifyAuthError } from "~/lib/authResend";
 import { getSupabaseBrowserClient } from "~/lib/supabaseBrowser";
+import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
+import { SITE_URL } from "~/lib/sitemap";
 
 const checkAuthed = createServerFn({ method: "GET" }).handler(async () => {
   const { getServerUser } = await import("~/server/supabaseServer");
@@ -12,7 +14,31 @@ const checkAuthed = createServerFn({ method: "GET" }).handler(async () => {
   return { authenticated: Boolean(user) };
 });
 
+const SIGNIN_DESCRIPTION = "Sign in to your YouInc workspace and dashboard.";
+
+const SIGNIN_JSON_LD = jsonLdScript(
+  jsonLdGraph([
+    {
+      "@type": "WebPage",
+      name: "Sign in to YouInc",
+      description: SIGNIN_DESCRIPTION,
+      url: `${SITE_URL}/signin`,
+    },
+    breadcrumbList(SITE_URL, [
+      { name: "Home", path: "/" },
+      { name: "Sign in", path: "/signin" },
+    ]),
+  ]),
+);
+
 export const Route = createFileRoute("/signin")({
+  head: () => ({
+    meta: [
+      { title: "Sign in — YouInc" },
+      { name: "description", content: SIGNIN_DESCRIPTION },
+    ],
+    scripts: [SIGNIN_JSON_LD],
+  }),
   loader: async () => {
     const { authenticated } = await checkAuthed();
     if (authenticated) throw redirect({ to: "/onboarding" });
