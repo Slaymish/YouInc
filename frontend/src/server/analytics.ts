@@ -1,7 +1,3 @@
-import type BetterSqlite3 from "better-sqlite3";
-
-type DB = BetterSqlite3.Database;
-
 // ── Recurring & subscriptions ──────────────────────────────────────────────
 
 export type RecurringCadence = "weekly" | "fortnightly" | "monthly";
@@ -222,44 +218,6 @@ export function computeRecurringPayments(
   return detectRecurring(computeRecurringGroups(rows));
 }
 
-type RawRecurringQueryRow = {
-  transaction_id: number | string;
-  date: string;
-  description: string;
-  account: string;
-  amount_cents: number;
-};
-
-export function readRecurringPayments(db: DB): RecurringPayment[] {
-  const rows = db
-    .prepare(
-      `
-      SELECT
-        jt.id AS transaction_id,
-        jt.transaction_date AS date,
-        jt.description AS description,
-        je.account AS account,
-        je.amount_cents AS amount_cents
-      FROM journal_transactions jt
-      JOIN journal_entries je ON je.journal_transaction_id = jt.id
-      WHERE je.account LIKE 'Expenses:%'
-        AND je.side = 'debit'
-        AND jt.source_account_id != 'manual'
-    `,
-    )
-    .all() as RawRecurringQueryRow[];
-
-  return computeRecurringPayments(
-    rows.map((row) => ({
-      transactionId: String(row.transaction_id),
-      date: row.date,
-      description: row.description,
-      account: row.account,
-      amountCents: Number(row.amount_cents),
-    })),
-  );
-}
-
 // ── Per-category monthly spend (for anomaly detection) ─────────────────────
 
 export interface CategoryMonthPoint {
@@ -310,39 +268,6 @@ export function computeCategoryMonthly(
         ? a.account.localeCompare(b.account)
         : a.month.localeCompare(b.month),
     );
-}
-
-type RawCategoryMonthlyRow = {
-  month: string;
-  account: string;
-  side: "debit" | "credit";
-  amount_cents: number;
-};
-
-export function readCategoryMonthly(db: DB): CategoryMonthPoint[] {
-  const rows = db
-    .prepare(
-      `
-      SELECT
-        substr(jt.transaction_date, 1, 7) AS month,
-        je.account AS account,
-        je.side AS side,
-        je.amount_cents AS amount_cents
-      FROM journal_entries je
-      JOIN journal_transactions jt ON jt.id = je.journal_transaction_id
-      WHERE je.account LIKE 'Expenses:%'
-    `,
-    )
-    .all() as RawCategoryMonthlyRow[];
-
-  return computeCategoryMonthly(
-    rows.map((row) => ({
-      month: row.month,
-      account: row.account,
-      side: row.side,
-      amountCents: Number(row.amount_cents),
-    })),
-  );
 }
 
 // ── Daily spend (for the calendar heatmap) ─────────────────────────────────
@@ -415,38 +340,3 @@ export function computeDailySpend(
     }));
 }
 
-type RawDailySpendRow = {
-  transaction_id: number | string;
-  date: string;
-  account: string;
-  side: "debit" | "credit";
-  amount_cents: number;
-};
-
-export function readDailySpend(db: DB): DailySpendPoint[] {
-  const rows = db
-    .prepare(
-      `
-      SELECT
-        jt.id AS transaction_id,
-        jt.transaction_date AS date,
-        je.account AS account,
-        je.side AS side,
-        je.amount_cents AS amount_cents
-      FROM journal_transactions jt
-      JOIN journal_entries je ON je.journal_transaction_id = jt.id
-      WHERE jt.source_account_id != 'manual'
-    `,
-    )
-    .all() as RawDailySpendRow[];
-
-  return computeDailySpend(
-    rows.map((row) => ({
-      date: row.date,
-      transactionId: String(row.transaction_id),
-      account: row.account,
-      side: row.side,
-      amountCents: Number(row.amount_cents),
-    })),
-  );
-}

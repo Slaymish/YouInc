@@ -4,11 +4,6 @@
   "sideEffects": false,
   "type": "module",
   "packageManager": "pnpm@10.33.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3"
-    ]
-  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit",
@@ -22,21 +17,16 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@fontsource/fraunces": "^5.2.9",
     "@fontsource/inter": "^5.2.8",
-    "@simplewebauthn/browser": "^13.3.0",
-    "@simplewebauthn/server": "^13.3.2",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.110.0",
     "@tanstack/react-router": "^1.170.16",
     "@tanstack/react-start": "^1.168.26",
-    "better-sqlite3": "^12.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "reflect-metadata": "^0.2.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.5.4",
     "@types/pg": "^8.20.0",
