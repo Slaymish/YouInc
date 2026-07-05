@@ -1,93 +1,102 @@
-# YouInc Ledger
+# YouInc
 
-Local-first Personal ERP and Akahu/BNZ Open Finance ledger engine.
+A multi-tenant personal ERP: a self-service executive dashboard over a per-user
+double-entry ledger, with live bank sync via Akahu (NZ Open Finance).
 
 ## What it does
 
-- Pulls Akahu transactions with pagination, rate limiting, and graceful HTTP error handling.
-- Caches raw transactions idempotently using Akahu `_id` or deterministic fallback hashes.
-- Posts only settled transactions to a strict double-entry SQLite ledger.
-- Routes transactions through hot-reloadable YAML rules with NZFCC fallback and suspense safety.
-- Exports hledger-compatible plain text accounting journals.
+- Self-service signup + onboarding — anyone can create an account and their own
+  isolated workspace (tenant).
+- Per-tenant double-entry ledger in Postgres, with tenant isolation enforced by
+  Supabase Row-Level Security.
+- Live bank sync via Akahu: each user connects their own Akahu account with an
+  enduring user token, stored encrypted in Supabase Vault and never returned to
+  the browser.
+- Transactions run through the ported ledger engine (rules routing, NZFCC
+  fallback, suspense safety) and post idempotently as `raw_transactions` +
+  balanced `journal_transactions` / `journal_entries`.
+- A configurable dashboard of widgets (net worth, runway, cashflow, balance
+  sheet, ledger controls, and more).
+- Public marketing surface: landing (`/`), live demo on sample data (`/demo`),
+  bespoke-service page (`/custom-builds`), and a live widget catalogue
+  (`/widgets`).
 
-See `docs/architecture_design.md` for the Phase 1 architecture design, `docs/persona_frontend_information_design.md` for the persona-led frontend, information model, and ingestion design, and `docs/research_competitors.md` for the competitor landscape, positioning, and pricing research.
+See `docs/architecture_design.md`, `docs/persona_frontend_information_design.md`,
+and `docs/research_competitors.md` for background, and
+`docs/superpowers/specs/2026-07-05-production-hosting-design.md` for the current
+hosting design.
 
-## Quick start
+## Architecture
 
-The TypeScript/Supabase-backed frontend in `frontend/` is the only implementation;
-see the section below to run it.
+- **Frontend:** TanStack Start (React 19 + Nitro server) in `frontend/`. Uses
+  [pnpm](https://pnpm.io/).
+- **Backend:** Supabase (Postgres + Auth + RLS + Vault) — the single source of
+  truth. Schema and policies live in `supabase/migrations/`.
+- **Stateless:** the app holds no local disk state. All persistence is Supabase
+  over the network; there is no SQLite and no attached volume in production.
 
-## TanStack Start frontend
+## Run locally
 
-A React frontend lives in `frontend/` and reads the same local SQLite ledger through TanStack Start server functions. It also exposes local live-ingestion controls and source-account mapping edits backed by `config/rules.yaml`. The frontend uses [pnpm](https://pnpm.io/).
-
-The same app serves the public marketing site: the landing page at `/`, a live demo at
-`/demo` (the real dashboard UI running on sample data — layout edits persist under a separate
-localStorage key and never touch your real board), the bespoke-service page at
-`/custom-builds`, and a live widget catalogue at `/widgets`. Everything else is
-passkey-gated (see "Publishing the frontend publicly" below).
-
-To run it:
+You need [Supabase CLI](https://supabase.com/docs/guides/cli) and Docker.
 
 ```sh
+supabase start          # from the repo root: local Postgres/Auth/Studio stack
+supabase db reset       # apply all migrations (and re-run on migration changes)
+
 cd frontend
 pnpm install
-pnpm dev
+pnpm dev                # http://localhost:3000
 ```
 
-Then open `http://localhost:3000`. Use the Ingestion panel to sync a live Akahu account. Click **Load Akahu accounts** and select the real Akahu account id (`acc_...`) rather than entering a bank label such as `BNZ`. Use Source Systems to map raw account IDs to ledger accounts before ongoing syncs. By default it reads `../data/youinc-ledger.sqlite3` from the frontend directory. Set `YOUINC_DB_PATH` if your ledger database is elsewhere:
+The frontend defaults (in `src/lib/supabaseConfig.ts`) point at the local
+`supabase start` stack, so dev works with no extra config. Create an account at
+`/signup`; local Supabase has email confirmation off, so signup goes straight to
+onboarding.
 
-```sh
-YOUINC_DB_PATH=/absolute/path/to/youinc-ledger.sqlite3 pnpm dev
-```
-
-Optional frontend ingestion environment variables:
-
-```sh
-YOUINC_RULES_PATH=/absolute/path/to/rules.yaml
-YOUINC_PROJECT_ROOT=/absolute/path/to/YouInc
-AKAHU_CA_BUNDLE=/absolute/path/to/network-or-corporate-ca.pem
-```
-
-### Publishing the frontend publicly
-
-The dashboard reads your real financial ledger, so it is gated behind a
-**passkey (WebAuthn)** login — every route except the public marketing pages
-(`/`, `/demo`, `/custom-builds`, `/widgets`) redirects to `/login` until you
-authenticate. To enrol your first passkey, set `YOUINC_ENROLLMENT_TOKEN` (in
-`frontend/.env` or your host's env settings), open `/login`, use "Enrol a new
-passkey", then unset the token to disable further registration. After that,
-"Sign in with passkey" is all you need. Serve the deployed frontend over HTTPS
-(WebAuthn requires a secure context outside localhost). The relying-party
-id/origin are derived from the request by default; override with `YOUINC_RP_ID`
-/ `YOUINC_RP_ORIGIN` only behind a proxy that rewrites Host/Origin. See
-`frontend/src/server/auth.ts` and `frontend/src/start.ts` for the
-implementation.
-
-To actually host it, see `docs/deploy_fly.md` for a Fly.io setup that scales
-to zero (a `Dockerfile` at the repo root packages the built frontend, backed
-by a Fly Volume for the SQLite ledger and `rules.yaml` — no changes to the
-local-first architecture).
-
-If `pnpm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, run it with local proxy variables unset:
+If `pnpm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, a local
+proxy is configured but not running — re-run with proxy vars unset:
 
 ```sh
 env -u HTTPS_PROXY -u HTTP_PROXY -u ALL_PROXY -u https_proxy -u http_proxy -u all_proxy pnpm install
 ```
 
-Akahu sync ignores generic `REQUESTS_CA_BUNDLE`, `SSL_CERT_FILE`, and `CURL_CA_BUNDLE` values so local mitmproxy/corporate cert settings do not silently affect banking ingestion. If live sync must run on a TLS-inspecting network, set `AKAHU_CA_BUNDLE` to that network's PEM CA bundle and restart the frontend.
+## Tests
+
+```sh
+cd frontend
+pnpm test        # vitest — pure logic (validation, ledger math, derivations)
+pnpm test:e2e    # Playwright — public pages + signup/workspace flows (needs supabase running)
+pnpm build       # vite build + tsc --noEmit (typecheck)
+```
+
+Database behavior (RLS isolation, RPCs) is verified by SQL tests in
+`supabase/tests/` against the local stack, e.g.:
+
+```sh
+docker exec -i supabase_db_YouInc psql -U postgres -d postgres \
+  -v ON_ERROR_STOP=1 < supabase/tests/rls_isolation.sql
+```
 
 ## Live Akahu sync
 
-Set these in `.env` or as environment variables:
+The Akahu **app** token is a server-wide secret; each user supplies their own
+**user** token via the `/workspace` connect form (stored encrypted in Vault).
+Set on the server (env / host secrets):
 
-- `AKAHU_BASE_URL`
 - `AKAHU_APP_TOKEN`
-- `AKAHU_USER_TOKEN`
+- `AKAHU_BASE_URL` (optional, defaults to `https://api.akahu.io/v1`)
+
+Without an app token the workspace shows a "live sync not enabled" note; manual
+accounts and sample data still work.
+
+## Deployment
+
+Hosted on Fly.io (stateless, scale-to-zero) backed by a Supabase Cloud project.
+See `docs/deploy_fly.md` for the full walkthrough.
 
 ## Safety notes
 
 - Pending transactions are cached but not posted by default.
 - Every journal posting is validated so debits equal credits before commit.
-- Unmatched transactions route to `Expenses:Uncategorized:Suspense`.
-- Real credentials and local database files are ignored by git.
+- Unmatched transactions route to a suspense account.
+- Real credentials are ignored by git; per-tenant data is isolated by RLS.
