@@ -29,10 +29,8 @@
 }
 
 .mk-footer__logo {
-  font-family: var(--mk-serif);
-  font-size: var(--text-h3);
-  color: var(--mk-ink);
-  letter-spacing: var(--tracking-head);
+  display: inline-flex;
+  align-items: center;
 }
 
 .mk-footer__tagline {

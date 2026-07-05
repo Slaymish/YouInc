@@ -1,6 +1,7 @@
 // frontend/src/components/marketing/MarketingFooter.tsx
 import { Link } from "@tanstack/react-router";
 import { PRODUCT, BOOKING_URL, DEFAULT_EMAIL } from "./config";
+import { Logo } from "../Logo";
 import "./MarketingFooter.css";
 
 /**
@@ -45,7 +46,9 @@ export function MarketingFooter() {
     <footer className="mk-footer">
       <div className="mk-footer__grid">
         <div className="mk-footer__brand">
-          <span className="mk-footer__logo">{PRODUCT.name}</span>
+          <span className="mk-footer__logo">
+            <Logo height={26} />
+          </span>
           <p className="mk-footer__tagline">{PRODUCT.heroHeadline}</p>
           <ul className="mk-footer__social" aria-label="YouInc on social media">
             {SOCIAL_LINKS.map((social) => (

@@ -7,7 +7,7 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useLightTheme } from "~/components/marketing/useLightTheme";
-import { PRODUCT } from "~/components/marketing/config";
+import { Logo } from "~/components/Logo";
 import { ManualBalancesEditor } from "~/components/workspace/ManualBalancesEditor";
 import { AkahuConnectPanel } from "~/components/workspace/AkahuConnectPanel";
 import { RulesEditor } from "~/components/workspace/RulesEditor";
@@ -186,8 +186,8 @@ function WorkspacePage() {
   return (
     <div className="ws-shell">
       <header className="ws-topbar">
-        <Link className="ws-topbar__logo" to="/">
-          {PRODUCT.name}
+        <Link className="ws-topbar__logo" to="/" aria-label="YouInc home">
+          <Logo height={24} />
         </Link>
         <div className="ws-topbar__account">
           <span>{account.email}</span>

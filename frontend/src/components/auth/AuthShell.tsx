@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { PRODUCT } from "~/components/marketing/config";
+import { Logo } from "~/components/Logo";
 import "~/styles/auth.css";
 
 interface AuthShellProps {
@@ -16,8 +17,8 @@ export function AuthShell({ children, aside }: AuthShellProps) {
   return (
     <div className="auth-shell">
       <header className="auth-topbar">
-        <Link className="auth-topbar__logo" to="/">
-          {PRODUCT.name}
+        <Link className="auth-topbar__logo" to="/" aria-label="YouInc home">
+          <Logo height={24} />
         </Link>
         {aside ? <div className="auth-topbar__aside">{aside}</div> : null}
       </header>

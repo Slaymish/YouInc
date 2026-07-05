@@ -1,6 +1,6 @@
 // frontend/src/components/marketing/MarketingHeader.tsx
 import { Link } from "@tanstack/react-router";
-import { PRODUCT } from "./config";
+import { Logo } from "../Logo";
 
 /**
  * Shared marketing nav for the landing page, /pricing, /custom-builds, and
@@ -11,8 +11,8 @@ import { PRODUCT } from "./config";
 export function MarketingHeader() {
   return (
     <header className="mk-nav">
-      <Link className="mk-nav__logo" to="/">
-        {PRODUCT.name}
+      <Link className="mk-nav__logo" to="/" aria-label="YouInc home">
+        <Logo height={24} />
       </Link>
       <nav className="mk-nav__links" aria-label="Main navigation">
         <Link to="/widgets">Widgets</Link>

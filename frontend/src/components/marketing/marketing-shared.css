@@ -181,9 +181,8 @@
   border-bottom: 1px solid var(--mk-line);
 }
 .mk-nav__logo {
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
   color: var(--mk-ink);
   text-decoration: none;
 }
