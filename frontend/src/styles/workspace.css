@@ -605,6 +605,47 @@
   font-size: 1.05rem;
 }
 
+/* ── Admin feedback stats callouts ─────────────────────────────────────── */
+.admin-callout {
+  border: 1px solid var(--line-subtle);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-callout h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.admin-callout p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.admin-callout--leader {
+  border-color: var(--accent, #12a150);
+}
+
+.admin-callout--leader strong {
+  font-size: 0.95rem;
+}
+
+.admin-callout--forbidden,
+.admin-callout--error {
+  border-color: var(--danger, #c0492f);
+}
+
+.admin-callout--forbidden h2,
+.admin-callout--error h2 {
+  color: var(--danger, #c0492f);
+}
+
 /* ── Sync history panel ──────────────────────────────────────────────── */
 .sync-history__status {
   font-weight: 600;
