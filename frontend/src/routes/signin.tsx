@@ -2,6 +2,8 @@ import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-rout
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { useResendVerification } from "~/hooks/useResendVerification";
+import { classifyAuthError } from "~/lib/authResend";
 import { getSupabaseBrowserClient } from "~/lib/supabaseBrowser";
 
 const checkAuthed = createServerFn({ method: "GET" }).handler(async () => {
@@ -29,6 +31,11 @@ function SigninPage() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Set when signInWithPassword fails specifically because the account's
+  // email hasn't been confirmed yet — shows a resend affordance instead of
+  // the generic error message so the user isn't stuck.
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const resend = useResendVerification();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,11 +49,16 @@ function SigninPage() {
 
     setBusy(true);
     setError(null);
+    setUnverifiedEmail(null);
     try {
       const supabase = getSupabaseBrowserClient();
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
-        setError(messageFor(signInError));
+        if (classifyAuthError(signInError) === "unverified") {
+          setUnverifiedEmail(email);
+        } else {
+          setError(messageFor(signInError));
+        }
         return;
       }
       await router.navigate({ to: "/onboarding" });
@@ -94,7 +106,29 @@ function SigninPage() {
             />
           </div>
 
-          {error ? (
+          {unverifiedEmail ? (
+            <div className="auth-notice" role="alert">
+              <p>
+                Your email isn't verified yet. Check your inbox for the
+                confirmation link, or resend it below.
+              </p>
+              <button
+                type="button"
+                className="auth-secondary"
+                onClick={() => resend.resend(unverifiedEmail)}
+                disabled={resend.disabled}
+              >
+                {resend.cooldownSeconds > 0
+                  ? `Resend available in ${resend.cooldownSeconds}s`
+                  : resend.status === "sending"
+                    ? "Sending…"
+                    : "Resend verification email"}
+              </button>
+              {resend.message ? (
+                <p className="auth-note">{resend.message}</p>
+              ) : null}
+            </div>
+          ) : error ? (
             <p className="auth-error" role="alert">
               {error}
             </p>

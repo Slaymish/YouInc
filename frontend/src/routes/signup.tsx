@@ -7,6 +7,7 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
+import { useResendVerification } from "~/hooks/useResendVerification";
 import { getSupabaseBrowserClient } from "~/lib/supabaseBrowser";
 
 // If the visitor already has a Supabase session, skip signup: send them to
@@ -40,6 +41,7 @@ function SignupPage() {
   // returns a user but NO session, so we show a "check your email" screen
   // instead of routing into onboarding (which would bounce to /signin).
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const resend = useResendVerification();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,7 +120,20 @@ function SignupPage() {
             Go to sign in →
           </Link>
           <p className="auth-note">
-            Didn't get it? Check spam, or{" "}
+            Didn't get it? Check spam,{" "}
+            <button
+              type="button"
+              className="auth-linkbtn"
+              onClick={() => resend.resend(pendingEmail)}
+              disabled={resend.disabled}
+            >
+              {resend.cooldownSeconds > 0
+                ? `resend in ${resend.cooldownSeconds}s`
+                : resend.status === "sending"
+                  ? "resending…"
+                  : "resend the email"}
+            </button>
+            , or{" "}
             <button
               type="button"
               className="auth-linkbtn"
@@ -128,6 +143,7 @@ function SignupPage() {
             </button>
             .
           </p>
+          {resend.message ? <p className="auth-note">{resend.message}</p> : null}
         </section>
       </AuthShell>
     );
