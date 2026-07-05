@@ -3,8 +3,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { MarketingPage } from "~/components/marketing/MarketingPage";
 
 const checkSession = createServerFn({ method: "GET" }).handler(async () => {
-  const { hasValidSession } = await import("~/server/auth");
-  return { authenticated: hasValidSession() };
+  const { getServerUser } = await import("~/server/supabaseServer");
+  return { authenticated: (await getServerUser()) !== null };
 });
 
 export const Route = createFileRoute("/")({

@@ -106,7 +106,7 @@ function SigninPage() {
         </form>
 
         <p className="auth-note">
-          Own the local ledger install? <Link to="/login">Sign in with a passkey →</Link>
+          New here? <Link to="/signup">Create your workspace →</Link>
         </p>
       </section>
     </AuthShell>
