@@ -2,7 +2,8 @@
 
 **Date:** 2026-07-05
 **Status:** Approved (design), pending implementation plan
-**Goal:** Stand up a real, secure production environment for YouInc and get it hosted properly at `youinc.hamishburke.dev`.
+**Goal:** Stand up a real, secure, **fully stateless** production environment for YouInc
+and get it hosted properly at `youinc.hamishburke.dev`.
 
 ## Context
 
@@ -18,7 +19,14 @@ to a **multi-tenant, Supabase-backed self-service app**:
   **no `service_role` key** anywhere in the app.
 - The legacy passkey/WebAuthn "owner" gate is now a **no-op** (`start.ts`
   `PROTECTED_PREFIXES` is empty); the owner uses `/workspace` as a normal tenant.
-  Passkey code (`server/auth.ts`, `/login`) remains dormant, not torn out.
+
+Two things still write to **local SQLite** at runtime, which is what blocks a stateless
+deploy:
+- `server/leads.ts` — concierge / waitlist lead capture (public, unauthenticated).
+- `server/feedback.ts` — A/B feedback votes (public, unauthenticated).
+
+Dormant/legacy SQLite that is not on any live path: `server/auth.ts` (passkey store) and
+`server/migration/migrateSqliteToSupabase.ts` (one-off SQLite→Supabase importer).
 
 The deployment artifacts (`Dockerfile`, `fly.toml`, `docs/deploy_fly.md`, `README.md`)
 still describe the **old** SQLite local-first + Basic Auth model and are stale.
@@ -30,37 +38,71 @@ still describe the **old** SQLite local-first + Basic Auth model and are stale.
   `data/youinc-ledger.sqlite3` (possibly deleted, migration never run) is not needed.
 - **Email:** configure **real SMTP now** (Resend) — the public signup funnel requires
   working confirmation email.
+- **Stateless:** the app must hold **no local disk state**. Move `leads` + `feedback`
+  into Supabase, retire the dormant passkey/SQLite path, drop `better-sqlite3` entirely,
+  and deploy with **no Fly volume**.
 
 ## Architecture
 
 Two managed services, both in the `syd` region (closest to NZ):
 
 ### Supabase Cloud
-Holds all multi-tenant state:
+The single source of truth for all persistent state:
 - Postgres schema, RLS policies, RPCs (from `supabase/migrations/`).
 - Supabase Auth (email/password + email confirmation) for `/signup` `/signin`
   `/onboarding` `/workspace`.
 - Vault-backed encrypted Akahu **user** tokens (SECURITY DEFINER RPCs from
   `20260704120006_akahu_connection_secrets.sql`).
+- **New:** `leads` + `feedback` tables (see "Statelessness" below).
 
 ### Fly.io
 One scale-to-zero Machine (`shared-cpu-1x`, 512 MB) running the built Nitro server
 (`frontend/.output/server/index.mjs`) via `docker/entrypoint.sh`.
 
-- **Fly Volume (1 GB) at `/data`** holds the *only* remaining runtime SQLite files:
-  - `youinc-leads.sqlite3` — concierge lead capture (business-critical; must persist).
-  - `youinc-feedback.sqlite3` — feedback submissions.
-  - `youinc-auth.sqlite3` — dormant passkey store; pointed at `/data` defensively so a
-    stray `/login` request cannot crash on an ephemeral/read-only path.
-
-  (`server/analytics.ts` is *financial* analytics — pure recurring/category math on
-  rows passed in; it opens no database and is not a runtime SQLite dependency.)
+- **No Fly Volume, no mounts.** The container holds nothing that must survive a restart;
+  all writes go to Supabase over the network.
 - `min_machines_running = 0`, `auto_stop_machines = "stop"`, `auto_start_machines`:
-  suspends when idle, wakes on request. Single machine (SQLite volume attaches to one).
+  suspends when idle, wakes on request.
+- Being stateless, it can also safely run more than one Machine (horizontal scale) later
+  with no code change; the default stays a single scale-to-zero Machine for cost.
 
 ### Public URL / TLS
 `youinc.hamishburke.dev` → CNAME to the Fly app; Fly provisions and renews the TLS
 certificate. `force_https = true`.
+
+## Statelessness: what moves and what is removed
+
+### `leads` + `feedback` → Supabase
+These are **public, unauthenticated** writes, so they follow the codebase's existing
+`SECURITY DEFINER` RPC pattern (as used for Akahu tokens) rather than direct table grants:
+
+- New migration adds `leads` and `feedback` tables (mirroring the current SQLite columns)
+  and two **`anon`-callable `SECURITY DEFINER` RPCs**: `record_lead(...)` and
+  `record_feedback(...)` that perform the insert (leads keeps its email upsert + honeypot
+  short-circuit inside the function).
+- The tables have **no anon SELECT/INSERT policy** — anon can only reach them through the
+  RPCs, so lead/feedback data is never client-readable. The owner reads via the Supabase
+  dashboard (or an authenticated/owner query).
+- `server/leads.ts` and `server/feedback.ts` are rewritten to call these RPCs via the
+  request-scoped Supabase client instead of opening a SQLite file. Best-effort webhook
+  notification (`YOUINC_LEADS_WEBHOOK_URL` / `YOUINC_FEEDBACK_WEBHOOK_URL`) is preserved.
+- Their unit tests are rewritten as integration tests against the local `supabase start`
+  stack (matching the other Supabase-backed server modules).
+
+### Retire the dormant SQLite path
+- Remove the passkey path that no live route uses: `server/auth.ts`, the `/login` route,
+  and the `YOUINC_ENROLLMENT_TOKEN` / `YOUINC_RP_ID` / `YOUINC_RP_ORIGIN` handling.
+- Remove the obsolete one-off importer `server/migration/` (prod starts clean; there is
+  no SQLite source left to import from).
+- Remove the vestigial `better-sqlite3` type import in `server/analytics.ts` (it opens no
+  database — it is pure recurring/category math on rows passed in).
+- Drop `better-sqlite3` (and `@types/better-sqlite3`) from `package.json` and the
+  `onlyBuiltDependencies` native-compile list once nothing imports it.
+
+### Docker image simplification
+With no native module to compile, the `frontend-build` stage no longer needs
+`python3 make g++` or the native rebuild, yielding a smaller, faster, more reliable image.
+`docker/entrypoint.sh` loses all volume-seeding logic and just launches the server.
 
 ## The critical correctness item: build-time vs runtime env
 
@@ -86,13 +128,8 @@ so build-args are **sufficient** — no runtime Supabase env is required.
 |---|---|---|
 | **Build args** (baked into image; public-safe) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | `fly.toml [build.args]` |
 | **Runtime secrets** | `AKAHU_APP_TOKEN`; optional `YOUINC_LEADS_WEBHOOK_URL`, `YOUINC_FEEDBACK_WEBHOOK_URL` | `fly secrets set` |
-| **Runtime env** | `NODE_ENV=production`, `PORT=3000`, SQLite paths → `/data` (`YOUINC_LEADS_DB_PATH`, `YOUINC_FEEDBACK_DB_PATH`, `YOUINC_AUTH_DB_PATH`) | `fly.toml [env]` + `entrypoint.sh` |
-| **Deliberately NOT set** | `service_role` key (unused), `YOUINC_ENROLLMENT_TOKEN` (keeps passkey enrolment disabled), `YOUINC_RP_ID`/`YOUINC_RP_ORIGIN` (derived; passkey dormant) | — |
-
-Note: `entrypoint.sh` currently only forces `YOUINC_DB_PATH`/`YOUINC_RULES_PATH` onto
-`/data`; the leads/feedback/auth SQLite paths default to `../data/...` which
-resolves onto `/data` only by cwd coincidence. Make all SQLite paths explicit onto
-`$DATA_DIR` so persistence does not depend on the process working directory.
+| **Runtime env** | `NODE_ENV=production`, `PORT=3000` | `fly.toml [env]` |
+| **Deliberately NOT set** | `service_role` key (unused), all `YOUINC_*_DB_PATH` (no SQLite), `YOUINC_ENROLLMENT_TOKEN` / `YOUINC_RP_*` (passkey retired) | — |
 
 ## Email (Resend → Supabase custom SMTP)
 
@@ -109,26 +146,34 @@ resolves onto `/data` only by cwd coincidence. Make all SQLite paths explicit on
 - Run `supabase/tests/rls_isolation.sql`, `classification_rules_isolation.sql`,
   `self_registration.sql`, `akahu_connection.sql`, `akahu_sync_log.sql` **against the
   cloud project** post-migration — verifying RLS is *enforced*, not merely present.
+- Add a test for the new `leads`/`feedback` tables: anon can call the RPCs but **cannot**
+  `SELECT` the tables directly.
 - Confirm Vault-backed Akahu token RPCs work on cloud (Vault available on all projects).
 - Confirm no `service_role` key is shipped to the client bundle or committed.
 
 ## Implementation sequence (tightest constraint first)
 
-1. **Supabase Cloud**: create project (`syd`) → `supabase link` → `supabase db push`
-   → run RLS/isolation SQL tests against cloud → configure Auth (Site URL, redirect
-   URLs) → configure custom SMTP (after step 2).
-2. **Resend**: sign up, verify `hamishburke.dev`, get API key.
-3. **Repo changes**: Dockerfile build-args (`VITE_SUPABASE_*`); `entrypoint.sh` explicit
-   SQLite paths onto `/data`; fix `fly.toml` (`[build.args]`, drop stale Basic Auth
-   framing, confirm mounts/env).
-4. **Fly app**: create app + 1 GB volume (`syd`), set runtime secrets.
-5. **Manual `fly deploy`**: add `youinc.hamishburke.dev` custom domain + DNS CNAME,
-   verify end-to-end — signup → confirmation email → onboarding → workspace; concierge
-   leads form persists; live RLS isolation between two test tenants.
-6. **CI**: create scoped `FLY_API_TOKEN`, add as GitHub Actions secret — **last**, so a
+1. **Repo — statelessness refactor (local, test against `supabase start`):**
+   new migration for `leads`/`feedback` tables + anon-callable RPCs; rewrite
+   `server/leads.ts` + `server/feedback.ts` onto Supabase; retire passkey path
+   (`auth.ts`, `/login`, enrolment/RP env) + `server/migration/`; drop `better-sqlite3`;
+   simplify Dockerfile (no native toolchain) + `entrypoint.sh` (no volume seeding); add
+   Dockerfile build-args; fix `fly.toml` (`[build.args]`, remove `[[mounts]]`, drop stale
+   Basic Auth framing). `pnpm build` + `pnpm test` green.
+2. **Supabase Cloud:** create project (`syd`) → `supabase link` → `supabase db push`
+   (now includes the leads/feedback migration) → run all SQL isolation tests against
+   cloud → configure Auth (Site URL, redirect URLs).
+3. **Resend:** sign up, verify `hamishburke.dev`, get API key → set Supabase custom SMTP.
+4. **Fly app:** create app (no volume), set build-args (via `fly.toml`) and runtime
+   secrets.
+5. **Manual `fly deploy`:** add `youinc.hamishburke.dev` custom domain + DNS CNAME,
+   verify end-to-end — signup → confirmation email → onboarding → workspace; a concierge
+   lead + a feedback vote land in Supabase; live RLS isolation between two test tenants;
+   confirm the deployed bundle points at the cloud Supabase URL (not localhost).
+6. **CI:** create scoped `FLY_API_TOKEN`, add as GitHub Actions secret — **last**, so a
    push to `main` (e.g. the docs commit) doesn't auto-deploy before prod is verified.
-7. **Docs**: rewrite `README.md` + `docs/deploy_fly.md` to the Supabase + Fly reality;
-   remove the "local-first SQLite ledger" and Basic Auth framing.
+7. **Docs:** rewrite `README.md` + `docs/deploy_fly.md` to the stateless Supabase + Fly
+   reality; remove the "local-first SQLite ledger", Basic Auth, and volume framing.
 
 ## Interactive hand-offs (owner runs; assistant guides)
 
@@ -136,30 +181,31 @@ Account- and machine-level steps that require the owner's interactive login/cred
 
 - `supabase login` + create the cloud project (+ set/confirm DB password, billing if needed).
 - Resend account signup + API key generation.
-- Adding DNS records (Fly custom-domain CNAME/A+AAAA; Resend SPF/DKIM; any Supabase records).
+- Adding DNS records (Fly custom-domain CNAME/A+AAAA; Resend SPF/DKIM).
 - `fly auth login` + payment method on the Fly account.
 - Creating the GitHub `FLY_API_TOKEN` Actions secret.
 
-The assistant owns: migrations, Dockerfile/`fly.toml`/`entrypoint.sh` edits, secrets
-*wiring* (commands), verification steps, and the docs rewrite.
+The assistant owns: the statelessness refactor + new migration, Dockerfile/`fly.toml`/
+`entrypoint.sh` edits, secrets *wiring* (commands), verification steps, and the docs rewrite.
 
 ## Out of scope (explicitly deferred)
 
 - Scheduled/background Akahu sync (currently on-demand per account). Needs its own
   hosting decision (GH Actions cron vs Supabase Edge Function + pg_cron vs Fly scheduled
-  machine).
+  machine). Now genuinely easy to add given a stateless app.
 - Email summary / "Monday Brief" delivery feature.
-- Migrating leads/feedback from SQLite to Supabase (possible future
-  simplification to make the app fully stateless and drop the Fly volume).
 - Recovering the deleted `data/youinc-ledger.sqlite3` (prod starts clean).
 
 ## Success criteria
 
 - `https://youinc.hamishburke.dev` serves the app over valid TLS.
+- The deployed bundle talks to the **cloud** Supabase project (not `127.0.0.1`).
 - A new user can sign up, receive + click a confirmation email, complete onboarding, and
   reach `/workspace` with their own RLS-isolated data.
 - Two tenants cannot see each other's data (verified live).
-- A concierge lead submitted via the site persists across a Machine stop/start.
+- A concierge lead and a feedback vote submitted via the site are stored in Supabase and
+  are **not** readable by the anon key directly.
 - Live Akahu sync works for a tenant who supplies their user token.
+- The container has **no volume** and no local SQLite; a Machine restart loses nothing.
 - Push to `main` (passing tests) auto-deploys via CI.
 - README/deploy docs accurately describe the deployed architecture.
