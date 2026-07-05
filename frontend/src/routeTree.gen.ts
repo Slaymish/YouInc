@@ -34,6 +34,7 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
+import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
 import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
 
@@ -162,6 +163,11 @@ const AuthConfirmRoute = AuthConfirmRouteImport.update({
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
+  id: '/admin/feedback',
+  path: '/admin/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAkahuCallbackRoute = ApiAkahuCallbackRouteImport.update({
   id: '/api/akahu/callback',
   path: '/api/akahu/callback',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRoute
+  '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/use-cases'
     | '/widgets'
     | '/workspace'
+    | '/admin/feedback'
     | '/auth/confirm'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/use-cases'
     | '/widgets'
     | '/workspace'
+    | '/admin/feedback'
     | '/auth/confirm'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/use-cases'
     | '/widgets'
     | '/workspace'
+    | '/admin/feedback'
     | '/auth/confirm'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
@@ -376,6 +388,7 @@ export interface RootRouteChildren {
   UseCasesRoute: typeof UseCasesRoute
   WidgetsRoute: typeof WidgetsRoute
   WorkspaceRoute: typeof WorkspaceRoute
+  AdminFeedbackRoute: typeof AdminFeedbackRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
   ApiAkahuOauthStartRoute: typeof ApiAkahuOauthStartRoute
@@ -558,6 +571,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/feedback': {
+      id: '/admin/feedback'
+      path: '/admin/feedback'
+      fullPath: '/admin/feedback'
+      preLoaderRoute: typeof AdminFeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/akahu/callback': {
       id: '/api/akahu/callback'
       path: '/api/akahu/callback'
@@ -600,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   UseCasesRoute: UseCasesRoute,
   WidgetsRoute: WidgetsRoute,
   WorkspaceRoute: WorkspaceRoute,
+  AdminFeedbackRoute: AdminFeedbackRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,
   ApiAkahuOauthStartRoute: ApiAkahuOauthStartRoute,
