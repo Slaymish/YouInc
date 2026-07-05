@@ -208,16 +208,16 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       "How YouInc protects bank data, account access, ledger data, exports, and support requests.",
     eyebrow: "Trust",
     heading: "Security at YouInc",
-    updated: "4 July 2026",
+    updated: "5 July 2026",
     subheading:
       "YouInc handles sensitive financial data, so the security model starts with least-privilege access, read-only bank connections, per-user data separation, clear export controls, and founder-accountable support. This page describes today's posture honestly and marks what is still planned.",
     sections: [
       {
         title: "How sign-in works",
         items: [
-          "Live product access is gated behind passkey (WebAuthn) sign-in. There is no reusable password to phish, leak, or reuse.",
-          "Authenticated routes redirect to sign-in until you present your passkey; only the public marketing and demo pages are open.",
-          "The app is served over HTTPS, which WebAuthn requires, so credentials are bound to the YouInc origin.",
+          "Accounts use email + password sign-in, and new signups must confirm their email address before the workspace unlocks.",
+          "Every workspace is isolated at the database level by row-level security, so you only ever see your own tenant's data — never another customer's.",
+          "The app is served over HTTPS and sessions are held in secure, HTTP-only cookies bound to the YouInc origin.",
         ],
       },
       {
