@@ -11,8 +11,8 @@ primary_region = 'syd'
   # runtime secrets. Both are public-safe (anon key is RLS-gated). Set these to
   # your Supabase Cloud project's values before deploying (Part B, Task 11).
   [build.args]
-    VITE_SUPABASE_URL = 'https://REPLACE.supabase.co'
-    VITE_SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY'
+    VITE_SUPABASE_URL = 'https://pntzvqetnovptiezirxt.supabase.co'
+    VITE_SUPABASE_ANON_KEY = 'sb_publishable_MzJJuRrRLPXEvpi04S-ANA_O8JTOltG'
 
 [env]
   NODE_ENV = 'production'
