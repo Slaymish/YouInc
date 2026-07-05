@@ -2,15 +2,19 @@
 
 # ---------------------------------------------------------------------------
 # Stage 1: build the TanStack Start frontend (vite build + nitro server).
-# better-sqlite3's native binding is compiled here, on the same base image
-# used at runtime, so the prebuilt binary is ABI-compatible at runtime.
+# No native modules to compile (better-sqlite3 removed), so no python/make/g++.
+# VITE_SUPABASE_* are inlined by Vite at build time, so they MUST arrive as
+# build-args here (Fly runtime secrets would be too late). Both are public-safe
+# (anon key is RLS-gated); baking them into the image is intended.
 # ---------------------------------------------------------------------------
 FROM node:22-bookworm-slim AS frontend-build
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 make g++ && \
-    rm -rf /var/lib/apt/lists/* && \
-    npm install -g pnpm@10.33.0
+RUN npm install -g pnpm@10.33.0
+
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
+    VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
@@ -20,25 +24,18 @@ COPY frontend/ ./
 RUN pnpm build
 
 # ---------------------------------------------------------------------------
-# Stage 2: runtime image. Node runs the built Nitro server.
+# Stage 2: runtime image. Node runs the built Nitro server. Stateless — no
+# volume, no SQLite, all persistence is Supabase over the network.
 # ---------------------------------------------------------------------------
 FROM node:22-bookworm-slim AS runtime
 
 WORKDIR /app
 
-# Default rules.yaml, seeded onto the persistent data volume by entrypoint.sh
-# on first boot.
-COPY config ./config
-
-# Built frontend, including the Nitro server and its traced node_modules
-# (e.g. better-sqlite3) from the build stage.
 COPY --from=frontend-build /app/frontend/.output ./frontend/.output
-
 COPY docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-ENV YOUINC_PROJECT_ROOT=/app \
-    NODE_ENV=production \
+ENV NODE_ENV=production \
     PORT=3000
 
 EXPOSE 3000

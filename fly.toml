@@ -1,7 +1,5 @@
-# fly.toml app configuration file generated for youinc on 2026-07-05T05:29:06Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# Fly.io app configuration for YouInc (stateless).
+# See docs/deploy_fly.md for the full walkthrough.
 
 app = 'youinc'
 primary_region = 'syd'
@@ -9,16 +7,19 @@ primary_region = 'syd'
 [build]
   dockerfile = 'Dockerfile'
 
+  # VITE_SUPABASE_* are inlined at build time — they MUST be build-args, not
+  # runtime secrets. Both are public-safe (anon key is RLS-gated). Set these to
+  # your Supabase Cloud project's values before deploying (Part B, Task 11).
+  [build.args]
+    VITE_SUPABASE_URL = 'https://REPLACE.supabase.co'
+    VITE_SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY'
+
 [env]
   NODE_ENV = 'production'
   PORT = '3000'
 
-[[mounts]]
-  source = 'youinc_data'
-  destination = '/data'
-
 [http_service]
-  internal_port = 8080
+  internal_port = 3000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
