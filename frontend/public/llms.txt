@@ -1,0 +1,40 @@
+# YouInc
+
+> YouInc turns your connected accounts into a live double-entry ledger, then renders it as an executive dashboard — net worth, cashflow, runway, income, expenses, and exceptions.
+
+YouInc is a founder-led, New Zealand-built personal finance ledger. Bank sync runs read-only through Akahu, manual accounts cover anything a bank feed can't see, and the full ledger exports as portable, hledger-compatible plain-text journals — no lock-in.
+
+## Product
+
+- [Home](https://youinc.hamishburke.dev/): Run yourself like a company — the YouInc landing page.
+- [Live demo](https://youinc.hamishburke.dev/demo): The real dashboard shell and widgets running on sample data, no sign-up required.
+- [Widget library](https://youinc.hamishburke.dev/widgets): Every YouInc dashboard widget, rendered live on sample data.
+- [Custom builds](https://youinc.hamishburke.dev/custom-builds): Bespoke widgets, integrations, and AI agents built on your live YouInc ledger.
+- [Integrations](https://youinc.hamishburke.dev/integrations): How YouInc connects to Akahu, supported banks, manual accounts, exports, and custom integrations.
+- [Use cases](https://youinc.hamishburke.dev/use-cases): Example ways people can use YouInc for net worth, runway, cashflow, manual accounts, and custom finance views.
+- [Compare](https://youinc.hamishburke.dev/compare): How YouInc compares with budgeting apps, spreadsheets, personal finance apps, and accounting tools.
+
+## Pricing
+
+- [Pricing](https://youinc.hamishburke.dev/pricing): Compare YouInc's Demo, Self-serve, and Concierge plans feature by feature, including live sync, exports, support, and bespoke work.
+- [Create an account](https://youinc.hamishburke.dev/signup): Start a free self-serve workspace — no card required.
+
+## Docs
+
+- [Documentation](https://youinc.hamishburke.dev/docs): V1 YouInc documentation for setup, bank sync, ledgers, widgets, exports, and support.
+- [Help center](https://youinc.hamishburke.dev/help): V1 help center for common YouInc questions around access, bank sync, widgets, exports, and support.
+- [Changelog](https://youinc.hamishburke.dev/changelog): A v1 changelog showing how YouInc is changing over time.
+- [Roadmap](https://youinc.hamishburke.dev/roadmap): The v1 public roadmap for YouInc product, integrations, documentation, and trust work.
+- [Status](https://youinc.hamishburke.dev/status): Current v1 service status for YouInc app availability, bank sync, demo, and support.
+
+## Company
+
+- [About](https://youinc.hamishburke.dev/about): The story and operating principles behind YouInc, a founder-led personal finance ledger product.
+- [Contact](https://youinc.hamishburke.dev/contact): Contact YouInc for support, security reports, privacy requests, billing questions, and custom build discussions.
+- [Security](https://youinc.hamishburke.dev/security): How YouInc protects bank data, account access, ledger data, exports, and support requests.
+
+## Legal
+
+- [Privacy](https://youinc.hamishburke.dev/privacy): How YouInc collects, uses, stores, and deletes personal and financial data.
+- [Terms](https://youinc.hamishburke.dev/terms): The v1 terms for using YouInc, including subscriptions, custom builds, data exports, and important disclaimers.
+- [Data deletion](https://youinc.hamishburke.dev/data-deletion): How to export, disconnect, and delete YouInc financial data and account records.

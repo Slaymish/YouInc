@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /workspace
+Disallow: /onboarding
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://youinc.hamishburke.dev/sitemap.xml

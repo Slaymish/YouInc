@@ -24,7 +24,21 @@ interface StaticPageSection {
   items?: readonly ReactNode[];
 }
 
-interface StaticPageData {
+/** A plain-text question/answer pair for `FAQPage` JSON-LD. Kept separate
+ * from `sections` because schema.org needs plain strings, while `sections`
+ * content is rich JSX (links, formatting) meant for on-page rendering. */
+export interface FaqEntry {
+  question: string;
+  answer: string;
+}
+
+/** Declares which schema.org node type `staticPageHead` should emit for a
+ * page. Defaults to a baseline `WebPage` when omitted — see
+ * `staticPageRoute.tsx`. Only pages that are genuinely a list of questions
+ * and answers should use `FAQPage`. */
+export type StaticPageSchema = { kind: "WebPage" } | { kind: "FAQPage"; questions: readonly FaqEntry[] };
+
+export interface StaticPageData {
   title: string;
   description: string;
   eyebrow: string;
@@ -32,6 +46,7 @@ interface StaticPageData {
   subheading: ReactNode;
   updated?: string;
   sections: readonly StaticPageSection[];
+  schema?: StaticPageSchema;
   cta?: {
     label: string;
     href: string;
@@ -470,6 +485,48 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     heading: "Help and support",
     subheading:
       "Short, honest answers to the questions people ask most before and during early access. If your question is not here, email and ask.",
+    // Plain-text mirror of the sections below, for FAQPage JSON-LD — schema.org
+    // needs strings, while the sections' `body`/`items` are rich JSX for
+    // on-page rendering (links, formatting). Keep the two in sync.
+    schema: {
+      kind: "FAQPage",
+      questions: [
+        {
+          question: "How do I get access?",
+          answer:
+            "The demo is public, uses sample data, and needs no sign-up. Self-serve accounts are open: create an account, name your workspace, and connect your accounts when you're ready. Concierge users can book a call to scope custom dashboards, integrations, or ledger-aware automation.",
+        },
+        {
+          question: "How do I sign in?",
+          answer:
+            "Live access uses a passkey (WebAuthn) rather than a password, so sign-in relies on your device's biometrics or PIN. There is no password to reset; if you lose access to your passkey, contact support to recover your account.",
+        },
+        {
+          question: "Is my bank login safe?",
+          answer:
+            "Live bank sync runs through Akahu and is read-only. YouInc never sees or stores your online-banking password. You choose which accounts to share and can revoke access from Akahu at any time.",
+        },
+        {
+          question: "Which banks and accounts are supported?",
+          answer:
+            "Live sync currently covers New Zealand accounts available through Akahu. Anything without a feed — property, KiwiSaver, vehicles, private loans — can be tracked as a manual account.",
+        },
+        {
+          question: "Can I get my data out?",
+          answer:
+            "Yes. Export your full ledger as plain-text accounting journals at any time — there is no lock-in. Do this before you cancel or delete.",
+        },
+        {
+          question: "How do I cancel or delete my account?",
+          answer:
+            "Cancelling stops billing; deletion removes your data. They are separate — you can cancel and keep your data, or ask for full deletion. Export first if you want a copy.",
+        },
+        {
+          question: "Still stuck?",
+          answer: `Email ${DEFAULT_EMAIL} or book a call. Include the page and your account email if it is a bug or sync issue.`,
+        },
+      ],
+    },
     sections: [
       {
         title: "How do I get access?",
@@ -644,6 +701,9 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     description: "A v1 changelog showing how YouInc is changing over time.",
     eyebrow: "Product updates",
     heading: "Changelog",
+    // Mirrors the most recent dated entry below (see the "5 July 2026"
+    // section) — used as the WebPage's `dateModified` in JSON-LD.
+    updated: "5 July 2026",
     subheading:
       "A public record that YouInc is maintained. Keep this factual, dated, and tied to user-visible changes.",
     sections: [

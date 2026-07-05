@@ -3,10 +3,47 @@ import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { MarketingHeader } from "~/components/marketing/MarketingHeader";
 import { MarketingFooter } from "~/components/marketing/MarketingFooter";
 import { PricingTable } from "~/components/marketing/PricingTable";
+import { PRICING } from "~/components/marketing/config";
+import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
+import { SITE_URL } from "~/lib/sitemap";
 import "~/components/marketing/marketing-tokens.css";
 import "~/components/marketing/marketing-shared.css";
 import "~/components/marketing/PricingTable.css";
 import "~/components/marketing/pricing-page.css";
+
+// Pulls the numeric NZD amount out of the display strings already pinned by
+// config.test.ts ("NZD $15", "From NZD $149", "Free") — never restates the
+// price itself, just extracts it for the Offer schema below.
+function parseNzdAmount(price: string): number {
+  const match = /([\d,.]+)/.exec(price);
+  return match ? Number(match[1].replace(/,/g, "")) : 0;
+}
+
+const PRICING_URL = `${SITE_URL}/pricing`;
+
+const PRICING_JSON_LD = jsonLdScript(
+  jsonLdGraph([
+    {
+      "@type": "Product",
+      name: "YouInc",
+      description:
+        "Personal finance ledger and executive dashboard with live bank sync via Akahu, manual accounts, and plain-text ledger exports.",
+      url: PRICING_URL,
+      offers: [PRICING.demo, PRICING.selfServe, PRICING.concierge].map((tier) => ({
+        "@type": "Offer",
+        name: tier.name,
+        price: parseNzdAmount(tier.price),
+        priceCurrency: "NZD",
+        url: PRICING_URL,
+        description: tier.features.join("; "),
+      })),
+    },
+    breadcrumbList(SITE_URL, [
+      { name: "Home", path: "/" },
+      { name: "Pricing", path: "/pricing" },
+    ]),
+  ]),
+);
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -18,6 +55,7 @@ export const Route = createFileRoute("/pricing")({
           "Compare YouInc's Demo, Self-serve, and Concierge plans feature by feature, including live sync, exports, support, and bespoke work.",
       },
     ],
+    scripts: [PRICING_JSON_LD],
   }),
   component: PricingPage,
 });

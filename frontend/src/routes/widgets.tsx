@@ -16,10 +16,30 @@ import { noop } from "~/components/marketing/noop";
 import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { MarketingHeader } from "~/components/marketing/MarketingHeader";
 import { MarketingFooter } from "~/components/marketing/MarketingFooter";
+import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
+import { SITE_URL } from "~/lib/sitemap";
 import "~/components/dashboard/dashboard.css";
 import "~/components/marketing/marketing-tokens.css";
 import "~/components/marketing/marketing-shared.css";
 import "~/components/marketing/widgets.css";
+
+const WIDGETS_JSON_LD = jsonLdScript(
+  jsonLdGraph([
+    {
+      "@type": "SoftwareApplication",
+      name: "YouInc widget library",
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Web",
+      description:
+        "Every YouInc dashboard widget, rendered live on sample data — net worth, runway, cashflow, balance sheet, ledger controls, and more.",
+      url: `${SITE_URL}/widgets`,
+    },
+    breadcrumbList(SITE_URL, [
+      { name: "Home", path: "/" },
+      { name: "Widget library", path: "/widgets" },
+    ]),
+  ]),
+);
 
 export const Route = createFileRoute("/widgets")({
   head: () => ({
@@ -31,6 +51,7 @@ export const Route = createFileRoute("/widgets")({
           "Every YouInc dashboard widget, rendered live on sample data — net worth, runway, cashflow, balance sheet, ledger controls, and more.",
       },
     ],
+    scripts: [WIDGETS_JSON_LD],
   }),
   component: WidgetLibraryPage,
 });

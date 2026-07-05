@@ -14,6 +14,7 @@ import { Route as WidgetsRouteImport } from './routes/widgets'
 import { Route as UseCasesRouteImport } from './routes/use-cases'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SecurityRouteImport } from './routes/security'
@@ -57,6 +58,11 @@ const TermsRoute = TermsRouteImport.update({
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/security': typeof SecurityRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/security': typeof SecurityRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/security': typeof SecurityRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/signin'
     | '/signup'
+    | '/sitemap.xml'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/signin'
     | '/signup'
+    | '/sitemap.xml'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/signin'
     | '/signup'
+    | '/sitemap.xml'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -334,6 +346,7 @@ export interface RootRouteChildren {
   SecurityRoute: typeof SecurityRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
   UseCasesRoute: typeof UseCasesRoute
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/status'
       fullPath: '/status'
       preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -534,6 +554,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityRoute: SecurityRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
   UseCasesRoute: UseCasesRoute,

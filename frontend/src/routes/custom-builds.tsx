@@ -4,12 +4,48 @@ import { useLightTheme } from "~/components/marketing/useLightTheme";
 import { MarketingHeader } from "~/components/marketing/MarketingHeader";
 import { MarketingFooter } from "~/components/marketing/MarketingFooter";
 import { ConciergeShowcase } from "~/components/marketing/ConciergeShowcase";
+import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
+import { SITE_URL } from "~/lib/sitemap";
 import "~/components/marketing/marketing-tokens.css";
 import "~/components/marketing/marketing-shared.css";
 // Reuses `.steps__list` / `.step*` (HowItWorks.css) for its own 4-step
 // engagement list, widened via the `.cb-steps` override in custom-builds.css.
 import "~/components/marketing/HowItWorks.css";
 import "~/components/marketing/custom-builds.css";
+
+const CUSTOM_BUILDS_JSON_LD = jsonLdScript(
+  jsonLdGraph([
+    {
+      "@type": "Product",
+      name: "YouInc Concierge custom builds",
+      description:
+        "Bespoke widgets, integrations, and AI agents built on your live YouInc ledger by the person who built the product.",
+      url: `${SITE_URL}/custom-builds`,
+      offers: [
+        {
+          "@type": "Offer",
+          name: "Scoped one-off build",
+          price: 1500,
+          priceCurrency: "NZD",
+          url: `${SITE_URL}/custom-builds`,
+          description: "A defined widget, integration, or agent — fixed quote up front.",
+        },
+        {
+          "@type": "Offer",
+          name: PRICING.concierge.name,
+          price: 149,
+          priceCurrency: "NZD",
+          url: `${SITE_URL}/custom-builds`,
+          description: PRICING.concierge.features.join("; "),
+        },
+      ],
+    },
+    breadcrumbList(SITE_URL, [
+      { name: "Home", path: "/" },
+      { name: "Custom builds", path: "/custom-builds" },
+    ]),
+  ]),
+);
 
 export const Route = createFileRoute("/custom-builds")({
   head: () => ({
@@ -21,6 +57,7 @@ export const Route = createFileRoute("/custom-builds")({
           "Bespoke widgets, integrations, and AI agents built on your live YouInc ledger by the person who built the product.",
       },
     ],
+    scripts: [CUSTOM_BUILDS_JSON_LD],
   }),
   component: CustomBuildsPage,
 });
