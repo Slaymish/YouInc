@@ -32,11 +32,16 @@ test("signin with an unconfirmed account shows the resend option", async ({
     });
   });
 
+  // Multi-step sign-in: step 1 email → step 2 password. With no local Supabase
+  // stack the flow service is unreachable, so step 1 degrades to the
+  // password-only path (email carried in the URL) — which is exactly the path
+  // this test exercises (the browser→GoTrue call is stubbed above).
   await page.goto("/signin");
   await page.waitForLoadState("networkidle");
   await page.getByLabel("Email").fill("unverified@example.com");
-  await page.getByLabel("Password").fill("supersecret123");
-  await page.getByRole("button", { name: /sign in/i }).click();
+  await page.getByRole("button", { name: /continue/i }).click();
+  await page.getByLabel("Password", { exact: true }).fill("supersecret123");
+  await page.getByRole("button", { name: /^sign in/i }).click();
 
   await expect(page.getByText(/isn't verified yet/i)).toBeVisible();
   // Match loosely on "resend" rather than the full label: once clicked, the
@@ -81,8 +86,9 @@ test("signin with the wrong password still shows the generic error (no regressio
   await page.goto("/signin");
   await page.waitForLoadState("networkidle");
   await page.getByLabel("Email").fill("someone@example.com");
-  await page.getByLabel("Password").fill("wrongpassword");
-  await page.getByRole("button", { name: /sign in/i }).click();
+  await page.getByRole("button", { name: /continue/i }).click();
+  await page.getByLabel("Password", { exact: true }).fill("wrongpassword");
+  await page.getByRole("button", { name: /^sign in/i }).click();
 
   await expect(page.getByText(/invalid login credentials/i)).toBeVisible();
   await expect(page.getByRole("button", { name: /resend/i })).toHaveCount(0);

@@ -116,9 +116,13 @@
 .pricing-table__yes {
   color: var(--mk-accent);
   font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1;
 }
 .pricing-table__no {
   color: var(--mk-soft);
+  font-size: 1.5rem;
+  line-height: 1;
 }
 .pricing-table__note {
   color: var(--mk-soft);

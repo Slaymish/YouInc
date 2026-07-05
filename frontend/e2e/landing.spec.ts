@@ -24,12 +24,14 @@ test("hero 'Start free' CTA routes to the signup flow", async ({ page }) => {
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /create your youinc account/i,
+      name: /create your account/i,
     }),
   ).toBeVisible();
-  // The signup form collects the essentials for self-service onboarding.
+  // Multi-step signup: step 1 asks only for the email, then advances.
   await expect(page.getByLabel("Email")).toBeVisible();
-  await expect(page.getByLabel("Password")).toBeVisible();
+  await expect(page.getByRole("button", { name: /continue/i })).toBeVisible();
+  // Password is collected on a later step, not on the first screen.
+  await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
 });
 
 test("signup page links back to sign-in and to the demo", async ({ page }) => {

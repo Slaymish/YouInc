@@ -28,7 +28,12 @@ test.describe(
       await page.goto("/signup");
       await page.waitForLoadState("networkidle");
       await page.getByLabel("Email").fill(email);
-      await page.getByLabel("Password").fill("supersecret123");
+      await page.getByRole("button", { name: /continue/i }).click();
+      // Step 2: name (optional) — skip straight through.
+      await page.getByRole("button", { name: /continue/i }).click();
+      // Step 3: choose the password branch instead of creating a passkey.
+      await page.getByRole("link", { name: /use a password instead/i }).click();
+      await page.getByLabel("Password", { exact: true }).fill("supersecret123");
       await page.getByRole("button", { name: /create account/i }).click();
       await expect(page).toHaveURL(/\/onboarding$/);
       await page.getByRole("button", { name: /let's go/i }).click();

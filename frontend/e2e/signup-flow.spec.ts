@@ -1,6 +1,34 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import http from "node:http";
 import type { Server } from "node:http";
+
+// The signup UI is a multi-step flow (email → name → credential). This drives
+// the password branch of step 3 ("Use a password instead") end-to-end, landing
+// on /onboarding in dev (email confirmations off → live session).
+async function signUpWithPassword(
+  page: Page,
+  opts: { email: string; password: string; name?: string },
+) {
+  await page.goto("/signup");
+  await page.waitForLoadState("networkidle");
+  await page.getByLabel("Email").fill(opts.email);
+  await page.getByRole("button", { name: /continue/i }).click();
+
+  // Step 2: name (optional).
+  if (opts.name) {
+    const [first, ...rest] = opts.name.split(" ");
+    await page.getByLabel("First name").fill(first);
+    if (rest.length > 0) {
+      await page.getByLabel("Last name").fill(rest.join(" "));
+    }
+  }
+  await page.getByRole("button", { name: /continue/i }).click();
+
+  // Step 3: pick the password branch instead of creating a passkey.
+  await page.getByRole("link", { name: /use a password instead/i }).click();
+  await page.getByLabel("Password", { exact: true }).fill(opts.password);
+  await page.getByRole("button", { name: /create account/i }).click();
+}
 
 // End-to-end self-service signup → onboarding → workspace flow. This exercises
 // the real Supabase Auth + create_tenant RPC path, so it needs a running local
@@ -23,12 +51,7 @@ test.describe(
       const email = `e2e-signup-${Date.now()}@example.com`;
       const password = "supersecret123";
 
-      await page.goto("/signup");
-      await page.waitForLoadState("networkidle");
-      await page.getByLabel("Your name (optional)").fill("E2E User");
-      await page.getByLabel("Email").fill(email);
-      await page.getByLabel("Password").fill(password);
-      await page.getByRole("button", { name: /create account/i }).click();
+      await signUpWithPassword(page, { email, password, name: "E2E User" });
 
       // Onboarding welcome.
       await expect(page).toHaveURL(/\/onboarding$/);
@@ -63,11 +86,7 @@ test.describe(
       const password = "supersecret123";
 
       // Sign up and complete onboarding into a fresh workspace.
-      await page.goto("/signup");
-      await page.waitForLoadState("networkidle");
-      await page.getByLabel("Email").fill(email);
-      await page.getByLabel("Password").fill(password);
-      await page.getByRole("button", { name: /create account/i }).click();
+      await signUpWithPassword(page, { email, password });
       await expect(page).toHaveURL(/\/onboarding$/);
       await page.getByRole("button", { name: /let's go/i }).click();
       await page.getByLabel("Workspace name").fill("Ledger Holdings");
@@ -120,11 +139,7 @@ test.describe(
       const email = `e2e-ingest-${Date.now()}@example.com`;
       const password = "supersecret123";
 
-      await page.goto("/signup");
-      await page.waitForLoadState("networkidle");
-      await page.getByLabel("Email").fill(email);
-      await page.getByLabel("Password").fill(password);
-      await page.getByRole("button", { name: /create account/i }).click();
+      await signUpWithPassword(page, { email, password });
       await expect(page).toHaveURL(/\/onboarding$/);
       await page.getByRole("button", { name: /let's go/i }).click();
       await page.getByLabel("Workspace name").fill("Ingest Co");
@@ -245,11 +260,10 @@ test.describe(
 
       try {
         const email = `e2e-akahu-${Date.now()}@example.com`;
-        await page.goto("/signup");
-        await page.waitForLoadState("networkidle");
-        await page.getByLabel("Email").fill(email);
-        await page.getByLabel("Password").fill("supersecret123");
-        await page.getByRole("button", { name: /create account/i }).click();
+        await signUpWithPassword(page, {
+          email,
+          password: "supersecret123",
+        });
         await expect(page).toHaveURL(/\/onboarding$/);
         await page.getByRole("button", { name: /let's go/i }).click();
         await page.getByLabel("Workspace name").fill("Akahu Co");

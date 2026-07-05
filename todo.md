@@ -144,8 +144,11 @@ Done:
   only copy of ~170 real transactions. Flagged to the user; holding here pending their call on
   recovery/acceptance before this line is trusted as done.
 - [ ] Improve SEO/GEO for whole site. Make it act as a knowledge graph, using Json-LD schema.org types to define the site's structure and content, and link to other pages from others. This includes making auto generated sitemap.xml, llms.txt
-- [ ] Change the free mode to be different to the demo. The 'free' tier should also provide all the widgets, but only manual accounts can be used. Essentially the self-serve tier is paying for that live connection.
-- [ ] Maybe make the email confirmation send a 6-digit code to the user's email address instead of a link, and then the confirm email screen allows them to enter it there. Ensure the state where the user tries to sign in but isn't reverified yet is handled (eg allow the to resend the verification email, so they don't get stuck)
+- [X] Change the free mode to be different to the demo. The 'free' tier should also provide all the widgets, but only manual accounts can be used. Essentially the self-serve tier is paying for that live connection.
+- [ ] Implement stripe/payment gating for features.
+- [ ] Maybe make the email confirmation send a 6-digit code to the user's email address instead of a link, and then the confirm email screen allows them to enter it there. 
+- [X] Ensure the state where the user tries to sign in but isn't reverified yet is handled
+- [X] Allow the user to resend the verification email, so they don't get stuck
 - [ ] Integrate Affiliate Tracking with Stripe Webhooks: Update the signup/checkout workflow to grab the ref URL parameter from local storage and pass it as affiliate_id inside the Stripe Checkout Session metadata object; then, create a /api/webhooks/stripe endpoint that listens for the invoice.paid event, extracts the affiliate_id, calculates the 50% commission split from the total amount paid, and logs the pending payout into a new commissions database ledger with a 30-day payout delay buffer.
 
 ***

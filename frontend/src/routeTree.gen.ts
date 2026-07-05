@@ -33,6 +33,12 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SignupIndexRouteImport } from './routes/signup.index'
+import { Route as SigninIndexRouteImport } from './routes/signin.index'
+import { Route as SignupPasswordRouteImport } from './routes/signup.password'
+import { Route as SignupNameRouteImport } from './routes/signup.name'
+import { Route as SignupCredentialRouteImport } from './routes/signup.credential'
+import { Route as SigninPasswordRouteImport } from './routes/signin.password'
 import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
@@ -158,6 +164,36 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupIndexRoute = SignupIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SignupRoute,
+} as any)
+const SigninIndexRoute = SigninIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SigninRoute,
+} as any)
+const SignupPasswordRoute = SignupPasswordRouteImport.update({
+  id: '/password',
+  path: '/password',
+  getParentRoute: () => SignupRoute,
+} as any)
+const SignupNameRoute = SignupNameRouteImport.update({
+  id: '/name',
+  path: '/name',
+  getParentRoute: () => SignupRoute,
+} as any)
+const SignupCredentialRoute = SignupCredentialRouteImport.update({
+  id: '/credential',
+  path: '/credential',
+  getParentRoute: () => SignupRoute,
+} as any)
+const SigninPasswordRoute = SigninPasswordRouteImport.update({
+  id: '/password',
+  path: '/password',
+  getParentRoute: () => SigninRoute,
+} as any)
 const AuthConfirmRoute = AuthConfirmRouteImport.update({
   id: '/auth/confirm',
   path: '/auth/confirm',
@@ -196,8 +232,8 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
-  '/signin': typeof SigninRoute
-  '/signup': typeof SignupRoute
+  '/signin': typeof SigninRouteWithChildren
+  '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
@@ -206,6 +242,12 @@ export interface FileRoutesByFullPath {
   '/workspace': typeof WorkspaceRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/signin/password': typeof SigninPasswordRoute
+  '/signup/credential': typeof SignupCredentialRoute
+  '/signup/name': typeof SignupNameRoute
+  '/signup/password': typeof SignupPasswordRoute
+  '/signin/': typeof SigninIndexRoute
+  '/signup/': typeof SignupIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -226,8 +268,6 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
-  '/signin': typeof SigninRoute
-  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
@@ -236,6 +276,12 @@ export interface FileRoutesByTo {
   '/workspace': typeof WorkspaceRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/signin/password': typeof SigninPasswordRoute
+  '/signup/credential': typeof SignupCredentialRoute
+  '/signup/name': typeof SignupNameRoute
+  '/signup/password': typeof SignupPasswordRoute
+  '/signin': typeof SigninIndexRoute
+  '/signup': typeof SignupIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -257,8 +303,8 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
-  '/signin': typeof SigninRoute
-  '/signup': typeof SignupRoute
+  '/signin': typeof SigninRouteWithChildren
+  '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
@@ -267,6 +313,12 @@ export interface FileRoutesById {
   '/workspace': typeof WorkspaceRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/signin/password': typeof SigninPasswordRoute
+  '/signup/credential': typeof SignupCredentialRoute
+  '/signup/name': typeof SignupNameRoute
+  '/signup/password': typeof SignupPasswordRoute
+  '/signin/': typeof SigninIndexRoute
+  '/signup/': typeof SignupIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -299,6 +351,12 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/admin/feedback'
     | '/auth/confirm'
+    | '/signin/password'
+    | '/signup/credential'
+    | '/signup/name'
+    | '/signup/password'
+    | '/signin/'
+    | '/signup/'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
@@ -319,8 +377,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/roadmap'
     | '/security'
-    | '/signin'
-    | '/signup'
     | '/sitemap.xml'
     | '/status'
     | '/terms'
@@ -329,6 +385,12 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/admin/feedback'
     | '/auth/confirm'
+    | '/signin/password'
+    | '/signup/credential'
+    | '/signup/name'
+    | '/signup/password'
+    | '/signin'
+    | '/signup'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   id:
@@ -359,6 +421,12 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/admin/feedback'
     | '/auth/confirm'
+    | '/signin/password'
+    | '/signup/credential'
+    | '/signup/name'
+    | '/signup/password'
+    | '/signin/'
+    | '/signup/'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
@@ -380,8 +448,8 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RoadmapRoute: typeof RoadmapRoute
   SecurityRoute: typeof SecurityRoute
-  SigninRoute: typeof SigninRoute
-  SignupRoute: typeof SignupRoute
+  SigninRoute: typeof SigninRouteWithChildren
+  SignupRoute: typeof SignupRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
@@ -564,6 +632,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup/': {
+      id: '/signup/'
+      path: '/'
+      fullPath: '/signup/'
+      preLoaderRoute: typeof SignupIndexRouteImport
+      parentRoute: typeof SignupRoute
+    }
+    '/signin/': {
+      id: '/signin/'
+      path: '/'
+      fullPath: '/signin/'
+      preLoaderRoute: typeof SigninIndexRouteImport
+      parentRoute: typeof SigninRoute
+    }
+    '/signup/password': {
+      id: '/signup/password'
+      path: '/password'
+      fullPath: '/signup/password'
+      preLoaderRoute: typeof SignupPasswordRouteImport
+      parentRoute: typeof SignupRoute
+    }
+    '/signup/name': {
+      id: '/signup/name'
+      path: '/name'
+      fullPath: '/signup/name'
+      preLoaderRoute: typeof SignupNameRouteImport
+      parentRoute: typeof SignupRoute
+    }
+    '/signup/credential': {
+      id: '/signup/credential'
+      path: '/credential'
+      fullPath: '/signup/credential'
+      preLoaderRoute: typeof SignupCredentialRouteImport
+      parentRoute: typeof SignupRoute
+    }
+    '/signin/password': {
+      id: '/signin/password'
+      path: '/password'
+      fullPath: '/signin/password'
+      preLoaderRoute: typeof SigninPasswordRouteImport
+      parentRoute: typeof SigninRoute
+    }
     '/auth/confirm': {
       id: '/auth/confirm'
       path: '/auth/confirm'
@@ -595,6 +705,36 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SigninRouteChildren {
+  SigninPasswordRoute: typeof SigninPasswordRoute
+  SigninIndexRoute: typeof SigninIndexRoute
+}
+
+const SigninRouteChildren: SigninRouteChildren = {
+  SigninPasswordRoute: SigninPasswordRoute,
+  SigninIndexRoute: SigninIndexRoute,
+}
+
+const SigninRouteWithChildren =
+  SigninRoute._addFileChildren(SigninRouteChildren)
+
+interface SignupRouteChildren {
+  SignupCredentialRoute: typeof SignupCredentialRoute
+  SignupNameRoute: typeof SignupNameRoute
+  SignupPasswordRoute: typeof SignupPasswordRoute
+  SignupIndexRoute: typeof SignupIndexRoute
+}
+
+const SignupRouteChildren: SignupRouteChildren = {
+  SignupCredentialRoute: SignupCredentialRoute,
+  SignupNameRoute: SignupNameRoute,
+  SignupPasswordRoute: SignupPasswordRoute,
+  SignupIndexRoute: SignupIndexRoute,
+}
+
+const SignupRouteWithChildren =
+  SignupRoute._addFileChildren(SignupRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -612,8 +752,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RoadmapRoute: RoadmapRoute,
   SecurityRoute: SecurityRoute,
-  SigninRoute: SigninRoute,
-  SignupRoute: SignupRoute,
+  SigninRoute: SigninRouteWithChildren,
+  SignupRoute: SignupRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
