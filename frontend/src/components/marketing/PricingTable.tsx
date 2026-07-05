@@ -7,6 +7,7 @@
 // in an overflow-x:auto container so a narrow viewport scrolls the table
 // instead of the page.
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { BOOKING_URL, PRICING, PRICING_COMPARISON } from "./config";
 import { StartFreeCta } from "./StartFreeCta";
 import "./PricingTable.css";
@@ -40,8 +41,9 @@ export function PricingTable() {
     <div className="pricing-table__scroll">
       <table className="pricing-table">
         <caption className="pricing-table__caption">
-          Compare {PRICING.demo.name}, {PRICING.selfServe.name}, and{" "}
-          {PRICING.concierge.name} feature by feature.
+          Compare {PRICING.demo.name}, {PRICING.free.name},{" "}
+          {PRICING.selfServe.name}, and {PRICING.concierge.name} feature by
+          feature.
         </caption>
         <thead>
           <tr>
@@ -54,6 +56,17 @@ export function PricingTable() {
               </span>
               <span className="pricing-table__tier-price">
                 {PRICING.demo.price}
+              </span>
+            </th>
+            <th scope="col">
+              <span className="pricing-table__tier-name">
+                {PRICING.free.name}
+              </span>
+              <span className="pricing-table__tier-price">
+                {PRICING.free.price}
+                <span className="pricing-table__cadence">
+                  {PRICING.free.cadence}
+                </span>
               </span>
             </th>
             <th scope="col" className="pricing-table__featured">
@@ -91,6 +104,11 @@ export function PricingTable() {
                 Open the demo →
               </a>
             </td>
+            <td>
+              <Link className="mk-btn mk-btn--ghost" to="/signup">
+                {PRICING.free.cta} →
+              </Link>
+            </td>
             <td className="pricing-table__featured">
               <StartFreeCta source="pricing-table" />
             </td>
@@ -110,6 +128,9 @@ export function PricingTable() {
               <th scope="row">{row.feature}</th>
               <td>
                 <ComparisonCell value={row.demo} />
+              </td>
+              <td>
+                <ComparisonCell value={row.free} />
               </td>
               <td className="pricing-table__featured">
                 <ComparisonCell value={row.selfServe} />

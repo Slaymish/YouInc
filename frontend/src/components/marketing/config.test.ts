@@ -19,7 +19,24 @@ describe("pricing + product copy", () => {
     expect(PRICING.concierge.price).toBe("From NZD $149");
   });
 
+  it("prices the signed-up free tier at $0", () => {
+    expect(PRICING.free.price).toBe("$0");
+  });
+
   it("names the product", () => {
     expect(PRODUCT.name).toBe("YouInc");
+  });
+
+  it("keeps the unauthenticated demo distinct from the signed-up free tier", () => {
+    // Demo = no account, sample data. Free = a real account, manual data.
+    // They must not collapse into the same tier name or CTA.
+    expect(PRICING.demo.name).not.toBe(PRICING.free.name);
+    expect(PRICING.free.name).toBe("Free");
+    expect(PRICING.demo.name).toBe("Demo");
+  });
+
+  it("gates live Akahu sync to self-serve and above, not the free tier", () => {
+    expect(PRICING.free.features).not.toContain("Live bank sync via Akahu");
+    expect(PRICING.selfServe.features).toContain("Live bank sync via Akahu");
   });
 });

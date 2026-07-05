@@ -1,11 +1,11 @@
 /* frontend/src/components/marketing/Pricing.css
  *
- * Landing teaser only (design-direction spec C8/E4). Three brief tiers, a
+ * Landing teaser only (design-direction spec C8/E4). Four brief tiers, a
  * "Compare all plans" link out to the full /pricing route + comparison
  * table. Test-pinned price strings render verbatim from PRICING; only the
  * layout/elevation here is new.
  */
-.pricing__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-grid, 1.5rem); }
+.pricing__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-grid, 1.5rem); }
 .tier {
   position: relative;
   background: var(--mk-surface-1, var(--mk-card));
@@ -52,7 +52,8 @@
 .pricing__compare a:hover,
 .pricing__compare a:focus-visible { border-color: var(--mk-ink); }
 .pricing__compare a:focus-visible { outline: 3px solid var(--mk-focus, #111); outline-offset: 2px; }
-@media (max-width: 900px) { .pricing__grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .pricing__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .pricing__grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) {
   .tier, .tier--featured { transition: none; }
   .tier:hover, .tier--featured:hover { transform: none; }

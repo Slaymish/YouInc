@@ -1,5 +1,6 @@
 import { useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import type {
   AkahuAccountSummary,
   AkahuConnectionStatus,
@@ -44,12 +45,25 @@ const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
+// Server errors that gate a plan-restricted action are prefixed
+// "TIER_RESTRICTED: " (see akahuConnection.ts connectAkahu) so callers could
+// branch on it without relying on the HTTP-ish status code, which doesn't
+// survive the server-fn serialization boundary. The UI already hides the
+// connect form for Free tenants, so this only surfaces if that check is
+// somehow bypassed — strip the marker and show the human sentence.
+const TIER_RESTRICTED_PREFIX = "TIER_RESTRICTED: ";
+
 function errorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (error && typeof error === "object" && "message" in error) {
-    return String((error as { message: unknown }).message);
-  }
-  return "Something went wrong — please try again.";
+  const raw = (() => {
+    if (error instanceof Error) return error.message;
+    if (error && typeof error === "object" && "message" in error) {
+      return String((error as { message: unknown }).message);
+    }
+    return "Something went wrong — please try again.";
+  })();
+  return raw.startsWith(TIER_RESTRICTED_PREFIX)
+    ? raw.slice(TIER_RESTRICTED_PREFIX.length)
+    : raw;
 }
 
 interface Props {
@@ -220,6 +234,19 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
               </>
             )
           ) : null}
+        </>
+      ) : !status.canConnectLive ? (
+        <>
+          <p className="akahu-panel__note">
+            Live bank sync via Akahu is a Self-serve feature. Your workspace is
+            on the Free plan — manual accounts only, with full access to every
+            widget.
+          </p>
+          <div className="akahu-panel__connect">
+            <Link className="auth-primary akahu-panel__connect-link" to="/pricing">
+              Upgrade to connect your bank live
+            </Link>
+          </div>
         </>
       ) : (
         <>

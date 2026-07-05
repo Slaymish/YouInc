@@ -10,11 +10,21 @@
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { throwServerError } from "./serverError";
 
+// Tenant-level product tier (billing/plan). 'free' = manual accounts only,
+// full widget access, no live Akahu sync — the default for brand-new
+// self-registered tenants since migration 20260705150001 (create_tenant used
+// to default to 'self-serve'; that's now an explicit, non-schema upgrade).
+// 'self-serve' = paid, adds live bank sync via Akahu. 'concierge' = bespoke,
+// operator-provisioned. Exported so other server modules (akahuConnection.ts)
+// can type their own tenant lookups against the same set of values instead of
+// re-declaring the union.
+export type TenantTier = "free" | "self-serve" | "concierge";
+
 export interface TenantSummary {
   id: string;
   name: string;
   slug: string;
-  tier: "self-serve" | "concierge";
+  tier: TenantTier;
   defaultCurrency: string;
 }
 
@@ -30,7 +40,7 @@ interface TenantRow {
   id: string;
   name: string;
   slug: string;
-  tier: "self-serve" | "concierge";
+  tier: TenantTier;
   default_currency: string;
 }
 
