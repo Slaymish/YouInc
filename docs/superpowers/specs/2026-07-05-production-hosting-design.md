@@ -50,9 +50,11 @@ One scale-to-zero Machine (`shared-cpu-1x`, 512 MB) running the built Nitro serv
 - **Fly Volume (1 GB) at `/data`** holds the *only* remaining runtime SQLite files:
   - `youinc-leads.sqlite3` — concierge lead capture (business-critical; must persist).
   - `youinc-feedback.sqlite3` — feedback submissions.
-  - analytics SQLite — usage analytics.
   - `youinc-auth.sqlite3` — dormant passkey store; pointed at `/data` defensively so a
     stray `/login` request cannot crash on an ephemeral/read-only path.
+
+  (`server/analytics.ts` is *financial* analytics — pure recurring/category math on
+  rows passed in; it opens no database and is not a runtime SQLite dependency.)
 - `min_machines_running = 0`, `auto_stop_machines = "stop"`, `auto_start_machines`:
   suspends when idle, wakes on request. Single machine (SQLite volume attaches to one).
 
@@ -84,11 +86,11 @@ so build-args are **sufficient** — no runtime Supabase env is required.
 |---|---|---|
 | **Build args** (baked into image; public-safe) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | `fly.toml [build.args]` |
 | **Runtime secrets** | `AKAHU_APP_TOKEN`; optional `YOUINC_LEADS_WEBHOOK_URL`, `YOUINC_FEEDBACK_WEBHOOK_URL` | `fly secrets set` |
-| **Runtime env** | `NODE_ENV=production`, `PORT=3000`, SQLite paths → `/data` (`YOUINC_LEADS_DB_PATH`, `YOUINC_FEEDBACK_DB_PATH`, analytics path, `YOUINC_AUTH_DB_PATH`) | `fly.toml [env]` + `entrypoint.sh` |
+| **Runtime env** | `NODE_ENV=production`, `PORT=3000`, SQLite paths → `/data` (`YOUINC_LEADS_DB_PATH`, `YOUINC_FEEDBACK_DB_PATH`, `YOUINC_AUTH_DB_PATH`) | `fly.toml [env]` + `entrypoint.sh` |
 | **Deliberately NOT set** | `service_role` key (unused), `YOUINC_ENROLLMENT_TOKEN` (keeps passkey enrolment disabled), `YOUINC_RP_ID`/`YOUINC_RP_ORIGIN` (derived; passkey dormant) | — |
 
 Note: `entrypoint.sh` currently only forces `YOUINC_DB_PATH`/`YOUINC_RULES_PATH` onto
-`/data`; the leads/feedback/analytics/auth SQLite paths default to `../data/...` which
+`/data`; the leads/feedback/auth SQLite paths default to `../data/...` which
 resolves onto `/data` only by cwd coincidence. Make all SQLite paths explicit onto
 `$DATA_DIR` so persistence does not depend on the process working directory.
 
@@ -147,7 +149,7 @@ The assistant owns: migrations, Dockerfile/`fly.toml`/`entrypoint.sh` edits, sec
   hosting decision (GH Actions cron vs Supabase Edge Function + pg_cron vs Fly scheduled
   machine).
 - Email summary / "Monday Brief" delivery feature.
-- Migrating leads/feedback/analytics from SQLite to Supabase (possible future
+- Migrating leads/feedback from SQLite to Supabase (possible future
   simplification to make the app fully stateless and drop the Fly volume).
 - Recovering the deleted `data/youinc-ledger.sqlite3` (prod starts clean).
 
