@@ -1,6 +1,6 @@
 // frontend/src/components/marketing/Pricing.tsx
 //
-// Light teaser only — three tiers, test-pinned copy untouched, each capped to
+// Light teaser only — four tiers, test-pinned copy untouched, each capped to
 // its two headline features. Full feature-by-feature detail lives on the
 // dedicated /pricing route (see PricingTable.tsx + routes/pricing.tsx).
 import { Link } from "@tanstack/react-router";
@@ -15,7 +15,7 @@ export function Pricing() {
     <section className="pricing" aria-labelledby="pricing-heading">
       <p className="mk-eyebrow">Pricing</p>
       <h2 id="pricing-heading" className="section-heading">
-        Three ways to run on YouInc.
+        Four ways to run on YouInc.
       </h2>
       <div className="pricing__grid">
         <article className="tier">
@@ -29,6 +29,22 @@ export function Pricing() {
           <a className="mk-btn mk-btn--ghost" href="/demo">
             Open the demo →
           </a>
+        </article>
+
+        <article className="tier">
+          <h3 className="tier__name">{PRICING.free.name}</h3>
+          <p className="tier__price">
+            {PRICING.free.price}
+            <span className="tier__cadence">{PRICING.free.cadence}</span>
+          </p>
+          <ul className="tier__features">
+            {PRICING.free.features.slice(0, TEASER_FEATURE_COUNT).map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
+          <Link className="mk-btn mk-btn--ghost" to="/signup">
+            {PRICING.free.cta} →
+          </Link>
         </article>
 
         <article className="tier tier--featured">

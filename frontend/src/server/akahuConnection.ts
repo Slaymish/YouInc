@@ -14,6 +14,7 @@ import { AkahuClient, AkahuApiError } from "./akahuClient";
 import { ingestTenantPayloads, type IngestResult } from "./tenantIngestion";
 import { throwServerError } from "./serverError";
 import { appToken, akahuBaseUrl, oauthConfigured } from "./akahuOAuth";
+import type { TenantTier } from "./accounts";
 
 // The OAuth authorize-URL / code-exchange logic lives in the pure,
 // path-alias-free akahuOAuth.ts (see its header comment for why) and is
@@ -28,20 +29,44 @@ export {
 } from "./akahuOAuth";
 export type { AkahuCallbackOutcome, AkahuCallbackQuery } from "./akahuOAuth";
 
-async function requireTenantId(): Promise<string> {
+interface TenantContext {
+  id: string;
+  tier: TenantTier;
+}
+
+// Single tenant lookup shared by every Akahu operation below — same table +
+// column shape accounts.ts's getAccountState() reads (tenants.id, tenants.tier),
+// so tier-gating logic here never drifts from the tenant summary the rest of
+// the app already trusts. Most callers only need the id (requireTenantId());
+// connectAkahu and getAkahuConnectionStatus also need the tier to decide
+// whether live sync is allowed on the caller's plan.
+async function requireTenant(): Promise<TenantContext> {
   const user = await getServerUser();
   if (!user) throwServerError("You must be signed in.", 401);
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tenants")
-    .select("id")
+    .select("id, tier")
     .order("created_at", { ascending: true })
     .limit(1);
   if (error) throwServerError(error.message, 400);
-  const row = data?.[0] as { id: string } | undefined;
+  const row = data?.[0] as TenantContext | undefined;
   if (!row) throwServerError("No workspace found. Finish onboarding first.", 409);
-  return row.id;
+  return row;
 }
+
+async function requireTenantId(): Promise<string> {
+  return (await requireTenant()).id;
+}
+
+/** Free-tier tenants get manual accounts + every widget, but no live bank feed. */
+function tierAllowsLiveConnect(tier: TenantTier): boolean {
+  return tier !== "free";
+}
+
+const TIER_RESTRICTED_MESSAGE =
+  "TIER_RESTRICTED: Live bank sync via Akahu isn't included on the Free plan. " +
+  "Upgrade to Self-serve to connect your bank live.";
 
 export interface AkahuConnectionStatus {
   connected: boolean;
@@ -52,15 +77,21 @@ export interface AkahuConnectionStatus {
   appConfigured: boolean;
   /** Whether the server has OAuth client creds configured (client id, secret, redirect uri). */
   oauthConfigured: boolean;
+  /** The caller's tenant tier ('free' | 'self-serve' | 'concierge'). */
+  tier: TenantTier;
+  /** Whether the tenant's PLAN allows connecting a live bank feed at all (false
+   *  for 'free' regardless of server config). This is the UI's "can connect"
+   *  signal — the actual enforcement lives in connectAkahu, not here. */
+  canConnectLive: boolean;
 }
 
 export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus> {
-  const tenantId = await requireTenantId();
+  const tenant = await requireTenant();
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("akahu_connections")
     .select("status, connected_at, last_synced_at")
-    .eq("tenant_id", tenantId)
+    .eq("tenant_id", tenant.id)
     .limit(1);
   if (error) throwServerError(error.message, 400);
   const row = data?.[0] as
@@ -73,18 +104,31 @@ export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus>
     lastSyncedAt: row?.last_synced_at ?? null,
     appConfigured: appToken() !== null,
     oauthConfigured: oauthConfigured(),
+    tier: tenant.tier,
+    canConnectLive: tierAllowsLiveConnect(tenant.tier),
   };
 }
 
-/** Store the caller's Akahu user token (Vault) and mark the connection active. */
+/**
+ * Store the caller's Akahu user token (Vault) and mark the connection active.
+ * This is the actual security boundary for the Free-tier restriction: it is
+ * called from every connect path (paste-a-token form today; also the OAuth
+ * callback once that flow lands), so gating here — not just in the UI — is
+ * what stops a Free tenant from wiring up live sync no matter how the request
+ * reaches the server.
+ */
 export async function connectAkahu(userToken: string): Promise<AkahuConnectionStatus> {
-  const tenantId = await requireTenantId();
+  const tenant = await requireTenant();
+  if (!tierAllowsLiveConnect(tenant.tier)) {
+    throwServerError(TIER_RESTRICTED_MESSAGE, 403);
+  }
+
   const clean = userToken.trim();
   if (!clean) throwServerError("Enter your Akahu user token.", 400);
 
   const supabase = getSupabaseServerClient();
   const { error } = await supabase.rpc("connect_akahu", {
-    target_tenant: tenantId,
+    target_tenant: tenant.id,
     user_token: clean,
   });
   if (error) throwServerError(error.message || "Could not save your Akahu connection.", 400);
