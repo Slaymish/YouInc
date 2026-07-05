@@ -69,7 +69,30 @@ Done:
   this needs a hosting decision (e.g. a GitHub Actions cron hitting an internal sync endpoint, vs a
   Supabase Edge Function + pg_cron, vs a separate Fly scheduled machine) — reviewed and explicitly
   deferred for now rather than building it, same as the email-delivery item below.
-- [ ] Maybe work on infra: How this is all hosted and secure. (untracked supabase/ migrations + docs/architecture/ + tests/golden/ from separate work exist in the repo — not part of the marketing revamp branch)
+- [x] Infra: hosted + secure. **LIVE at https://youinc.hamishburke.dev** (verified signup →
+  confirm email → onboarding → workspace end to end). Made the app fully **stateless** and shipped it:
+  - Moved `leads` + `feedback` off local SQLite into Supabase via anon-callable `SECURITY DEFINER`
+    RPCs (`record_lead`/`record_feedback`, migration `20260705120000`); locked the tables down so
+    anon/authenticated have no direct access (migration `20260705130000`). Verified by
+    `supabase/tests/leads_feedback.sql` and against cloud (anon read → 401, RPC → 204).
+  - Retired the dormant passkey/WebAuthn path (`server/auth.ts`, `/login`, the `start.ts` gate) and
+    the obsolete SQLite→Supabase importer; **dropped `better-sqlite3`** entirely → no local disk,
+    Docker image builds with no native toolchain (68 MB).
+  - Added the missing email-confirmation callback route `/auth/confirm` (verifyOtp → session →
+    onboarding); this was needed for the signup→confirm→onboarding flow to work.
+  - **Hosting:** Fly.io app `youinc` (region `syd`, scale-to-zero, **no volume**) fronted by
+    `youinc.hamishburke.dev` (Cloudflare DNS-only → Fly, Let's Encrypt cert). Backed by a
+    **Supabase Cloud** project (`pntzvqetnovptiezirxt`, region ap-southeast-1) holding all state.
+    `VITE_SUPABASE_*` passed as **Docker build-args** (Vite inlines at build; Fly runtime secrets
+    would be too late); `AKAHU_APP_TOKEN` as a runtime secret. No `service_role` key anywhere.
+  - **CI/CD:** push to `main` → GitHub Actions runs tests then `flyctl deploy --remote-only --yes`
+    (fixed the volume-prompt + the original `internal_port` 8080→3000 mismatch). `FLY_API_TOKEN` set.
+  - **Email:** Resend custom SMTP wired into Supabase Auth; confirmation emails deliver.
+  - Design/plan: `docs/superpowers/specs/2026-07-05-production-hosting-design.md` +
+    `docs/superpowers/plans/2026-07-05-production-hosting.md`; README + `docs/deploy_fly.md` rewritten.
+  - Follow-ups (minor): delete the `smtp-probe@hamishburke.dev` test user; destroy the orphaned
+    `youinc_data` Fly volume; optionally verify `youinc.hamishburke.dev` in Resend if the sender
+    address should be `no-reply@youinc.hamishburke.dev` rather than `@hamishburke.dev`.
 - [x] Optional polish (from review): calmer `/demo` first impression — sample suspense backlog
   50 → 3 items (`components/marketing/sampleDashboard.ts`), plus a shared
   `SUSPENSE_MINOR_THRESHOLD` (`components/widgets/derive.ts`) so small backlogs render as a neutral
