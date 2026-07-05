@@ -140,14 +140,17 @@ test.describe(
         page.getByRole("heading", { name: "Synced ledger" }),
       ).toBeVisible();
 
-      // Settlement-dated settled txns post; the PENDING one is skipped.
-      //   +5000 (salary) -1800 (rent) -89.99 (spark) -152.40 (groceries) = 2957.61
+      // Settlement-dated settled txns post; the PENDING one is skipped. The
+      // ATM withdrawal deliberately matches no rule (see sampleIngestion.ts)
+      // and posts to the tenant's suspense account instead of Assets:Bank:
+      // Everyday, so it doesn't appear in this sum:
+      //   +5000 (salary) -1800 (rent) -89.99 (spark) -152.40 (groceries) = 2917.61
       const ledgerPanel = page.locator(".ws-panel:has(#ws-ledger-heading)");
       await expect(
         ledgerPanel.getByRole("row", { name: /Assets:Bank:Everyday/ }),
-      ).toContainText("$2,957.61");
+      ).toContainText("$2,917.61");
       await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$2,957.61",
+        "$2,917.61",
       );
 
       // Idempotent: re-running does not double-count.
@@ -155,7 +158,7 @@ test.describe(
         .getByRole("button", { name: /load sample transactions/i })
         .click();
       await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$2,957.61",
+        "$2,917.61",
       );
     });
 
@@ -234,6 +237,11 @@ test.describe(
         await page.getByRole("button", { name: /load my accounts/i }).click();
         await expect(page.getByText("Mock Everyday")).toBeVisible();
 
+        // Choose an explicit date range instead of the default last-90-days.
+        // Exact match: "To" is otherwise a substring of "History"/"synced".
+        await page.getByLabel("From", { exact: true }).fill("2026-05-01");
+        await page.getByLabel("To", { exact: true }).fill("2026-06-30");
+
         // Sync pulls txns → ingests to Postgres. Bank balance = 4200 - 60 = 4140.
         await page
           .getByRole("listitem")
@@ -247,6 +255,20 @@ test.describe(
         await expect(page.locator(".ws-metric__value").first()).toHaveText(
           "$4,140.00",
         );
+
+        // The chosen date range produced a sync-log entry, visible in the
+        // Sync history panel (akahu_sync_log — server/akahuConnection.ts).
+        const syncHistoryPanel = page.locator(
+          ".ws-panel:has(#ws-sync-history-heading)",
+        );
+        const historyRow = syncHistoryPanel
+          .locator("table tbody tr")
+          .filter({ hasText: "acc_mock_1" })
+          .first();
+        await expect(historyRow).toContainText("Success");
+        await expect(historyRow).toContainText("1/05/2026");
+        await expect(historyRow).toContainText("30/06/2026");
+        await expect(historyRow.locator("td").last()).toHaveText("2");
 
         // Idempotent re-sync.
         await page

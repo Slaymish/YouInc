@@ -93,15 +93,25 @@ describe("buildAttentionItems", () => {
     expect(items[0]).toMatchObject({ id: "no-database", severity: "critical" });
   });
 
-  it("flags suspense items as an action with the right count and target", () => {
+  it("flags a large suspense backlog as an action with the right count and target", () => {
     const dashboard = baseDashboard();
-    dashboard.routing.suspenseCount = 3;
+    dashboard.routing.suspenseCount = 15; // above SUSPENSE_MINOR_THRESHOLD
     const item = buildAttentionItems(dashboard, NOW).find(
       (i) => i.id === "suspense",
     );
     expect(item).toMatchObject({ severity: "action", targetView: "books" });
-    expect(item?.label).toContain("3");
+    expect(item?.label).toContain("15");
     expect(item?.label).toContain("transactions");
+  });
+
+  it("flags a small suspense backlog as a low-key review, not an action", () => {
+    const dashboard = baseDashboard();
+    dashboard.routing.suspenseCount = 3; // at/under SUSPENSE_MINOR_THRESHOLD
+    const item = buildAttentionItems(dashboard, NOW).find(
+      (i) => i.id === "suspense",
+    );
+    expect(item).toMatchObject({ severity: "review", targetView: "books" });
+    expect(item?.label).toContain("3");
   });
 
   it("flags low runway as critical and routes to wealth", () => {
@@ -240,7 +250,7 @@ describe("buildAttentionItems", () => {
   it("orders items critical → action → review", () => {
     const dashboard = baseDashboard();
     dashboard.totals.runwayMonths = 2; // critical
-    dashboard.routing.suspenseCount = 4; // action
+    dashboard.routing.suspenseCount = 15; // action (above SUSPENSE_MINOR_THRESHOLD)
     dashboard.categoryMonthly = spikingCategory(); // review
     const severities = buildAttentionItems(dashboard, NOW).map(
       (i) => i.severity,

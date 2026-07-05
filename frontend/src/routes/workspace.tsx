@@ -11,13 +11,16 @@ import { PRODUCT } from "~/components/marketing/config";
 import { ManualBalancesEditor } from "~/components/workspace/ManualBalancesEditor";
 import { AkahuConnectPanel } from "~/components/workspace/AkahuConnectPanel";
 import { RulesEditor } from "~/components/workspace/RulesEditor";
+import { AccountMappingEditor } from "~/components/workspace/AccountMappingEditor";
+import { SyncHistoryPanel } from "~/components/workspace/SyncHistoryPanel";
 import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
 import { WORKSPACE_WIDGET_IDS } from "~/components/workspace/workspaceWidgetIds";
 import { formatMoney } from "~/components/widgets/format";
 import type { AccountState } from "~/server/accounts";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
-import type { AkahuConnectionStatus } from "~/server/akahuConnection";
+import type { AkahuConnectionStatus, AkahuSyncLogEntry } from "~/server/akahuConnection";
 import type { ClassificationRule } from "~/server/tenantRules";
+import type { AccountMapping } from "~/server/accountMappings";
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import "~/styles/auth.css";
 import "~/styles/workspace.css";
@@ -29,24 +32,37 @@ const loadWorkspace = createServerFn({ method: "GET" }).handler(
     ledger: WorkspaceLedgerSummary | null;
     akahu: AkahuConnectionStatus | null;
     rules: ClassificationRule[];
+    accountMappings: AccountMapping[];
+    syncLog: AkahuSyncLogEntry[];
     dashboard: LedgerDashboardData | null;
   }> => {
     const { getAccountState } = await import("~/server/accounts");
     const account = await getAccountState();
     if (!account || !account.tenant)
-      return { account, ledger: null, akahu: null, rules: [], dashboard: null };
+      return {
+        account,
+        ledger: null,
+        akahu: null,
+        rules: [],
+        accountMappings: [],
+        syncLog: [],
+        dashboard: null,
+      };
     const { getWorkspaceLedger } = await import("~/server/workspaceLedger");
-    const { getAkahuConnectionStatus } =
+    const { getAkahuConnectionStatus, listSyncLog } =
       await import("~/server/akahuConnection");
     const { listRules } = await import("~/server/tenantRules");
+    const { listAccountMappings } = await import("~/server/accountMappings");
     const { getWorkspaceDashboard } = await import("~/server/workspaceDashboard");
-    const [ledger, akahu, rules, dashboard] = await Promise.all([
+    const [ledger, akahu, rules, accountMappings, syncLog, dashboard] = await Promise.all([
       getWorkspaceLedger(),
       getAkahuConnectionStatus(),
       listRules(),
+      listAccountMappings(),
+      listSyncLog(),
       getWorkspaceDashboard(),
     ]);
-    return { account, ledger, akahu, rules, dashboard };
+    return { account, ledger, akahu, rules, accountMappings, syncLog, dashboard };
   },
 );
 
@@ -86,6 +102,8 @@ export const Route = createFileRoute("/workspace")({
       ledger: WorkspaceLedgerSummary;
       akahu: AkahuConnectionStatus;
       rules: ClassificationRule[];
+      accountMappings: AccountMapping[];
+      syncLog: AkahuSyncLogEntry[];
       dashboard: LedgerDashboardData;
     };
   },
@@ -116,6 +134,8 @@ function WorkspacePage() {
     ledger: initialLedger,
     akahu,
     rules,
+    accountMappings,
+    syncLog,
     dashboard,
   } = Route.useLoaderData();
   const router = useRouter();
@@ -124,6 +144,7 @@ function WorkspacePage() {
   const [sampleBusy, setSampleBusy] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
   const [ledger, setLedger] = useState(initialLedger);
+  const [syncRefreshToken, setSyncRefreshToken] = useState(0);
   const [dashboardData, setDashboardData] = useState(dashboard);
   const tenant = account.tenant!;
 
@@ -292,7 +313,29 @@ function WorkspacePage() {
             <h2 id="ws-akahu-heading">Connect your bank</h2>
           </div>
           <div style={{ padding: "1.25rem" }}>
-            <AkahuConnectPanel status={akahu} onLedgerChange={setLedger} />
+            <AkahuConnectPanel
+              status={akahu}
+              onLedgerChange={setLedger}
+              onSynced={() => setSyncRefreshToken((n) => n + 1)}
+            />
+          </div>
+        </section>
+
+        <section className="ws-panel" aria-labelledby="ws-sync-history-heading">
+          <div className="ws-panel__head">
+            <h2 id="ws-sync-history-heading">Sync history</h2>
+          </div>
+          <div style={{ padding: "1.25rem" }}>
+            <SyncHistoryPanel initialEntries={syncLog} refreshToken={syncRefreshToken} />
+          </div>
+        </section>
+
+        <section className="ws-panel" aria-labelledby="ws-account-mappings-heading">
+          <div className="ws-panel__head">
+            <h2 id="ws-account-mappings-heading">Account mappings</h2>
+          </div>
+          <div style={{ padding: "1.25rem" }}>
+            <AccountMappingEditor initialMappings={accountMappings} />
           </div>
         </section>
 

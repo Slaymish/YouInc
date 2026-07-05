@@ -146,42 +146,172 @@ export interface AkahuSyncResult extends IngestResult {
   fetched: number;
 }
 
+type SupabaseServerClient = ReturnType<typeof getSupabaseServerClient>;
+
+/** Insert the "running" sync-log row for a new sync attempt; returns its id. */
+async function startSyncLog(
+  supabase: SupabaseServerClient,
+  tenantId: string,
+  akahuAccountId: string,
+  fromDate: string,
+  toDate: string | null,
+): Promise<string> {
+  const { data, error } = await supabase
+    .from("akahu_sync_log")
+    .insert({
+      tenant_id: tenantId,
+      akahu_account_id: akahuAccountId,
+      from_date: fromDate,
+      to_date: toDate,
+      status: "running",
+    })
+    .select("id")
+    .single();
+  if (error) throwServerError(error.message, 400);
+  return (data as { id: string }).id;
+}
+
+interface SyncLogOutcome {
+  status: "success" | "error";
+  transactionsIngested?: number;
+  errorMessage?: string;
+}
+
+/** Mark a sync-log row finished (success or error) with its outcome. */
+async function finishSyncLog(
+  supabase: SupabaseServerClient,
+  tenantId: string,
+  logId: string,
+  outcome: SyncLogOutcome,
+): Promise<void> {
+  await supabase
+    .from("akahu_sync_log")
+    .update({
+      finished_at: new Date().toISOString(),
+      status: outcome.status,
+      transactions_ingested: outcome.transactionsIngested ?? null,
+      error_message: outcome.errorMessage ?? null,
+    })
+    .eq("tenant_id", tenantId)
+    .eq("id", logId);
+}
+
+function defaultStartDate(): string {
+  return new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+function errorText(err: unknown): string {
+  return err instanceof Error ? err.message : "Unknown error";
+}
+
 /**
- * Pull transactions for one Akahu account since `startDate` (default: last 90
- * days) and ingest them into the tenant's ledger. Idempotent via the ingestion
- * dedup. Updates last_synced_at on success.
+ * Pull transactions for one Akahu account over [startDate, endDate] (default
+ * start: last 90 days; default end: today, per iterTransactions/Akahu's API)
+ * and ingest them into the tenant's ledger. Idempotent via the ingestion
+ * dedup. Updates last_synced_at on success, and logs the attempt (date range,
+ * outcome, count/error) to akahu_sync_log for the sync-history UI.
  */
 export async function syncAkahuAccount(
   accountId: string,
   startDate?: string,
+  endDate?: string,
 ): Promise<AkahuSyncResult> {
   const tenantId = await requireTenantId();
   const cleanAccount = accountId.trim();
   if (!cleanAccount) throwServerError("Choose an account to sync.", 400);
 
+  const start = startDate ?? defaultStartDate();
+  const end = endDate?.trim() || undefined;
+  if (end && end < start) {
+    throwServerError("The end date must be on or after the start date.", 400);
+  }
+
   const token = await userTokenFor(tenantId);
   const client = buildClient(token);
+  const supabase = getSupabaseServerClient();
+  const logId = await startSyncLog(supabase, tenantId, cleanAccount, start, end ?? null);
 
-  const start =
-    startDate ?? new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-
-  const payloads: Record<string, unknown>[] = [];
   try {
-    for await (const txn of client.iterTransactions(cleanAccount, start)) {
+    const payloads: Record<string, unknown>[] = [];
+    for await (const txn of client.iterTransactions(cleanAccount, start, end)) {
       payloads.push(txn);
     }
+
+    const result = await ingestTenantPayloads(payloads);
+
+    await supabase
+      .from("akahu_connections")
+      .update({ last_synced_at: new Date().toISOString() })
+      .eq("tenant_id", tenantId);
+    await finishSyncLog(supabase, tenantId, logId, {
+      status: "success",
+      transactionsIngested: payloads.length,
+    });
+
+    return { ...result, accountId: cleanAccount, fetched: payloads.length };
   } catch (err) {
+    const message = err instanceof AkahuApiError ? err.message : errorText(err);
+    await finishSyncLog(supabase, tenantId, logId, { status: "error", errorMessage: message });
     if (err instanceof AkahuApiError) throwServerError(err.message, 502);
     throw err;
   }
+}
 
-  const result = await ingestTenantPayloads(payloads);
+export interface AkahuSyncLogEntry {
+  id: string;
+  akahuAccountId: string;
+  startedAt: string;
+  finishedAt: string | null;
+  fromDate: string | null;
+  toDate: string | null;
+  transactionsIngested: number | null;
+  status: "running" | "success" | "error";
+  errorMessage: string | null;
+}
 
+interface SyncLogDbRow {
+  id: string;
+  akahu_account_id: string;
+  started_at: string;
+  finished_at: string | null;
+  from_date: string | null;
+  to_date: string | null;
+  transactions_ingested: number | null;
+  status: string;
+  error_message: string | null;
+}
+
+function toSyncLogEntry(r: SyncLogDbRow): AkahuSyncLogEntry {
+  return {
+    id: r.id,
+    akahuAccountId: r.akahu_account_id,
+    startedAt: r.started_at,
+    finishedAt: r.finished_at,
+    fromDate: r.from_date,
+    toDate: r.to_date,
+    transactionsIngested: r.transactions_ingested,
+    status: r.status === "success" || r.status === "error" ? r.status : "running",
+    errorMessage: r.error_message,
+  };
+}
+
+const SYNC_LOG_SELECT_COLS =
+  "id, akahu_account_id, started_at, finished_at, from_date, to_date, transactions_ingested, status, error_message";
+const SYNC_LOG_LIMIT = 20;
+
+/** Recent sync attempts for the tenant, newest first (optionally one account). */
+export async function listSyncLog(accountId?: string): Promise<AkahuSyncLogEntry[]> {
+  const tenantId = await requireTenantId();
   const supabase = getSupabaseServerClient();
-  await supabase
-    .from("akahu_connections")
-    .update({ last_synced_at: new Date().toISOString() })
-    .eq("tenant_id", tenantId);
-
-  return { ...result, accountId: cleanAccount, fetched: payloads.length };
+  let query = supabase
+    .from("akahu_sync_log")
+    .select(SYNC_LOG_SELECT_COLS)
+    .eq("tenant_id", tenantId)
+    .order("started_at", { ascending: false })
+    .limit(SYNC_LOG_LIMIT);
+  const cleanAccountId = accountId?.trim();
+  if (cleanAccountId) query = query.eq("akahu_account_id", cleanAccountId);
+  const { data, error } = await query;
+  if (error) throwServerError(error.message, 400);
+  return ((data ?? []) as SyncLogDbRow[]).map(toSyncLogEntry);
 }

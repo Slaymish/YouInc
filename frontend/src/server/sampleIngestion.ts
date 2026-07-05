@@ -73,6 +73,22 @@ const SAMPLE_PAYLOADS: ReadonlyArray<Record<string, unknown>> = [
     merchant: { name: "Countdown" },
     category: { nzfcc: "groceries" },
   },
+  {
+    // Deliberately unmatched by every STARTER_RULES regex and carries no
+    // nzfcc category, so RulesRouter falls through to the tenant's suspense
+    // account — the one item in the sample batch that demonstrates the
+    // suspense queue + reclassify flow (see SuspenseQueueWidget.tsx /
+    // tenantReclassify.ts) rather than routing cleanly on load.
+    _id: "sample_atm_001",
+    _account: SAMPLE_SOURCE_ACCOUNT,
+    status: "SETTLED",
+    date: "2026-06-07",
+    settlement_date: "2026-06-07",
+    amount: -40.0,
+    currency: "NZD",
+    description: "ATM WITHDRAWAL QUEEN STREET",
+    merchant: { name: "Cash Withdrawal" },
+  },
 ];
 
 interface StarterRule {

@@ -1,4 +1,5 @@
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
+import { SUSPENSE_MINOR_THRESHOLD } from "./derive";
 
 function formatPercent(value: number | null) {
   if (value === null || Number.isNaN(value)) return "n/a";
@@ -35,7 +36,7 @@ export function LedgerConfidenceWidget({ dashboard }: { dashboard: LedgerDashboa
     <div className="confidence">
       <strong>{formatPercent(dashboard.routing.classificationRate)}</strong>
       <TableList rows={rows} />
-      {dashboard.routing.suspenseCount ? (
+      {dashboard.routing.suspenseCount > SUSPENSE_MINOR_THRESHOLD ? (
         <p className="exception">Exception: unresolved suspense exists.</p>
       ) : null}
     </div>

@@ -2,26 +2,29 @@
 // `DashboardGrid` (built for the single-tenant SQLite dashboard) can render
 // on the self-service `/workspace` route.
 //
-// PHASE 1+2+3 of the DashboardGrid port. Populated: totals P&L
+// PHASE 1+2+3+4 of the DashboardGrid port. Populated: totals P&L
 // (income/expenses/ebitda/margin/average-income/overhead/runway), liquidity
 // (cash/credit limit/credit headroom/available liquidity), creditFacilities,
 // balances[].liquidityTier (Phase 1), plus pnl monthly series, income/expense
 // breakdowns, net-worth trend, recent transactions, recurring payments, and
-// category/daily spend (Phase 2+3). Still left as a safe empty array/zeroed
-// struct: suspense queue, pipeline health, source accounts, known accounts,
-// routing, sync state — Phase-4 ops/health fields with no per-tenant
-// equivalent yet. The workspace widget allowlist
+// category/daily spend (Phase 2+3). Phase 4 (added here): suspense queue,
+// pipeline health, routing/classification confidence, and knownAccounts (the
+// classify-as picker's options) — see workspaceSuspenseMath.ts /
+// workspacePipeline.ts. Still left as a safe empty array: source accounts,
+// sync state — no per-tenant equivalent yet. The workspace widget allowlist
 // (`components/workspace/workspaceWidgetIds.ts`) only exposes widgets that
 // read fields this module actually populates.
 //
 // Every read here goes through the caller's RLS-scoped Supabase client
 // (never service_role) via getWorkspaceLedger / workspacePnl /
-// workspaceLiquidity / workspaceBreakdowns / workspaceJournal.
+// workspaceLiquidity / workspaceBreakdowns / workspaceJournal /
+// workspacePipeline.
 import { getWorkspaceLedger } from "./workspaceLedger";
 import { getWorkspacePnl } from "./workspacePnl";
 import { getWorkspaceLiquidity } from "./workspaceLiquidity";
 import { getWorkspaceAccountBreakdowns } from "./workspaceBreakdowns";
 import { fetchTenantJournalEntries } from "./workspaceJournal";
+import { getWorkspacePipelineHealth } from "./workspacePipeline";
 import { computeWorkspaceNetWorthTrend } from "./workspaceTrends";
 import { computeWorkspaceRecentTransactions } from "./workspaceTransactions";
 import { computeWorkspaceRecurringPayments } from "./workspaceRecurring";
@@ -29,17 +32,23 @@ import {
   computeWorkspaceCategoryMonthly,
   computeWorkspaceDailySpend,
 } from "./workspaceSpending";
+import {
+  computeRoutingHealth,
+  computeSuspenseQueue,
+  isSuspenseAccount,
+} from "./workspaceSuspenseMath";
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 
-/** The caller's tenant, reshaped into a Phase-1+2+3 `LedgerDashboardData`. */
+/** The caller's tenant, reshaped into a Phase-1+2+3+4 `LedgerDashboardData`. */
 export async function getWorkspaceDashboard(): Promise<LedgerDashboardData> {
   const ledger = await getWorkspaceLedger();
 
-  const [pnl, liquidity, breakdowns, journalEntries] = await Promise.all([
+  const [pnl, liquidity, breakdowns, journalEntries, pipeline] = await Promise.all([
     getWorkspacePnl(ledger.tenantId, ledger.totals.assetsCents),
     getWorkspaceLiquidity(ledger.tenantId, ledger.balances, ledger.currency),
     getWorkspaceAccountBreakdowns(ledger.tenantId),
     fetchTenantJournalEntries(ledger.tenantId),
+    getWorkspacePipelineHealth(ledger.tenantId),
   ]);
 
   const netWorthTrend = computeWorkspaceNetWorthTrend(journalEntries);
@@ -47,6 +56,15 @@ export async function getWorkspaceDashboard(): Promise<LedgerDashboardData> {
   const recurringPayments = computeWorkspaceRecurringPayments(journalEntries);
   const categoryMonthly = computeWorkspaceCategoryMonthly(journalEntries);
   const dailySpend = computeWorkspaceDailySpend(journalEntries);
+  const suspenseQueue = computeSuspenseQueue(journalEntries, ledger.suspenseAccount);
+  const routing = computeRoutingHealth(journalEntries, ledger.suspenseAccount);
+  const knownAccounts = [
+    ...new Set(
+      journalEntries
+        .map((entry) => entry.account)
+        .filter((account) => !isSuspenseAccount(account, ledger.suspenseAccount)),
+    ),
+  ].sort();
 
   return {
     databasePath: `postgres:tenant:${ledger.tenantId}`,
@@ -70,10 +88,8 @@ export async function getWorkspaceDashboard(): Promise<LedgerDashboardData> {
       averageMonthlyIncomeCents: pnl.averageMonthlyIncomeCents,
       monthlyOverheadCents: pnl.monthlyOverheadCents,
       runwayMonths: pnl.runwayMonths,
-      // Not yet ported (Phase 2+): no per-tenant equivalent of SQLite's raw
-      // pipeline transaction counts.
-      transactionCount: 0,
-      rawTransactionCount: 0,
+      transactionCount: routing.journalCount,
+      rawTransactionCount: pipeline.rawCached,
       cashCents: liquidity.cashCents,
       creditHeadroomCents: liquidity.creditHeadroomCents,
       creditLimitCents: liquidity.creditLimitCents,
@@ -84,32 +100,16 @@ export async function getWorkspaceDashboard(): Promise<LedgerDashboardData> {
     pnl: pnl.pnl,
     incomeBreakdown: breakdowns.incomeBreakdown,
     expenseBreakdown: breakdowns.expenseBreakdown,
-    suspenseQueue: [],
+    suspenseQueue,
     netWorthTrend,
     recentTransactions,
     recurringPayments,
     categoryMonthly,
     dailySpend,
-    pipeline: {
-      rawCached: 0,
-      posted: 0,
-      pending: 0,
-      zeroAmount: 0,
-      unprocessed: 0,
-      earliestTransactionDate: null,
-      latestTransactionDate: null,
-      lastSeenAt: null,
-    },
+    pipeline,
     sourceAccounts: [],
-    knownAccounts: [],
-    routing: {
-      journalCount: 0,
-      customRuleCount: 0,
-      nzfccFallbackCount: 0,
-      suspenseCount: 0,
-      suspenseCents: 0,
-      classificationRate: null,
-    },
+    knownAccounts,
+    routing,
     syncState: [],
     error: null,
   };

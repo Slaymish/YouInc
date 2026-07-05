@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YouInc — Run Yourself Like a Company</title>
+<style>
+  :root {
+    --bg-0: #06090c;
+    --bg-1: #0b1117;
+    --bg-2: #10181f;
+    --surface: #121c24;
+    --surface-raised: #16222b;
+    --line: rgba(148, 189, 178, 0.14);
+    --line-strong: rgba(148, 189, 178, 0.28);
+    --text-0: #eef4f1;
+    --text-1: #b9c8c3;
+    --text-2: #7c8f8a;
+    --accent: #3cf2a0;
+    --accent-dim: #21a374;
+    --accent-amber: #ffb454;
+    --accent-glow: rgba(60, 242, 160, 0.35);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --space-1: clamp(0.4rem, 0.35rem + 0.2vw, 0.6rem);
+    --space-2: clamp(0.8rem, 0.7rem + 0.4vw, 1.2rem);
+    --space-3: clamp(1.4rem, 1.2rem + 0.8vw, 2.2rem);
+    --space-4: clamp(2.2rem, 1.8rem + 1.6vw, 3.6rem);
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-l: 22px;
+    --dur-fast: 150ms;
+    --dur-normal: 320ms;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: var(--sans);
+    overflow: hidden;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse 900px 600px at 12% -10%, rgba(60,242,160,0.08), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 100%, rgba(255,180,84,0.05), transparent 55%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 60%, var(--bg-0));
+  }
+
+  /* faint ledger grid texture */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(148,189,178,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,189,178,0.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 40%, transparent 90%);
+    z-index: 0;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2rem, 4vw, 4.5rem) clamp(2.2rem, 7vw, 7rem);
+    opacity: 0;
+    transform: translateX(24px) scale(0.99);
+    transition: opacity var(--dur-normal) var(--ease), transform var(--dur-normal) var(--ease);
+    pointer-events: none;
+  }
+  .slide.is-active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+  }
+  .slide.is-prev {
+    transform: translateX(-24px) scale(0.99);
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: clamp(0.68rem, 0.6rem + 0.2vw, 0.8rem);
+    color: var(--accent);
+    margin: 0 0 var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px; height: 1px;
+    background: var(--accent-dim);
+    display: inline-block;
+  }
+
+  h1, h2, h3 { font-family: var(--sans); margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+
+  .slide h1 {
+    font-size: clamp(2.4rem, 1.6rem + 4vw, 5rem);
+    line-height: 1.02;
+    color: var(--text-0);
+    max-width: 16ch;
+  }
+  .slide h2 {
+    font-size: clamp(1.7rem, 1.3rem + 2vw, 3rem);
+    line-height: 1.08;
+    max-width: 22ch;
+    margin-bottom: var(--space-3);
+  }
+  .accent { color: var(--accent); }
+  .amber { color: var(--accent-amber); }
+
+  .lede {
+    font-size: clamp(1rem, 0.92rem + 0.5vw, 1.3rem);
+    color: var(--text-1);
+    max-width: 58ch;
+    line-height: 1.55;
+    margin-top: var(--space-3);
+  }
+  .lede.tight { margin-top: var(--space-2); }
+
+  .content { max-width: 1200px; width: 100%; margin: 0 auto; }
+
+  /* Grid of feature cards */
+  .card-grid {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .card {
+    background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    padding: var(--space-3);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 18px 40px -24px rgba(0,0,0,0.6);
+    transition: transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+  .card .glyph {
+    font-size: 1.6rem;
+    color: var(--accent);
+    display: inline-flex;
+    width: 44px; height: 44px;
+    align-items: center; justify-content: center;
+    background: rgba(60,242,160,0.08);
+    border: 1px solid rgba(60,242,160,0.25);
+    border-radius: 10px;
+    margin-bottom: var(--space-2);
+  }
+  .card h3 { font-size: 1.05rem; margin-bottom: 0.5em; color: var(--text-0); }
+  .card p { margin: 0; color: var(--text-1); font-size: 0.92rem; line-height: 1.5; }
+
+  /* Step flow (pipeline) */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .step {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    padding: var(--space-2) var(--space-2) var(--space-2) 2.6rem;
+  }
+  .step .num {
+    position: absolute;
+    left: 0.7rem; top: 0.7rem;
+    font-family: var(--mono);
+    color: var(--bg-0);
+    background: var(--accent);
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .step h3 { font-size: 0.88rem; color: var(--text-0); margin-bottom: 0.35em; }
+  .step p { margin: 0; font-size: 0.8rem; color: var(--text-2); line-height: 1.45; }
+  .step code { font-family: var(--mono); color: var(--accent-amber); font-size: 0.78em; }
+
+  /* Pricing */
+  .price-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .price-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    padding: var(--space-3);
+    display: flex; flex-direction: column;
+  }
+  .price-card.featured {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 0 1px var(--accent-dim), 0 24px 50px -28px var(--accent-glow);
+    background: linear-gradient(160deg, rgba(60,242,160,0.07), var(--surface));
+  }
+  .price-card .tier { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+  .price-card .amount { font-family: var(--mono); font-size: clamp(1.6rem, 1.3rem + 1vw, 2.3rem); color: var(--text-0); margin: 0.3em 0 0.6em; }
+  .price-card .amount small { font-size: 0.4em; color: var(--text-2); font-weight: 400; }
+  .price-card ul { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.55em; }
+  .price-card li { font-size: 0.85rem; color: var(--text-1); padding-left: 1.3em; position: relative; }
+  .price-card li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+
+  /* Table for module map */
+  .mod-table { width: 100%; border-collapse: collapse; margin-top: var(--space-3); font-size: 0.86rem; }
+  .mod-table th, .mod-table td { text-align: left; padding: 0.65em 1em; border-bottom: 1px solid var(--line); }
+  .mod-table th { font-family: var(--mono); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--text-2); font-weight: 500; }
+  .mod-table td:first-child { font-family: var(--mono); color: var(--accent); white-space: nowrap; }
+  .mod-table td { color: var(--text-1); }
+  .mod-table tr:hover td { color: var(--text-0); }
+
+  /* Divider slide */
+  .slide.divider { align-items: center; text-align: center; }
+  .slide.divider .content { display: flex; flex-direction: column; align-items: center; }
+  .divider h1 { max-width: none; }
+  .divider .rule { width: 80px; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); margin: var(--space-3) 0; }
+
+  /* Journey / arrow flow */
+  .journey {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .journey .jstep {
+    flex: 1 1 0;
+    min-width: 150px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    padding: var(--space-2);
+    position: relative;
+  }
+  .journey .jstep h3 { font-size: 0.9rem; color: var(--text-0); margin-bottom: 0.3em; }
+  .journey .jstep p { margin: 0; font-size: 0.78rem; color: var(--text-2); }
+  .journey .arrow { display: flex; align-items: center; color: var(--accent-dim); font-size: 1.2rem; }
+
+  /* stack list for tech */
+  .stack-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin-top: var(--space-3); }
+  .stack-item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-s); padding: var(--space-2); }
+  .stack-item .label { font-family: var(--mono); font-size: 0.7rem; color: var(--accent-amber); text-transform: uppercase; letter-spacing: 0.08em; }
+  .stack-item .value { font-size: 0.95rem; color: var(--text-0); margin-top: 0.3em; }
+  .stack-item .value code { font-family: var(--mono); font-size: 0.85em; color: var(--text-1); }
+
+  /* folder tree */
+  .tree {
+    font-family: var(--mono);
+    font-size: clamp(0.72rem, 0.65rem + 0.3vw, 0.88rem);
+    color: var(--text-1);
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    padding: var(--space-3);
+    margin-top: var(--space-3);
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.35);
+  }
+  .tree .dir { color: var(--accent); }
+  .tree .cmt { color: var(--text-2); }
+
+  /* Security list */
+  .sec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2) var(--space-4); margin-top: var(--space-3); }
+  .sec-item { display: flex; gap: 0.8em; align-items: flex-start; }
+  .sec-item .tick {
+    flex: none;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: rgba(60,242,160,0.1);
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    margin-top: 0.1em;
+  }
+  .sec-item p { margin: 0; font-size: 0.88rem; color: var(--text-1); line-height: 1.5; }
+  .sec-item strong { color: var(--text-0); font-weight: 600; }
+
+  /* pill / tag */
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    padding: 0.25em 0.7em;
+    border-radius: 100px;
+    border: 1px solid var(--line-strong);
+    color: var(--text-2);
+    margin-right: 0.4em;
+  }
+
+  /* Big stat row */
+  .stat-row { display: flex; gap: var(--space-4); margin-top: var(--space-4); flex-wrap: wrap; }
+  .stat { min-width: 160px; }
+  .stat .num { font-family: var(--mono); font-size: clamp(1.8rem, 1.4rem + 1.6vw, 3.2rem); color: var(--accent); line-height: 1; }
+  .stat .lab { font-size: 0.82rem; color: var(--text-2); margin-top: 0.4em; }
+
+  /* Footer per-slide */
+  .slide-footer {
+    position: absolute;
+    left: clamp(2.2rem, 7vw, 7rem);
+    bottom: 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-2);
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .slide-footer .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-dim); }
+
+  /* Nav chrome */
+  .nav-chrome {
+    position: fixed;
+    bottom: 1.3rem;
+    right: clamp(1.5rem, 5vw, 4rem);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgba(18, 28, 36, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line-strong);
+    border-radius: 100px;
+    padding: 0.5rem 0.7rem;
+    box-shadow: 0 12px 30px -14px rgba(0,0,0,0.7);
+  }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--text-0);
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+  .nav-btn:hover { background: rgba(60,242,160,0.12); border-color: var(--accent-dim); }
+  .nav-btn:active { transform: scale(0.92); }
+  .nav-counter { font-family: var(--mono); font-size: 0.78rem; color: var(--text-1); min-width: 3.6em; text-align: center; }
+
+  .progress-dots {
+    position: fixed;
+    top: 50%;
+    right: clamp(1rem, 3vw, 2rem);
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .progress-dots button {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--line-strong);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+  .progress-dots button.is-active {
+    background: var(--accent);
+    transform: scale(1.6);
+  }
+
+  .brandmark {
+    position: fixed;
+    top: 1.3rem;
+    left: clamp(2.2rem, 7vw, 7rem);
+    z-index: 10;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-2);
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  .brandmark .chip {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  @media (max-width: 900px) {
+    .cols-2, .cols-3, .price-grid, .steps, .stack-list, .sec-grid { grid-template-columns: 1fr; }
+    .journey { flex-direction: column; }
+    .journey .arrow { transform: rotate(90deg); justify-content: center; }
+    .progress-dots { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brandmark"><span class="chip"></span>YOUINC / DECK</div>
+
+<div class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide" data-title="Title">
+    <div class="content">
+      <p class="eyebrow">Personal Finance Operating System</p>
+      <h1>Run Yourself<br/>Like a <span class="accent">Company.</span></h1>
+      <p class="lede">A live double-entry ledger and CFO dashboard that turns your bank accounts into an executive view of net worth, runway, and cashflow.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="num">$15<span style="font-size:0.5em;color:var(--text-2);">/mo</span></div><div class="lab">Self-serve entry price</div></div>
+        <div class="stat"><div class="num">NZ</div><div class="lab">Built for NZ founders via Akahu</div></div>
+        <div class="stat"><div class="num">1:1</div><div class="lab">True double-entry ledger</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide" data-title="The Problem">
+    <div class="content">
+      <p class="eyebrow">The Problem</p>
+      <h2>Founders run their company's books like a CFO. Their <span class="accent">own</span> finances like a stranger.</h2>
+      <p class="lede tight">Budgeting apps optimize for emotional reassurance — "you're doing great this month." Founders and the self-employed need something else: accounting-grade visibility into net worth, burn, and runway, the same instruments they'd demand from a company's finance function.</p>
+      <div class="card-grid cols-3" style="margin-top: var(--space-4);">
+        <div class="card"><div class="glyph">◐</div><h3>No consolidated view</h3><p>Personal and business cash scattered across banks, crypto, and brokerage with no single ledger.</p></div>
+        <div class="card"><div class="glyph">▤</div><h3>No real classification</h3><p>Bank categorization is generic and doesn't reflect how an operator actually thinks about spend.</p></div>
+        <div class="card"><div class="glyph">◔</div><h3>No runway math</h3><p>Consumer apps show balances, not burn rate or months-of-runway — the numbers that matter to an operator.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide" data-title="The Pitch">
+    <div class="content">
+      <p class="eyebrow">The Pitch</p>
+      <h2>"Run yourself like a <span class="accent">company.</span>"</h2>
+      <p class="lede">A live double-entry ledger and CFO dashboard that turns your bank accounts into an executive view of net worth, runway, and cashflow — built for people who think like both employees and executives.</p>
+      <div style="margin-top: var(--space-4);">
+        <p class="eyebrow" style="margin-bottom: 0.6em;">Target User</p>
+        <p class="lede tight" style="max-width: 62ch;">Founders, entrepreneurs, and self-employed professionals in New Zealand who want accounting-grade visibility into their personal finances — not another budgeting app.</p>
+      </div>
+      <div style="margin-top: var(--space-3);">
+        <span class="tag">FOUNDERS</span><span class="tag">SELF-EMPLOYED</span><span class="tag">OPERATORS</span><span class="tag">NZ MARKET</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide" data-title="Product Overview">
+    <div class="content">
+      <p class="eyebrow">Product Overview</p>
+      <h2>One ledger. Every account. <span class="accent">Executive-grade</span> read.</h2>
+      <div class="card-grid cols-3">
+        <div class="card"><div class="glyph">⇄</div><h3>Live Bank Sync</h3><p>Read-only Akahu connection pulls NZ bank transactions straight into your ledger.</p></div>
+        <div class="card"><div class="glyph">§</div><h3>Auto Classification</h3><p>Regex rules editor plus NZFCC fallback coding sorts every transaction automatically.</p></div>
+        <div class="card"><div class="glyph">▦</div><h3>Custom Dashboard</h3><p>Drag-and-resize widgets: net worth, runway, cashflow, P&amp;L, balance sheet.</p></div>
+        <div class="card"><div class="glyph">⧉</div><h3>Multi-Tenant Isolation</h3><p>Fully isolated workspace per user — own ledger, rules, and balance history.</p></div>
+        <div class="card"><div class="glyph">⇵</div><h3>Double-Entry Ledger</h3><p>Transactions auto-post to a standard chart of accounts; only settled txns land.</p></div>
+        <div class="card"><div class="glyph">⇩</div><h3>No Lock-In Export</h3><p>Export your full ledger as plain-text hledger journals, any time.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide" data-title="How It Works">
+    <div class="content">
+      <p class="eyebrow">How It Works</p>
+      <h2>From sign-up to <span class="accent">live ledger</span> in four steps.</h2>
+      <div class="journey">
+        <div class="jstep"><h3>1. Sign Up</h3><p>Email sign-up creates a Supabase Auth account.</p></div>
+        <div class="arrow">→</div>
+        <div class="jstep"><h3>2. Onboard</h3><p>Name your workspace — "Your Inc." — provisioning a tenant.</p></div>
+        <div class="arrow">→</div>
+        <div class="jstep"><h3>3. Connect</h3><p>Link a bank via Akahu, or add accounts manually.</p></div>
+        <div class="arrow">→</div>
+        <div class="jstep"><h3>4. Live Ledger</h3><p>Transactions classify and post — the dashboard comes alive.</p></div>
+      </div>
+      <p class="lede tight" style="margin-top: var(--space-3);">No signup required to try it first — sample data seeds the full dashboard experience on demand.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide" data-title="Feature: Live Bank Sync">
+    <div class="content">
+      <p class="eyebrow">Feature</p>
+      <h2>Live Bank Sync via <span class="accent">Akahu</span></h2>
+      <div class="card-grid cols-2">
+        <div class="card"><div class="glyph">⇄</div><h3>Read-only, revocable</h3><p>Secure connection to NZ bank accounts through Akahu's open-banking layer. Users can revoke access at any time.</p></div>
+        <div class="card"><div class="glyph">↻</div><h3>Continuous sync</h3><p>Pulls transactions via cursor-paginated API calls and re-ingests them into the tenant's ledger automatically.</p></div>
+        <div class="card"><div class="glyph">✓</div><h3>Settled-only posting</h3><p>Only settled transactions appear in the ledger; pending transactions stay cached until they clear.</p></div>
+        <div class="card"><div class="glyph">🔒</div><h3>Vault-encrypted tokens</h3><p>Akahu user tokens are never stored in plaintext — encrypted at rest in Supabase Vault.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide" data-title="Feature: Transaction Classification">
+    <div class="content">
+      <p class="eyebrow">Feature</p>
+      <h2>Automatic Transaction <span class="accent">Classification</span></h2>
+      <p class="lede tight">A rules editor lets users define regex-based patterns to categorize transactions — matching on description, merchant, or amount. Unmatched transactions fall back to standard NZFCC coding.</p>
+      <div class="card-grid cols-3" style="margin-top: var(--space-3);">
+        <div class="card"><div class="glyph">/…/</div><h3>Regex rules</h3><p>Match on description, merchant name, or amount thresholds with user-defined priority order.</p></div>
+        <div class="card"><div class="glyph">⇊</div><h3>NZFCC fallback</h3><p>Anything a rule doesn't catch still lands in a sane standard category, never unclassified.</p></div>
+        <div class="card"><div class="glyph">↺</div><h3>Re-routes on edit</h3><p>Editing a rule reclassifies new transactions on the next ingest — the ledger stays current.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide" data-title="Feature: Dashboard & Widgets">
+    <div class="content">
+      <p class="eyebrow">Feature</p>
+      <h2>A Dashboard Built Like a <span class="accent">CFO Deck</span></h2>
+      <div class="card-grid cols-3">
+        <div class="card"><div class="glyph">◎</div><h3>Net Worth</h3><p>Consolidated across every connected and manual account.</p></div>
+        <div class="card"><div class="glyph">◔</div><h3>Runway</h3><p>Months of burn runway calculated live from cash position and spend rate.</p></div>
+        <div class="card"><div class="glyph">≋</div><h3>Cashflow</h3><p>In vs. out, trended over time, at a glance.</p></div>
+        <div class="card"><div class="glyph">▤</div><h3>P&amp;L by Month</h3><p>Operator-style monthly profit and loss, not a spending pie chart.</p></div>
+        <div class="card"><div class="glyph">▥</div><h3>Expense Breakdown</h3><p>Category-level detail driven by the classification engine.</p></div>
+        <div class="card"><div class="glyph">▦</div><h3>Balance Sheet</h3><p>Assets and liabilities, structured like a real set of books.</p></div>
+      </div>
+      <p class="lede tight" style="margin-top: var(--space-3);">Drag, resize, and rearrange — layout persists per user via <code style="font-family:var(--mono);color:var(--accent-amber);">@dnd-kit</code>.</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide" data-title="Feature: Data Export">
+    <div class="content">
+      <p class="eyebrow">Feature</p>
+      <h2>Your Data, <span class="accent">No Lock-In</span></h2>
+      <p class="lede">Export the full ledger as plain-text hledger journals — a portable, auditable, tool-agnostic format. Your financial history isn't hostage to one app.</p>
+      <div class="card-grid cols-2" style="margin-top: var(--space-3);">
+        <div class="card"><div class="glyph">⇩</div><h3>Full ledger export</h3><p>Every journal entry, every account, in plain-text hledger format.</p></div>
+        <div class="card"><div class="glyph">＋</div><h3>Manual accounts included</h3><p>Crypto, cash, and brokerage accounts you added manually export right alongside synced ones.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide" data-title="Pricing">
+    <div class="content">
+      <p class="eyebrow">Business Model</p>
+      <h2>Priced like a tool operators <span class="accent">actually pay for.</span></h2>
+      <div class="price-grid">
+        <div class="price-card">
+          <span class="tier">Demo</span>
+          <div class="amount">Free</div>
+          <ul><li>Full dashboard, sample data</li><li>No signup required</li><li>Explore before you connect</li></ul>
+        </div>
+        <div class="price-card featured">
+          <span class="tier" style="color: var(--accent);">Self-Serve</span>
+          <div class="amount">$15<small> NZD / mo</small></div>
+          <ul><li>Live bank sync</li><li>All dashboard widgets</li><li>Custom layout</li><li>Full ledger export</li><li>Email support</li></ul>
+        </div>
+        <div class="price-card">
+          <span class="tier">Concierge</span>
+          <div class="amount">$149<small>+ NZD / mo</small></div>
+          <ul><li>Bespoke widgets</li><li>Custom integrations</li><li>AI agents</li><li>Founder direct line</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide" data-title="Trust & Security">
+    <div class="content">
+      <p class="eyebrow">Trust &amp; Security</p>
+      <h2>Honest about being <span class="accent">founder-led</span> and early.</h2>
+      <div class="sec-grid">
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Read-only bank access.</strong> Akahu connections cannot move money — visibility only.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Credentials never stored.</strong> Bank logins never touch YouInc's servers.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Encrypted token vault.</strong> Akahu tokens are encrypted at rest in Supabase Vault.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Passkey authentication.</strong> WebAuthn passkeys, not passwords, on the private dashboard.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Revoke anytime.</strong> Disconnect bank access in one click, no support ticket needed.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Data deletion available.</strong> Full account and data deletion on request.</p></div>
+      </div>
+      <p class="lede tight" style="margin-top: var(--space-3);">We emphasize operational completeness over false enterprise claims — this is a small, founder-run product, and we say so.</p>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide divider" data-title="Under the Hood">
+    <div class="content">
+      <p class="eyebrow">Section</p>
+      <h1>Under the <span class="accent">Hood</span></h1>
+      <div class="rule"></div>
+      <p class="lede" style="text-align:center;">How the ledger, the rules engine, and multi-tenant isolation are actually built.</p>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide" data-title="Tech Stack">
+    <div class="content">
+      <p class="eyebrow">Architecture</p>
+      <h2>The <span class="accent">Stack</span></h2>
+      <div class="stack-list">
+        <div class="stack-item"><div class="label">Frontend</div><div class="value">TanStack Start (React 19 + Nitro), TypeScript, <code>Vite</code></div></div>
+        <div class="stack-item"><div class="label">Database</div><div class="value">Supabase (Postgres) — multi-tenant; SQLite (<code>better-sqlite3</code>) for legacy single-tenant dashboard</div></div>
+        <div class="stack-item"><div class="label">Auth</div><div class="value">Passkey/WebAuthn (<code>@simplewebauthn</code>) + Supabase Auth (email/password)</div></div>
+        <div class="stack-item"><div class="label">Key Libraries</div><div class="value"><code>@tanstack/react-router</code>, <code>@supabase/ssr</code>, <code>zod</code>, <code>@dnd-kit</code></div></div>
+        <div class="stack-item"><div class="label">Testing</div><div class="value"><code>Vitest</code> for units, <code>Playwright</code> for E2E</div></div>
+        <div class="stack-item"><div class="label">Server Fns</div><div class="value">26 modules in <code>frontend/src/server/</code>, each independently auth-checked</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide" data-title="Folder Structure">
+    <div class="content">
+      <p class="eyebrow">Architecture</p>
+      <h2>Folder <span class="accent">Structure</span></h2>
+      <div class="tree"><span class="dir">frontend/src/server/</span>       <span class="cmt"># 26 modules: auth, accounts, akahuConnection,</span>
+                          <span class="cmt"># tenantIngestion, workspaceLedger, tenantRules...</span>
+<span class="dir">frontend/src/routes/</span>        <span class="cmt"># marketing: /, signup, signin, onboarding, workspace</span>
+                          <span class="cmt"># internal: dashboard, login, demo, widgets</span>
+<span class="dir">frontend/src/components/</span>    <span class="cmt"># workspace/, dashboard/, marketing/</span>
+<span class="dir">frontend/src/hooks/, lib/</span>   <span class="cmt"># supabaseConfig, supabaseBrowser, analytics</span>
+<span class="dir">frontend/src/styles/</span>
+<span class="dir">supabase/migrations/</span>        <span class="cmt"># 6 SQL files: schema, RLS, self-registration RPC,</span>
+                          <span class="cmt"># Akahu Vault secrets</span></div>
+    </div>
+  </section>
+
+  <!-- 15 -->
+  <section class="slide" data-title="Data Pipeline">
+    <div class="content">
+      <p class="eyebrow">Data Pipeline</p>
+      <h2>Signup → Rules → <span class="accent">Ledger</span> — 9 Stages</h2>
+      <div class="steps">
+        <div class="step"><span class="num">1</span><h3>Signup</h3><p>User → Supabase Auth → <code>create_tenant</code> RPC.</p></div>
+        <div class="step"><span class="num">2</span><h3>Onboarding</h3><p>Name workspace → <code>createTenant()</code> creates a row in <code>tenants</code>.</p></div>
+        <div class="step"><span class="num">3</span><h3>Manual Entry</h3><p>Balances upsert into <code>manual_account_balances</code> (tenant-scoped RLS).</p></div>
+        <div class="step"><span class="num">4</span><h3>Sample Seed</h3><p>Optional demo payloads seed starter rules via <code>ingestTenantPayloads()</code>.</p></div>
+        <div class="step"><span class="num">5</span><h3>Akahu Connect</h3><p>Token stored encrypted in Vault via <code>connect_akahu</code> RPC.</p></div>
+        <div class="step"><span class="num">6</span><h3>Live Sync</h3><p><code>syncAkahuAccount</code> pulls txns via <code>AkahuClient</code>.</p></div>
+        <div class="step"><span class="num">7</span><h3>Ingestion</h3><p>Payload → RulesRouter + tenant rules → <code>raw_transactions</code> + journal.</p></div>
+        <div class="step"><span class="num">8</span><h3>Rules Classification</h3><p>Editing <code>classification_rules</code> re-routes future ingests.</p></div>
+        <div class="step"><span class="num">9</span><h3>Ledger Read</h3><p><code>getWorkspaceLedger()</code> merges journal + manual → per-account totals.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 -->
+  <section class="slide" data-title="Multi-Tenant Isolation">
+    <div class="content">
+      <p class="eyebrow">Multi-Tenant Isolation</p>
+      <h2>Every row carries a <span class="accent">tenant_id</span>.</h2>
+      <div class="card-grid cols-2">
+        <div class="card"><div class="glyph">⛨</div><h3>Row-Level Security</h3><p>RLS enforced on every business table — <code style="font-family:var(--mono);color:var(--accent-amber);">raw_transactions</code>, <code style="font-family:var(--mono);color:var(--accent-amber);">journal_entries</code>, <code style="font-family:var(--mono);color:var(--accent-amber);">manual_account_balances</code>, <code style="font-family:var(--mono);color:var(--accent-amber);">classification_rules</code>.</p></div>
+        <div class="card"><div class="glyph">ƒ</div><h3>SECURITY DEFINER helpers</h3><p><code style="font-family:var(--mono);color:var(--accent-amber);">user_tenant_ids()</code> and <code style="font-family:var(--mono);color:var(--accent-amber);">is_tenant_member()</code> check membership before any access.</p></div>
+        <div class="card"><div class="glyph">✗</div><h3>WITH CHECK guards</h3><p>Prevents an INSERT/UPDATE from moving a row into another tenant's ownership.</p></div>
+        <div class="card"><div class="glyph">✓</div><h3>Tested boundaries</h3><p><code style="font-family:var(--mono);color:var(--accent-amber);">supabase/tests/classification_rules_isolation.sql</code> proves cross-tenant read/write isolation.</p></div>
+      </div>
+      <p class="lede tight" style="margin-top: var(--space-3);">Server-side guarantee: every server function calls <code style="font-family:var(--mono);color:var(--accent);">requireTenant()</code> and uses a request-scoped Supabase client under the user's RLS context — never <code style="font-family:var(--mono);color:var(--accent);">service_role</code>.</p>
+    </div>
+  </section>
+
+  <!-- 17 -->
+  <section class="slide" data-title="Key Server Modules">
+    <div class="content">
+      <p class="eyebrow">Architecture</p>
+      <h2>Key Server <span class="accent">Modules</span></h2>
+      <table class="mod-table">
+        <thead><tr><th>Module</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td>auth.ts</td><td>WebAuthn passkey ceremonies + session JWT; SQLite-backed.</td></tr>
+          <tr><td>accounts.ts</td><td>Tenant CRUD — <code style="font-family:var(--mono);">getAccountState</code>, <code style="font-family:var(--mono);">createTenant</code>, <code style="font-family:var(--mono);">signOutUser</code>.</td></tr>
+          <tr><td>akahuConnection.ts</td><td>Akahu OAuth orchestration; Vault-backed token encryption; sync trigger.</td></tr>
+          <tr><td>akahuClient.ts</td><td>TS port of Python AkahuClient; cursor pagination + error handling.</td></tr>
+          <tr><td>tenantIngestion.ts</td><td>Akahu payload → double-entry journal via ported LedgerPipeline + RulesRouter.</td></tr>
+          <tr><td>workspaceLedger.ts</td><td>Tenant-scoped ledger DAL; merges manual + journal balances.</td></tr>
+          <tr><td>tenantRules.ts</td><td>CRUD for classification_rules; RLS-gated, validated input.</td></tr>
+          <tr><td>ruleValidation.ts</td><td>Pure rule validation — regex, amounts, account paths; no dependencies.</td></tr>
+          <tr><td>sampleIngestion.ts</td><td>Seeds starter rules + demo Akahu batch; idempotent via upsert/dedup.</td></tr>
+          <tr><td>serverError.ts</td><td>ServerFnError wrapper — serializable error + HTTP status.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 18 -->
+  <section class="slide" data-title="Security & Auth Model">
+    <div class="content">
+      <p class="eyebrow">Security &amp; Auth</p>
+      <h2>Defense in <span class="accent">depth.</span></h2>
+      <div class="sec-grid">
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Two independent auth systems.</strong> Passkey/WebAuthn for the private dashboard; Supabase Auth for self-service multi-tenant.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Session gate.</strong> Passkey session required only for <code style="font-family:var(--mono);">/dashboard</code>; everything else public by default.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Independent checks.</strong> Every server function calls <code style="font-family:var(--mono);">requireSession()</code> / <code style="font-family:var(--mono);">getServerUser()</code> — no shared trust assumption.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Short-lived credentials.</strong> Passkey challenges/sessions expire on 5-minute / 30-day TTLs.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Vault-encrypted secrets.</strong> Akahu tokens encrypted via <code style="font-family:var(--mono);">connect_akahu</code> RPC; app token server-only.</p></div>
+        <div class="sec-item"><span class="tick">✓</span><p><strong>Request-scoped RLS.</strong> Supabase server client built from request cookies per the <code style="font-family:var(--mono);">@supabase/ssr</code> pattern, plus default CSRF middleware.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 19 -->
+  <section class="slide" data-title="Closing">
+    <div class="content">
+      <p class="eyebrow">Vision</p>
+      <h1>Every operator deserves<br/>a <span class="accent">CFO dashboard.</span></h1>
+      <p class="lede">YouInc treats you like the executive of your own finances — not a saver to be nudged, but an operator who needs real numbers: net worth, runway, burn. Start with the demo. Connect your bank when you're ready. Own your data, always.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="num amber">Try It</div><div class="lab">Sample dashboard, no signup</div></div>
+        <div class="stat"><div class="num accent">$15/mo</div><div class="lab">Go live with your own ledger</div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="progress-dots" id="progressDots"></div>
+
+<div class="nav-chrome">
+  <button class="nav-btn" id="prevBtn" aria-label="Previous slide">‹</button>
+  <span class="nav-counter" id="counter">1 / 19</span>
+  <button class="nav-btn" id="nextBtn" aria-label="Next slide">›</button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = slides.length;
+    var current = 0;
+
+    var counterEl = document.getElementById('counter');
+    var prevBtn = document.getElementById('prevBtn');
+    var nextBtn = document.getElementById('nextBtn');
+    var dotsWrap = document.getElementById('progressDots');
+
+    // build footer + dots
+    slides.forEach(function (slide, i) {
+      var footer = document.createElement('div');
+      footer.className = 'slide-footer';
+      var title = slide.getAttribute('data-title') || '';
+      footer.innerHTML = '<span class="dot"></span> YOUINC <span class="dot"></span> ' + title;
+      slide.appendChild(footer);
+
+      var dot = document.createElement('button');
+      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      dot.addEventListener('click', function () { goTo(i); });
+      dotsWrap.appendChild(dot);
+    });
+
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+
+    function render() {
+      slides.forEach(function (slide, i) {
+        slide.classList.toggle('is-active', i === current);
+        slide.classList.toggle('is-prev', i < current);
+      });
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('is-active', i === current);
+      });
+      counterEl.textContent = (current + 1) + ' / ' + total;
+    }
+
+    function goTo(index) {
+      if (index < 0 || index >= total) return;
+      current = index;
+      render();
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+      else if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    });
+
+    render();
+  });
+</script>
+
+</body>
+</html>

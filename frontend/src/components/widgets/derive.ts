@@ -624,6 +624,15 @@ const STALE_SYNC_DAYS = 7;
 const NEW_RECURRING_DAYS = 35;
 const CREDIT_UTILIZATION_WARN = 0.7;
 
+/**
+ * A suspense backlog at or under this size reads as routine cleanup, not an
+ * exception — shared by the Action Center severity below and the Control
+ * Brief / Ledger Confidence banners (`ControlBriefWidget`,
+ * `LedgerConfidenceWidget`) so "books not decision-grade" language only
+ * appears once the backlog is actually large enough to matter.
+ */
+export const SUSPENSE_MINOR_THRESHOLD = 10;
+
 const SEVERITY_RANK: Record<AttentionSeverity, number> = {
   critical: 0,
   action: 1,
@@ -676,11 +685,14 @@ export function buildAttentionItems(
 
   if (routing.suspenseCount > 0) {
     const n = routing.suspenseCount;
+    const isMinor = n <= SUSPENSE_MINOR_THRESHOLD;
     items.push({
       id: "suspense",
-      severity: "action",
+      severity: isMinor ? "review" : "action",
       label: `${n.toLocaleString()} ${n === 1 ? "transaction" : "transactions"} to classify`,
-      detail: "Books aren't decision-grade until these are routed.",
+      detail: isMinor
+        ? "A small backlog — route these whenever convenient."
+        : "Books aren't decision-grade until these are routed.",
       targetView: "books",
     });
   }

@@ -39,6 +39,8 @@ export interface WorkspaceManualBalance {
 export interface WorkspaceLedgerSummary {
   tenantId: string;
   currency: string;
+  /** The tenant's configured suspense/fallback account (default: Expenses:Uncategorized:Suspense). */
+  suspenseAccount: string;
   /** Editable manual balances (the accounts a user maintains by hand). */
   manualBalances: WorkspaceManualBalance[];
   /** Combined per-account balances: journal-derived + manual (manual wins). */
@@ -64,9 +66,10 @@ interface JournalEntryDbRow {
 interface TenantContext {
   tenantId: string;
   currency: string;
+  suspenseAccount: string;
 }
 
-/** Resolve the caller's primary tenant (id + default currency), or throw 401. */
+/** Resolve the caller's primary tenant (id + default currency + suspense account), or throw 401. */
 async function requireTenant(): Promise<TenantContext> {
   const user = await getServerUser();
   if (!user) {
@@ -75,18 +78,20 @@ async function requireTenant(): Promise<TenantContext> {
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tenants")
-    .select("id, default_currency")
+    .select("id, default_currency, suspense_account")
     .order("created_at", { ascending: true })
     .limit(1);
   if (error) {
     throwServerError(error.message || "Could not load your workspace.", 400);
   }
-  const row = data?.[0] as { id: string; default_currency: string } | undefined;
+  const row = data?.[0] as
+    | { id: string; default_currency: string; suspense_account: string }
+    | undefined;
   if (!row) {
     // Signed in but no tenant yet — onboarding not finished.
     throwServerError("No workspace found. Finish onboarding first.", 409);
   }
-  return { tenantId: row.id, currency: row.default_currency };
+  return { tenantId: row.id, currency: row.default_currency, suspenseAccount: row.suspense_account };
 }
 
 /** Aggregate journal entries into per-account balances: debit +, credit −. */
@@ -132,6 +137,7 @@ function summarize(
   return {
     tenantId: tenant.tenantId,
     currency: tenant.currency,
+    suspenseAccount: tenant.suspenseAccount,
     manualBalances,
     balances,
     hasJournalBalances: journalBalances.length > 0,

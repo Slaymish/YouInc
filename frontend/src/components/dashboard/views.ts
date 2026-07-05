@@ -102,7 +102,7 @@ const VIEW_BLUEPRINTS: ViewBlueprint[] = [
     // "Are my numbers trustworthy?"
     id: "books",
     name: "Books",
-    ids: ["ledger-confidence", "journal"],
+    ids: ["ledger-confidence", "suspense-queue", "journal"],
   },
 ];
 

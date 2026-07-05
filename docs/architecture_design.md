@@ -1,4 +1,6 @@
-# Phase 1 Architecture Design Document
+# Phase 1 Architecture Design Document (Historical)
+
+> **Note**: This document describes the legacy Python CLI + SQLite architecture from Phase 1. It has been superseded by the Supabase-backed TanStack Start frontend (Phase 3+). For the current architecture and deployment model, see [`frontend/CLAUDE.md`](../frontend/CLAUDE.md). This document is preserved as a historical reference for understanding the previous system design.
 
 ## 1. Overview
 

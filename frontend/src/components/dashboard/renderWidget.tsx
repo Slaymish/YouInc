@@ -26,6 +26,7 @@ import { IncomeConcentrationWidget } from "../widgets/IncomeConcentrationWidget"
 import { CashflowWaterfallWidget } from "../widgets/CashflowWaterfallWidget";
 import { SpendingAnomaliesWidget } from "../widgets/SpendingAnomaliesWidget";
 import { SpendCalendarWidget } from "../widgets/SpendCalendarWidget";
+import { SuspenseQueueWidget } from "../widgets/SuspenseQueueWidget";
 
 export const METRIC_IDS = new Set<string>([
   "metric-net-worth",
@@ -88,6 +89,8 @@ export function renderWidgetContent(
       return <SpendingAnomaliesWidget dashboard={dashboard} />;
     case "spend-calendar":
       return <SpendCalendarWidget dashboard={dashboard} />;
+    case "suspense-queue":
+      return <SuspenseQueueWidget dashboard={dashboard} />;
     default:
       return null;
   }

@@ -148,12 +148,16 @@ export const SAMPLE_DASHBOARD: LedgerDashboardData = {
     "Income:Salary",
   ],
   routing: {
+    // A healthy, well-maintained sample ledger: a small handful of items
+    // still need routing, not a 50-item backlog that reads as "broken" on
+    // first look at /demo. Keep customRuleCount + nzfccFallbackCount +
+    // suspenseCount == journalCount.
     journalCount: 1_240,
-    customRuleCount: 980,
+    customRuleCount: 1_027,
     nzfccFallbackCount: 210,
-    suspenseCount: 50,
-    suspenseCents: 84_000,
-    classificationRate: 0.96,
+    suspenseCount: 3,
+    suspenseCents: 4_800,
+    classificationRate: 0.998,
   },
   syncState: [{ key: "last_sync", value: "2026-06-30T08:55:00.000Z", updatedAt: "2026-06-30T08:55:00.000Z" }],
   error: null,

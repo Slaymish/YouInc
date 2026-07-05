@@ -57,9 +57,58 @@ Done:
   browser), list accounts, and sync transactions into their per-tenant ledger.
   E2E-covered against a mock Akahu API (connect → list → sync → idempotent →
   disconnect).
-- [ ] Self-service follow-ups (rest of Phase 2): (a) grow `/workspace` toward the full widget
-  dashboard (reuse DashboardGrid on the per-tenant `LedgerDashboardData` once the remaining read
-  aggregates are ported); (b) per-tenant rules/classification editing UI so users can re-route
-  transactions; (c) scheduled/background Akahu sync (currently on-demand per account).
+- [x] Self-service follow-ups (rest of Phase 2), part (b): per-tenant rules/classification
+  editing UI (`components/workspace/RulesEditor.tsx` + `server/tenantRules.ts` CRUD, wired into
+  `routes/workspace.tsx`) — shipped in the Python-removal refactor commit but not logged here at
+  the time. E2E-covered (`e2e/rules-editor.spec.ts`).
+- [x] Self-service follow-ups (rest of Phase 2), part (a): `/workspace` now runs the full
+  DashboardGrid with real per-tenant data end to end — completed together with the "Capability
+  gaps" slice below (`suspenseQueue`/`pipeline`/`routing` are no longer stubbed).
+- [ ] Feature: scheduled/background Akahu sync (currently on-demand per account only). Deploy is a
+  single scale-to-zero Fly Machine (`docs/deploy_fly.md`) with no cron/edge-function infra yet, so
+  this needs a hosting decision (e.g. a GitHub Actions cron hitting an internal sync endpoint, vs a
+  Supabase Edge Function + pg_cron, vs a separate Fly scheduled machine) — reviewed and explicitly
+  deferred for now rather than building it, same as the email-delivery item below.
 - [ ] Maybe work on infra: How this is all hosted and secure. (untracked supabase/ migrations + docs/architecture/ + tests/golden/ from separate work exist in the repo — not part of the marketing revamp branch)
-- [ ] Optional polish (from review): demo opens with the red "books not decision-grade" exception from 50 sample suspense items — honest but alarming as a first impression; consider a calmer sample backlog. Action Center widget is tall/sparse at its default size.
+- [x] Optional polish (from review): calmer `/demo` first impression — sample suspense backlog
+  50 → 3 items (`components/marketing/sampleDashboard.ts`), plus a shared
+  `SUSPENSE_MINOR_THRESHOLD` (`components/widgets/derive.ts`) so small backlogs render as a neutral
+  "review" nudge instead of the red "books not decision-grade" exception
+  (`ControlBriefWidget.tsx`, `LedgerConfidenceWidget.tsx`, `AttentionWidget`). Action Center widget
+  default height trimmed 3 → 2 rows (`components/dashboard/widgets.ts`) to fix the tall/sparse
+  layout. Tests updated (`derive.attention.test.ts`); `pnpm test` and `pnpm build` green.
+
+***
+
+- [x] Remove the Python ledger pipeline (`youinc_ledger` CLI, Streamlit BI, `ledger.ts`,
+  Docker/CI Python steps) and make Supabase/`/workspace` the only production path. `/dashboard`
+  now redirects to `/workspace`; 28 shared widgets rewired onto `dashboardData.ts`.
+- [x] Capability gaps left by the Python removal (all four ported to `/workspace`):
+  - [x] Account-mapping UI: `server/accountMappings.ts` CRUD (RLS-scoped, mirrors
+    `tenantRules.ts`) + `components/workspace/AccountMappingEditor.tsx`, using the
+    already-existing `account_mappings` table (no new migration needed). E2E-covered
+    (`e2e/account-mapping-editor.spec.ts`).
+  - [x] Reclassify / suspense-queue resolution: `server/tenantReclassify.ts`
+    (`reclassifySuspenseItem` posts a balanced double-entry correction transaction rather than
+    mutating existing rows), `server/workspaceSuspenseMath.ts` (pure suspense-queue math),
+    `components/widgets/SuspenseQueueWidget.tsx` re-enabled in `workspaceWidgetIds.ts`.
+    E2E-covered (`e2e/suspense-reclassify.spec.ts`).
+  - [x] Pipeline/routing health visibility: `server/workspacePipeline.ts` +
+    `server/workspacePipelineMath.ts` (posted/pending/zero-amount/unprocessed, date range,
+    `last_synced_at`) feed real `pipeline`/`routing` data into `workspaceDashboard.ts`;
+    `AttentionWidget`/`LedgerConfidenceWidget` re-enabled in `workspaceWidgetIds.ts`.
+  - [x] Per-sync detail log / date-range picker: migration `20260705000001_akahu_sync_log.sql`
+    (new `akahu_sync_log` table + RLS, verified by `supabase/tests/akahu_sync_log.sql`);
+    `akahuConnection.ts` now logs each sync attempt and accepts an explicit date range;
+    `components/workspace/SyncHistoryPanel.tsx` + date inputs in `AkahuConnectPanel.tsx`.
+  - All four: `pnpm vitest run` (253 passed) and `pnpm build` (incl. `tsc --noEmit`) green on the
+    combined change set.
+- [x] Cleanup leftovers from the Python removal: `tests/golden/README.md` and
+  `docs/architecture_design.md` now describe the removed Python tooling as historical, not
+  current. **`data/youinc-ledger.sqlite3` deletion is UNDER REVIEW, not confirmed-good** — a
+  cleanup subagent deleted it with `rm`; it was never git-tracked (`.gitignore`) and evidence
+  suggests the real owner-tenant backfill into Supabase was never actually run (see
+  `docs/architecture/migration-strategy.md`: "No migration executed", "keep the original SQLite
+  files untouched as the source of truth until parity is verified"), so this may have been the
+  only copy of ~170 real transactions. Flagged to the user; holding here pending their call on
+  recovery/acceptance before this line is trusted as done.

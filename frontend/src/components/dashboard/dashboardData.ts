@@ -10,10 +10,11 @@
 // `SyncLedgerInput`, `SyncLedgerResult`, `AccountMappingInput`,
 // `ClassifyTransactionInput`, `AkahuAccountRow`, `AkahuAccountsResult`) were
 // dropped along with the widgets that used them exclusively
-// (IngestionWidget, ManualAccountsWidget, SourceSystemsWidget,
-// SuspenseQueueWidget) — those capabilities now live in the per-tenant
-// Postgres path (`workspaceLedger.ts`, `tenantIngestion.ts`,
-// `akahuConnection.ts`, `tenantRules.ts`) with their own types.
+// (IngestionWidget, ManualAccountsWidget, SourceSystemsWidget) — those
+// capabilities now live in the per-tenant Postgres path (`workspaceLedger.ts`,
+// `tenantIngestion.ts`, `akahuConnection.ts`, `tenantRules.ts`) with their own
+// types. `SuspenseQueueWidget` was rebuilt on the per-tenant path (Phase 4) —
+// see `workspaceSuspenseMath.ts` (read) / `tenantReclassify.ts` (mutation).
 import type {
   CategoryMonthPoint,
   DailySpendPoint,
@@ -29,6 +30,8 @@ import type {
   NetWorthPoint,
   PnlRow,
 } from "~/server/ledgerAggregates";
+import type { PipelineHealth } from "~/server/workspacePipelineMath";
+import type { RoutingHealth, SuspenseItem } from "~/server/workspaceSuspenseMath";
 
 export type {
   CategoryMonthPoint,
@@ -45,6 +48,8 @@ export type {
   NetWorthPoint,
   PnlRow,
 } from "~/server/ledgerAggregates";
+export type { PipelineHealth } from "~/server/workspacePipelineMath";
+export type { RoutingHealth, SuspenseItem } from "~/server/workspaceSuspenseMath";
 
 export interface BalanceRow {
   account: string;
@@ -62,17 +67,6 @@ export interface ManualBalanceRow {
   updatedAt: string;
 }
 
-export interface PipelineHealth {
-  rawCached: number;
-  posted: number;
-  pending: number;
-  zeroAmount: number;
-  unprocessed: number;
-  earliestTransactionDate: string | null;
-  latestTransactionDate: string | null;
-  lastSeenAt: string | null;
-}
-
 export interface SourceAccountRow {
   accountId: string;
   rawCount: number;
@@ -88,31 +82,10 @@ export interface SourceAccountRow {
   creditLimitCents: number | null;
 }
 
-export interface RoutingHealth {
-  journalCount: number;
-  customRuleCount: number;
-  nzfccFallbackCount: number;
-  suspenseCount: number;
-  suspenseCents: number;
-  classificationRate: number | null;
-}
-
 export interface SyncStateRow {
   key: string;
   value: string;
   updatedAt: string;
-}
-
-export interface SuspenseItem {
-  externalId: string;
-  transactionDate: string;
-  description: string;
-  /** Signed cents: negative when money left the account, positive when it arrived. */
-  amountCents: number;
-  /** "out" = money left the account, "in" = money arrived. */
-  direction: "in" | "out";
-  /** The real (non-suspense) account the money moved through. */
-  counterAccount: string;
 }
 
 export interface LedgerDashboardData {

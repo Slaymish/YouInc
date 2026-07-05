@@ -13,18 +13,26 @@ import type { WidgetId } from "../dashboard/widgets";
 // netWorthCents,assetsCents,liabilitiesCents}, creditFacilities,
 // balances[].liquidityTier.
 //
-// Phase 2+3 (added here): pnl[], incomeBreakdown[]/expenseBreakdown[],
+// Phase 2+3: pnl[], incomeBreakdown[]/expenseBreakdown[],
 // recentTransactions[], netWorthTrend[], categoryMonthly[], dailySpend[],
 // recurringPayments[] — see the derive.ts pure functions each widget below
 // reads (monthPulse, netWorthVelocity, incomeConcentration,
 // cashflowWaterfall, spendingAnomalies, spendCalendar, rollingAverages,
 // runwayProjection) and JournalWidget/RecurringWidget/*BreakdownWidget.
 //
-// Still excluded: widgets needing pipeline/routing/suspense-queue health
-// (attention, ledger-confidence, suspense-queue, ingestion, source-systems)
-// or session-gated mutation widgets (manual-accounts) — no per-tenant
-// equivalent yet (Phase 4).
+// Phase 4 (added here): pipeline[]/routing[]/suspenseQueue[] are now real
+// (workspaceSuspenseMath.ts / workspacePipeline.ts), so `attention` and
+// `ledger-confidence` (pure presentational — read only the `dashboard` prop)
+// and the new tenant-scoped `suspense-queue` (has its own resolve mutation,
+// tenantReclassify.ts) are safe to include.
+//
+// Still excluded: `ingestion` / `source-systems` (no per-tenant sourceAccounts
+// yet) and `manual-accounts` (rendered directly on the /workspace route, not
+// through the grid).
 export const WORKSPACE_WIDGET_IDS: WidgetId[] = [
+  "attention",
+  "ledger-confidence",
+  "suspense-queue",
   "metric-net-worth",
   "metric-runway",
   "metric-burn",

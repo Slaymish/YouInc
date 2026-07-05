@@ -31,10 +31,10 @@ const listAccountsFn = createServerFn({ method: "GET" }).handler(
 );
 
 const syncFn = createServerFn({ method: "POST" })
-  .validator((accountId: string) => accountId)
-  .handler(async ({ data: accountId }): Promise<AkahuSyncResult> => {
+  .validator((data: { accountId: string; fromDate?: string; toDate?: string }) => data)
+  .handler(async ({ data }): Promise<AkahuSyncResult> => {
     const { syncAkahuAccount } = await import("~/server/akahuConnection");
-    return syncAkahuAccount(accountId);
+    return syncAkahuAccount(data.accountId, data.fromDate, data.toDate);
   });
 
 const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
@@ -56,15 +56,24 @@ interface Props {
   status: AkahuConnectionStatus;
   /** Called with the refreshed ledger after a successful sync. */
   onLedgerChange: (next: WorkspaceLedgerSummary) => void;
+  /** Called after every sync attempt (success or failure) so a sync-history
+   *  panel elsewhere on the page can refresh. */
+  onSynced?: () => void;
 }
 
-export function AkahuConnectPanel({ status: initialStatus, onLedgerChange }: Props) {
+function defaultFromDate(): string {
+  return new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSynced }: Props) {
   const [status, setStatus] = useState(initialStatus);
   const [token, setToken] = useState("");
   const [accounts, setAccounts] = useState<AkahuAccountSummary[] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [fromDate, setFromDate] = useState(defaultFromDate());
+  const [toDate, setToDate] = useState("");
 
   function connect() {
     if (!token.trim()) return;
@@ -114,7 +123,9 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange }: Pro
     setMessage(null);
     startTransition(async () => {
       try {
-        const result = await syncFn({ data: accountId });
+        const result = await syncFn({
+          data: { accountId, fromDate: fromDate || undefined, toDate: toDate || undefined },
+        });
         onLedgerChange(await refreshLedgerFn());
         setStatus((s) => ({ ...s, lastSyncedAt: new Date().toISOString() }));
         setMessage(
@@ -124,6 +135,8 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange }: Pro
         );
       } catch (err) {
         setError(errorMessage(err));
+      } finally {
+        onSynced?.();
       }
     });
   }
@@ -166,19 +179,45 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange }: Pro
             accounts.length === 0 ? (
               <p className="akahu-panel__note">No Akahu accounts found for this token.</p>
             ) : (
-              <ul className="akahu-accounts">
-                {accounts.map((a) => (
-                  <li key={a.id}>
-                    <div>
-                      <strong>{a.name}</strong>
-                      <code className="akahu-accounts__id">{a.id}</code>
-                    </div>
-                    <button type="button" onClick={() => sync(a.id)} disabled={pending}>
-                      Sync
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <div className="akahu-panel__range">
+                  <label>
+                    From
+                    <input
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      disabled={pending}
+                    />
+                  </label>
+                  <label>
+                    To
+                    <input
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                      placeholder="today"
+                      disabled={pending}
+                    />
+                  </label>
+                  <span className="akahu-panel__meta">
+                    Defaults to the last 90 days through today when left blank.
+                  </span>
+                </div>
+                <ul className="akahu-accounts">
+                  {accounts.map((a) => (
+                    <li key={a.id}>
+                      <div>
+                        <strong>{a.name}</strong>
+                        <code className="akahu-accounts__id">{a.id}</code>
+                      </div>
+                      <button type="button" onClick={() => sync(a.id)} disabled={pending}>
+                        Sync
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )
           ) : null}
         </>

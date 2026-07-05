@@ -1,9 +1,11 @@
 # Golden characterization tests (Phase 0.5)
 
-This directory pins the **current Python `youinc_ledger` engine's exact
-behavior** as language-agnostic JSON fixtures, so the future TypeScript port
-(Phase 2) can be proven byte-for-byte at parity before it ships. It does not
-change any application code. It is baseline-capture only.
+This directory pins the **Python `youinc_ledger` engine's exact behavior**
+as language-agnostic JSON fixtures, establishing a parity contract for the
+production TypeScript engine (`frontend/src/server/ledger-engine/*`). The
+original Python fixtures were captured to ensure the TS port could be proven
+byte-for-byte at parity before replacing the legacy system. The TS port is now
+production; these fixtures remain as the source-of-truth for regression testing.
 
 Captured: 2026-07-04, against `youinc_ledger` at the commit checked out on
 `feat/marketing-revamp` (`config/rules.yaml` frozen into
@@ -75,15 +77,14 @@ the scope of this contract.
 
 ## Real data used, and where it came from
 
-The owner's real SQLite ledger at `data/youinc-ledger.sqlite3` (170
-`raw_transactions`, 173 `journal_transactions` as of capture) was found via
-`YOUINC_DB_PATH`'s default (`./data/youinc-ledger.sqlite3`) and used as the
-primary corpus for `idempotency_hash.json`, `rules_routing.json`,
-`account_mapping.json`, and the `real_batch_diverse_sample` case in
-`journal_balancing.json`. Samples were chosen to spread across every
-distinct transaction `status` present (EFTPOS, ATM, PAYMENT, DIRECT DEBIT,
-CREDIT, TRANSFER, DIRECT CREDIT, STANDING ORDER), the smallest and largest
-`|amount_cents|`, and an even spread across the remaining rows.
+The original Python engine's SQLite ledger (captured 2026-07-04, 170
+`raw_transactions`, 173 `journal_transactions`) served as the primary corpus
+for `idempotency_hash.json`, `rules_routing.json`, `account_mapping.json`, and
+the `real_batch_diverse_sample` case in `journal_balancing.json`. Samples
+were chosen to spread across every distinct transaction `status` present
+(EFTPOS, ATM, PAYMENT, DIRECT DEBIT, CREDIT, TRANSFER, DIRECT CREDIT,
+STANDING ORDER), the smallest and largest `|amount_cents|`, and an even
+spread across the remaining rows.
 
 **PII scrub applied before writing fixtures to git**: `data/` is
 gitignored and contains real bank account numbers (`meta.other_account`),

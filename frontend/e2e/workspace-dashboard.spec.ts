@@ -51,18 +51,21 @@ test.describe(
         .click();
       // The sample batch nets to a single asset account with no configured
       // credit facility: $5,000 salary − $1,800 rent − $89.99 software −
-      // $152.40 groceries = $2,957.61, all in one month.
+      // $152.40 groceries − $40 unclassified ATM withdrawal = $2,917.61, all
+      // in one month. The ATM withdrawal deliberately matches no rule, so it
+      // posts to the tenant's suspense account (see sampleIngestion.ts) —
+      // that's the one item the suspense-reclassify e2e spec resolves.
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Net Worth')) strong"),
-      ).toHaveText("$2,957.61");
+      ).toHaveText("$2,917.61");
 
       // ── "This Week" tab (default): control-brief + 4 P&L metrics ────────
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Burn / Mo')) strong"),
-      ).toHaveText("$2,042.39");
+      ).toHaveText("$2,082.39");
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Margin')) strong"),
-      ).toHaveText("59.2%");
+      ).toHaveText("58.4%");
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Runway')) strong"),
       ).toHaveText("1.4m");
@@ -73,21 +76,24 @@ test.describe(
       );
 
       // ── "Wealth" tab: liquidity, credit facilities, asset mix ───────────
-      await dashboardSection.getByRole("button", { name: "Wealth" }).click();
+      // exact: true avoids ambiguity with the Action Center's per-item
+      // "Wealth →" navigation button (AttentionWidget), now that Phase 4
+      // enables `attention` on /workspace.
+      await dashboardSection.getByRole("button", { name: "Wealth", exact: true }).click();
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Assets')) strong"),
-      ).toHaveText("$2,957.61");
+      ).toHaveText("$2,917.61");
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Liabilities')) strong"),
       ).toHaveText("$0.00");
       await expect(
         dashboardSection.locator(".metric-inner:has(p:text-is('Available Liquidity')) strong"),
-      ).toHaveText("$2,957.61");
+      ).toHaveText("$2,917.61");
 
       const liquidityPanel = dashboardSection.locator("section.panel:has(h2:text-is('Cash Position'))");
       await expect(
         liquidityPanel.locator(".liquidity-row--primary .liquidity-value"),
-      ).toHaveText("$2,957.61");
+      ).toHaveText("$2,917.61");
 
       // The sample account mapping has no credit_limit_cents, so this is a
       // genuinely populated (not merely empty-by-omission) empty state.

@@ -26,7 +26,8 @@ export type WidgetId =
   | "income-concentration"
   | "cashflow-waterfall"
   | "spending-anomalies"
-  | "spend-calendar";
+  | "spend-calendar"
+  | "suspense-queue";
 
 export type WidgetCategory =
   | "overview"
@@ -51,9 +52,9 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     label: "Action Center",
     category: "overview",
     defaultW: 12,
-    defaultH: 3,
+    defaultH: 2,
     minW: 6,
-    minH: 3,
+    minH: 2,
   },
   {
     id: "control-brief",
@@ -295,6 +296,15 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     category: "finance",
     defaultW: 7,
     defaultH: 3,
+    minW: 4,
+    minH: 3,
+  },
+  {
+    id: "suspense-queue",
+    label: "Suspense Queue",
+    category: "actions",
+    defaultW: 6,
+    defaultH: 4,
     minW: 4,
     minH: 3,
   },
