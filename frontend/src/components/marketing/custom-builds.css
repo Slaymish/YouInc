@@ -9,7 +9,7 @@
 .cb-hero__ctas { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
 
 .cb-what__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-.cb-card { background: var(--mk-card); border: 1px solid var(--mk-line); border-radius: 12px; padding: 1.5rem 1.4rem; box-shadow: 0 16px 36px -26px rgba(40,40,30,.4); }
+.cb-card { background: var(--mk-soft-ground); border: none; border-radius: 12px; padding: 1.5rem 1.4rem; box-shadow: var(--mk-soft-raised); }
 .cb-card__title { font-family: var(--mk-serif); font-weight: 400; font-size: 1.35rem; letter-spacing: -.01em; margin: 0 0 0.7rem; }
 .cb-card__body { margin: 0; color: var(--mk-soft); line-height: 1.6; font-size: 0.95rem; }
 @media (max-width: 900px) { .cb-what__grid { grid-template-columns: 1fr; } }
@@ -22,7 +22,7 @@
 
 .cb-pricing { text-align: center; }
 .cb-pricing__figures { display: grid; grid-template-columns: repeat(2, minmax(0, 22rem)); justify-content: center; gap: 1.5rem; margin: 0 auto 2rem; }
-.cb-figure { background: var(--mk-card); border: 1px solid var(--mk-line); border-radius: 14px; padding: 1.6rem 1.5rem; text-align: left; }
+.cb-figure { background: var(--mk-soft-ground); border: none; border-radius: 14px; padding: 1.6rem 1.5rem; text-align: left; box-shadow: var(--mk-soft-raised); }
 .cb-figure__label { font-family: var(--mk-sans); font-size: 0.8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mk-soft); margin: 0 0 0.5rem; }
 .cb-figure__price { font-family: var(--mk-serif); font-size: 2rem; margin: 0 0 0.6rem; font-variant-numeric: tabular-nums; }
 .cb-figure__cadence { font-family: var(--mk-sans); font-size: 0.9rem; color: var(--mk-soft); }

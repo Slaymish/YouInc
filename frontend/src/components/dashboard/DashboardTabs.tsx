@@ -1,4 +1,5 @@
 import type { DashboardViewMeta } from "./useDashboardLayout";
+import { AddIcon, RemoveIcon } from "./icons";
 
 interface DashboardTabsProps {
   views: DashboardViewMeta[];
@@ -42,7 +43,7 @@ export function DashboardTabs({
                 aria-label={`Delete ${view.name} view`}
                 title={canDelete ? "Delete view" : "Can't delete the last view"}
               >
-                ×
+                <RemoveIcon size={14} />
               </button>
             </span>
           );
@@ -66,7 +67,7 @@ export function DashboardTabs({
         aria-label="Add view"
         title="Add view"
       >
-        +
+        <AddIcon size={14} />
       </button>
     </nav>
   );

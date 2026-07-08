@@ -33,8 +33,10 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceIndexRouteImport } from './routes/workspace.index'
 import { Route as SignupIndexRouteImport } from './routes/signup.index'
 import { Route as SigninIndexRouteImport } from './routes/signin.index'
+import { Route as WorkspaceSettingsRouteImport } from './routes/workspace.settings'
 import { Route as SignupPasswordRouteImport } from './routes/signup.password'
 import { Route as SignupNameRouteImport } from './routes/signup.name'
 import { Route as SignupCredentialRouteImport } from './routes/signup.credential'
@@ -164,6 +166,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
 const SignupIndexRoute = SignupIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -173,6 +180,11 @@ const SigninIndexRoute = SigninIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SigninRoute,
+} as any)
+const WorkspaceSettingsRoute = WorkspaceSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => WorkspaceRoute,
 } as any)
 const SignupPasswordRoute = SignupPasswordRouteImport.update({
   id: '/password',
@@ -239,15 +251,17 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
   '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
   '/signup/name': typeof SignupNameRoute
   '/signup/password': typeof SignupPasswordRoute
+  '/workspace/settings': typeof WorkspaceSettingsRoute
   '/signin/': typeof SigninIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -273,15 +287,16 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
-  '/workspace': typeof WorkspaceRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
   '/signup/name': typeof SignupNameRoute
   '/signup/password': typeof SignupPasswordRoute
+  '/workspace/settings': typeof WorkspaceSettingsRoute
   '/signin': typeof SigninIndexRoute
   '/signup': typeof SignupIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -310,15 +325,17 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
   '/admin/feedback': typeof AdminFeedbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
   '/signup/name': typeof SignupNameRoute
   '/signup/password': typeof SignupPasswordRoute
+  '/workspace/settings': typeof WorkspaceSettingsRoute
   '/signin/': typeof SigninIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -355,8 +372,10 @@ export interface FileRouteTypes {
     | '/signup/credential'
     | '/signup/name'
     | '/signup/password'
+    | '/workspace/settings'
     | '/signin/'
     | '/signup/'
+    | '/workspace/'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
@@ -382,15 +401,16 @@ export interface FileRouteTypes {
     | '/terms'
     | '/use-cases'
     | '/widgets'
-    | '/workspace'
     | '/admin/feedback'
     | '/auth/confirm'
     | '/signin/password'
     | '/signup/credential'
     | '/signup/name'
     | '/signup/password'
+    | '/workspace/settings'
     | '/signin'
     | '/signup'
+    | '/workspace'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   id:
@@ -425,8 +445,10 @@ export interface FileRouteTypes {
     | '/signup/credential'
     | '/signup/name'
     | '/signup/password'
+    | '/workspace/settings'
     | '/signin/'
     | '/signup/'
+    | '/workspace/'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
@@ -455,7 +477,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UseCasesRoute: typeof UseCasesRoute
   WidgetsRoute: typeof WidgetsRoute
-  WorkspaceRoute: typeof WorkspaceRoute
+  WorkspaceRoute: typeof WorkspaceRouteWithChildren
   AdminFeedbackRoute: typeof AdminFeedbackRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
@@ -632,6 +654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workspace/': {
+      id: '/workspace/'
+      path: '/'
+      fullPath: '/workspace/'
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
     '/signup/': {
       id: '/signup/'
       path: '/'
@@ -645,6 +674,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/signin/'
       preLoaderRoute: typeof SigninIndexRouteImport
       parentRoute: typeof SigninRoute
+    }
+    '/workspace/settings': {
+      id: '/workspace/settings'
+      path: '/settings'
+      fullPath: '/workspace/settings'
+      preLoaderRoute: typeof WorkspaceSettingsRouteImport
+      parentRoute: typeof WorkspaceRoute
     }
     '/signup/password': {
       id: '/signup/password'
@@ -735,6 +771,20 @@ const SignupRouteChildren: SignupRouteChildren = {
 const SignupRouteWithChildren =
   SignupRoute._addFileChildren(SignupRouteChildren)
 
+interface WorkspaceRouteChildren {
+  WorkspaceSettingsRoute: typeof WorkspaceSettingsRoute
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
+}
+
+const WorkspaceRouteChildren: WorkspaceRouteChildren = {
+  WorkspaceSettingsRoute: WorkspaceSettingsRoute,
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
+}
+
+const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
+  WorkspaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -759,7 +809,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UseCasesRoute: UseCasesRoute,
   WidgetsRoute: WidgetsRoute,
-  WorkspaceRoute: WorkspaceRoute,
+  WorkspaceRoute: WorkspaceRouteWithChildren,
   AdminFeedbackRoute: AdminFeedbackRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,

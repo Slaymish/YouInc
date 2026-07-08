@@ -40,15 +40,20 @@ In the dashboard → **Authentication**:
 - **URL Configuration:** Site URL = `https://youinc.hamishburke.dev`; add
   `https://youinc.hamishburke.dev/**` to Redirect URLs.
 - **Email → Confirm email:** ON.
-- **Email Templates → Confirm signup:** point the link at the app's callback
-  route, which exchanges the token for a session (`src/routes/auth.confirm.tsx`):
+- **Email Templates → Confirm signup:** paste the contents of
+  `supabase/templates/confirmation.html` (the local stack picks this up
+  automatically via `[auth.email.template.confirmation]` in
+  `supabase/config.toml`; the hosted dashboard template is separate and needs
+  this manual paste after any edit to that file). It shows only the 6-digit
+  `{{ .Token }}` code — no link — which the user types into the confirm
+  screen (`src/components/auth/EmailCodeConfirm.tsx`, calling
+  `supabase.auth.verifyOtp({ email, token, type: "signup" })`).
 
-  ```html
-  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirm your email</a>
-  ```
-
-Record the project's **URL** and **anon/public key** from Project Settings → API
-(the `service_role` key is not used by this app).
+Record the project's **URL**, **anon/public key**, and **service_role key** from
+Project Settings → API. The service_role key is now required (passkey
+registration and the passkey→session bridge run pre-session and must bypass
+RLS — see `src/server/supabaseAdmin.ts`); it is a runtime secret, never a
+build-arg or `VITE_`-prefixed var.
 
 ### 2. Email (Resend custom SMTP)
 
@@ -66,6 +71,7 @@ Put the Supabase URL + anon key into `fly.toml` `[build.args]`
 
 ```sh
 fly launch --no-deploy --copy-config --name youinc --region syd   # first time only
+fly secrets set SUPABASE_SERVICE_ROLE_KEY='<service_role_key>'    # required — passkey auth
 fly secrets set AKAHU_APP_TOKEN='<app_token>'                      # enables live Akahu sync
 # optional: fly secrets set YOUINC_LEADS_WEBHOOK_URL='...' YOUINC_FEEDBACK_WEBHOOK_URL='...'
 ```

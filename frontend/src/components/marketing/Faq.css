@@ -7,23 +7,23 @@
 }
 
 .faq__item {
-  background: var(--mk-surface-1);
-  border: 1px solid var(--mk-line);
+  background: var(--mk-soft-ground);
+  border: none;
   border-radius: var(--radius-md);
   padding: var(--space-4) var(--space-5);
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--mk-soft-raised-sm);
   transition:
-    box-shadow 200ms ease,
-    border-color 200ms ease;
+    box-shadow 200ms ease;
 }
 
 .faq__item:hover {
-  box-shadow: var(--shadow-2);
-  border-color: var(--mk-accent-line);
+  box-shadow: var(--mk-soft-raised);
 }
 
+/* Open answer sits "pressed in" — a recessed well distinguishes it from the
+   raised closed items. */
 .faq__item[open] {
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--mk-soft-inset);
 }
 
 .faq__q {

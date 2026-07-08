@@ -9,7 +9,7 @@
  */
 
 .mk {
-  background: var(--mk-paper);
+  background: var(--mk-soft-ground);
   color: var(--mk-ink);
   font-family: var(--mk-sans);
   font-size: var(--text-body);
@@ -44,13 +44,26 @@
     box-shadow 150ms ease,
     background 150ms ease;
 }
+/* Primary CTA stays a solid high-contrast fill (accessibility + trust), but
+   gains soft elevation and a tactile press-in on :active. */
 .mk-btn--primary {
   background: var(--mk-ink);
   color: #fff;
+  box-shadow:
+    5px 5px 12px rgba(46, 50, 38, 0.24),
+    -4px -4px 10px rgba(255, 255, 255, 0.7);
 }
 .mk-btn--primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    7px 9px 18px rgba(46, 50, 38, 0.3),
+    -5px -5px 12px rgba(255, 255, 255, 0.75);
+}
+.mk-btn--primary:active {
+  transform: translateY(1px);
+  box-shadow:
+    2px 2px 6px rgba(46, 50, 38, 0.28),
+    inset 0 2px 5px rgba(0, 0, 0, 0.35);
 }
 .mk-btn--ghost {
   background: transparent;
@@ -62,6 +75,22 @@
 .mk-btn:focus-visible {
   outline: 3px solid var(--mk-focus);
   outline-offset: 2px;
+}
+
+/* Soft "tactile" button — ground-coloured, extruded, depresses on click.
+   Text stays ink so contrast holds. Use for secondary/utility actions. */
+.mk-btn--soft {
+  background: var(--mk-soft-ground);
+  color: var(--mk-ink);
+  box-shadow: var(--mk-soft-raised-sm);
+}
+.mk-btn--soft:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--mk-soft-raised);
+}
+.mk-btn--soft:active {
+  transform: translateY(0);
+  box-shadow: var(--mk-soft-pressed);
 }
 
 /* Waitlist form */
@@ -77,7 +106,10 @@
   border: 1px solid var(--mk-line);
   border-radius: var(--radius-sm);
   min-width: 15rem;
-  background: #fff;
+  /* Recessed "well": keeps a real border for affordance/contrast (soft-ui
+     rule: inputs never rely on shadow alone) but sits inset for tactility. */
+  background: var(--mk-soft-ground-2);
+  box-shadow: var(--mk-soft-inset);
 }
 .waitlist-error {
   color: var(--mk-negative);
@@ -104,7 +136,8 @@
     transform: none;
   }
   .bank-chip,
-  .artifact {
+  .artifact,
+  .mk-nav__links a {
     transition: none;
   }
 }
@@ -196,25 +229,68 @@
   color: var(--mk-ink);
   text-decoration: none;
   opacity: 0.85;
+  /* Restrained accent affordance: an underline that grows in on hover/focus,
+     so interactive nav items read as interactive without shouting. */
+  background-image: linear-gradient(var(--mk-accent), var(--mk-accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition:
+    opacity 150ms ease,
+    background-size 180ms ease;
 }
-.mk-nav__links a:hover {
+.mk-nav__links a:hover,
+.mk-nav__links a:focus-visible {
   opacity: 1;
+  background-size: 100% 2px;
+}
+/* The two button-style nav items (Sign in / Start free) keep their own chrome
+   and shouldn't grow an underline. */
+.mk-nav__signin,
+.mk-nav__cta {
+  background-image: none;
 }
 .mk-nav__signin {
-  border: 1px solid var(--mk-ink);
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  background: var(--mk-soft-ground);
+  box-shadow: var(--mk-soft-raised-sm);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+.mk-nav__signin:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--mk-soft-raised);
+}
+.mk-nav__signin:active {
+  transform: translateY(0);
+  box-shadow: var(--mk-soft-pressed);
 }
 .mk-nav__cta {
   background: var(--mk-ink);
   color: #fff !important;
   opacity: 1 !important;
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
   font-weight: 600;
+  box-shadow:
+    4px 4px 10px rgba(46, 50, 38, 0.24),
+    -3px -3px 8px rgba(255, 255, 255, 0.7);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
 }
 .mk-nav__cta:hover {
   background: var(--mk-accent-strong);
+  transform: translateY(-1px);
+}
+.mk-nav__cta:active {
+  transform: translateY(1px);
+  box-shadow:
+    2px 2px 5px rgba(46, 50, 38, 0.26),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Shared tabular-number emphasis (positive/negative deltas quoted in prose) */

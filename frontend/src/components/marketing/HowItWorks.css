@@ -75,6 +75,74 @@
   .steps__list { grid-template-columns: 1fr; }
 }
 
+/* ── Zigzag "flow" variant (landing HowItWorks only) ─────────────────────
+ * Scoped under `.steps__list--flow` so it never touches the shared 3/4-col
+ * `.steps__list` used by /custom-builds. Turns the symmetric card grid into an
+ * alternating editorial rhythm: media and text swap sides row to row. */
+.steps__list--flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.steps__list--flow .step {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  /* Drop the card chrome — this variant reads as content, not tiles. */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.steps__list--flow .step:hover,
+.steps__list--flow .step:focus-within {
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+/* Even rows: media moves to the right, text to the left. */
+.steps__list--flow .step:nth-child(even) .step__media {
+  order: 2;
+}
+
+/* Reset the overflow "bleed" transform used in the card grid. */
+.steps__list--flow .step__media {
+  margin: 0;
+  transform: none;
+  box-shadow: var(--shadow-2);
+}
+
+.steps__list--flow .step__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.steps__list--flow .step__n {
+  font-size: clamp(3rem, 2rem + 4vw, 5rem);
+  margin-bottom: var(--space-1);
+}
+
+.steps__list--flow .step__body {
+  max-width: 32ch;
+}
+
+@media (max-width: 780px) {
+  .steps__list--flow .step {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  /* On mobile keep the natural media-first order for every row. */
+  .steps__list--flow .step:nth-child(even) .step__media {
+    order: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .step {
     transition: none;

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
 import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
-import { useResendVerification } from "~/hooks/useResendVerification";
+import { EmailCodeConfirm } from "~/components/auth/EmailCodeConfirm";
 import { checkAuthed, loadFlow, signupWithPassword } from "~/lib/authServerFns";
 
 export const Route = createFileRoute("/signup/password")({
@@ -38,7 +38,6 @@ function SignupPasswordPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  const resend = useResendVerification();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -76,47 +75,10 @@ function SignupPasswordPage() {
 
   if (pendingEmail) {
     return (
-      <AuthShell>
-        <section className="auth-card" aria-labelledby="confirm-heading">
-          <p className="auth-eyebrow">Almost there</p>
-          <h1 id="confirm-heading">Check your email</h1>
-          <p className="auth-lede">
-            We sent a confirmation link to <strong>{pendingEmail}</strong>.
-            Click it to activate your account, then sign in.
-          </p>
-          <Link
-            className="auth-primary"
-            to="/signin"
-            style={{ textAlign: "center", textDecoration: "none" }}
-          >
-            Go to sign in →
-          </Link>
-          <p className="auth-note">
-            Didn't get it? Check spam, or{" "}
-            <button
-              type="button"
-              className="auth-linkbtn"
-              onClick={() => resend.resend(pendingEmail)}
-              disabled={resend.disabled}
-            >
-              {resend.cooldownSeconds > 0
-                ? `resend in ${resend.cooldownSeconds}s`
-                : resend.status === "sending"
-                  ? "resending…"
-                  : "resend the email"}
-            </button>
-            .
-          </p>
-          {resend.message ? <p className="auth-note">{resend.message}</p> : null}
-          <AuthCardFooter
-            prompt={
-              <>
-                Already confirmed? <Link to="/signin">Sign in</Link>
-              </>
-            }
-          />
-        </section>
-      </AuthShell>
+      <EmailCodeConfirm
+        email={pendingEmail}
+        onVerified={() => void router.navigate({ to: "/onboarding" })}
+      />
     );
   }
 

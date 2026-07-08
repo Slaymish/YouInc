@@ -32,18 +32,26 @@
 }
 
 .ws-signout {
-  border: 1px solid var(--line);
+  border: none;
   background: var(--surface);
   color: var(--text);
-  border-radius: 8px;
-  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
   font: inherit;
   font-size: 0.8rem;
   cursor: pointer;
+  box-shadow: var(--soft-raised-sm);
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
 .ws-signout:hover:not(:disabled) {
-  background: var(--surface-muted);
+  transform: translateY(-1px);
+  box-shadow: var(--soft-raised);
+}
+
+.ws-signout:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--soft-pressed);
 }
 
 .ws-main {
@@ -53,6 +61,192 @@
   display: flex;
   flex-direction: column;
   gap: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+/* ── Overview / Settings tab strip (workspace layout route) ────────────── */
+.ws-tabs {
+  display: flex;
+  gap: 0.25rem;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.ws-tab {
+  padding: 0.7rem 1rem;
+  margin-bottom: -1px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.ws-tab:hover {
+  color: var(--text);
+}
+
+.ws-tab--active {
+  color: var(--text);
+  border-bottom-color: var(--accent, #12a150);
+}
+
+/* Shared panel body padding — replaces per-instance inline padding so every
+   panel that isn't a self-padding editor gets consistent spacing. */
+.ws-panel__body {
+  padding: 1.25rem;
+}
+
+.ws-panel__defer {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* ── First-run guided path (Overview, empty stage) ─────────────────────── */
+.ws-firstrun {
+  border: none;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--soft-raised-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ws-firstrun__head h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.ws-firstrun__head p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.ws-firstrun__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.ws-firstrun__step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 12px;
+  padding: 1.1rem;
+  background: var(--surface);
+  box-shadow: var(--soft-raised-sm);
+}
+
+.ws-firstrun__step h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ws-firstrun__step p {
+  margin: 0;
+  flex: 1;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.ws-firstrun__step .auth-primary,
+.ws-firstrun__step .auth-secondary {
+  text-align: center;
+  text-decoration: none;
+}
+
+.ws-firstrun__error {
+  color: var(--danger, #c0492f);
+  font-size: 0.78rem;
+}
+
+/* ── Settings: sticky sub-nav + sections ───────────────────────────────── */
+.ws-settings {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  align-items: start;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.ws-subnav {
+  position: sticky;
+  top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ws-subnav__link {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.ws-subnav__link:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.ws-subnav__link--active {
+  color: var(--text);
+  border-left-color: var(--accent, #12a150);
+  background: var(--surface-muted);
+}
+
+.ws-settings__body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  min-width: 0;
+}
+
+/* Offset anchor jumps so section headers aren't hidden under the sticky nav. */
+.ws-settings__body > .ws-panel {
+  scroll-margin-top: 1.5rem;
+}
+
+@media (max-width: 760px) {
+  .ws-settings {
+    grid-template-columns: 1fr;
+  }
+
+  .ws-subnav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line-subtle);
+  }
+
+  .ws-subnav__link {
+    border-left: none;
+    border: 1px solid var(--line-subtle);
+  }
+
+  .ws-subnav__link--active {
+    border-color: var(--accent, #12a150);
+  }
 }
 
 .ws-hero h1 {
@@ -137,13 +331,20 @@
 }
 
 .ws-card {
-  border: 1px solid var(--line-subtle);
-  border-radius: 12px;
+  border: none;
+  border-radius: 14px;
   padding: 1.5rem;
   background: var(--surface);
+  box-shadow: var(--soft-raised);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.ws-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--soft-raised-lg);
 }
 
 .ws-card h3 {
@@ -190,10 +391,11 @@
 }
 
 .ws-metric {
-  border: 1px solid var(--line-subtle);
-  border-radius: 12px;
+  border: none;
+  border-radius: 14px;
   padding: 1.1rem 1.25rem;
   background: var(--surface);
+  box-shadow: var(--soft-raised);
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -219,9 +421,10 @@
 
 /* ── Accounts panel ────────────────────────────────────────────────────── */
 .ws-panel {
-  border: 1px solid var(--line-subtle);
-  border-radius: 12px;
+  border: none;
+  border-radius: 14px;
   background: var(--surface);
+  box-shadow: var(--soft-raised);
   overflow: hidden;
 }
 

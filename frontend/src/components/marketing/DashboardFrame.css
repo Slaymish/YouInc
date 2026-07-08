@@ -43,11 +43,11 @@
   z-index: 1;
   max-width: var(--mk-maxw-frame);
   margin: 0 auto;
-  background: var(--mk-card);
-  border: 1px solid var(--mk-line);
+  background: var(--mk-soft-ground);
+  border: none;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-4);
+  box-shadow: var(--mk-soft-raised-lg);
 }
 .df-chrome {
   display: flex;

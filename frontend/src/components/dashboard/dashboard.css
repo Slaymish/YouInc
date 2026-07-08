@@ -207,7 +207,9 @@
   overflow-wrap: anywhere;
   font-size: clamp(1rem, 1.45vw, 1.7rem);
   line-height: 1;
-  letter-spacing: -0.035em;
+  /* -0.02em keeps values compact without letting adjacent digits (1/7/8) merge
+     at the smaller end of the clamp. */
+  letter-spacing: -0.02em;
 }
 
 /* ── Edit mode: panel states ── */
@@ -230,12 +232,14 @@
 
 .widget-drag-handle {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   padding: 2px 4px;
   background: transparent;
   color: var(--text-muted);
   cursor: grab;
-  font-size: 1rem;
   line-height: 1;
 }
 

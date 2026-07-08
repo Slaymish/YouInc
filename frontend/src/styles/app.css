@@ -16,6 +16,27 @@
   --bar-muted: #777;
   --dash: #999;
   --inverse-text: #fff;
+
+  /* ── Soft-UI (accessible neumorphism) — light ──────────────────────────
+   * Dual-light extrusion tokens shared by panels, metric frames, cards, and
+   * tactile buttons. Content (text, numbers, table rules) and input borders
+   * stay high-contrast; only container elevation uses these. */
+  --soft-raised:
+    6px 6px 14px rgba(24, 26, 20, 0.12),
+    -6px -6px 14px rgba(255, 255, 255, 0.8);
+  --soft-raised-sm:
+    3px 3px 8px rgba(24, 26, 20, 0.1),
+    -3px -3px 8px rgba(255, 255, 255, 0.7);
+  --soft-raised-lg:
+    10px 10px 24px rgba(24, 26, 20, 0.14),
+    -8px -8px 20px rgba(255, 255, 255, 0.85);
+  --soft-inset:
+    inset 4px 4px 9px rgba(24, 26, 20, 0.13),
+    inset -4px -4px 9px rgba(255, 255, 255, 0.75);
+  --soft-pressed:
+    inset 3px 3px 7px rgba(24, 26, 20, 0.16),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.7);
+
   color: var(--text);
   background: var(--page);
   font-family:
@@ -48,10 +69,40 @@
   --bar-muted: #858b82;
   --dash: #62675d;
   --inverse-text: #fff;
+
+  /* Soft-UI — dark: highlight is a faint top-left sheen, shadow a deep well. */
+  --soft-raised:
+    6px 6px 15px rgba(0, 0, 0, 0.55),
+    -5px -5px 13px rgba(255, 255, 255, 0.04);
+  --soft-raised-sm:
+    3px 3px 8px rgba(0, 0, 0, 0.5),
+    -3px -3px 8px rgba(255, 255, 255, 0.03);
+  --soft-raised-lg:
+    10px 10px 26px rgba(0, 0, 0, 0.6),
+    -8px -8px 20px rgba(255, 255, 255, 0.05);
+  --soft-inset:
+    inset 4px 4px 10px rgba(0, 0, 0, 0.6),
+    inset -3px -3px 8px rgba(255, 255, 255, 0.04);
+  --soft-pressed:
+    inset 3px 3px 8px rgba(0, 0, 0, 0.65),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.03);
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Honour reduced-motion: the soft-UI hover lifts / press transforms are
+   decorative, so drop transitions + translate for users who opt out. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {
@@ -226,11 +277,17 @@ th,
   margin-top: 8px;
 }
 
+/* Soft-UI: panels/metrics read as extruded tiles. Tight (-sm) shadow so the
+   dual-light glow doesn't bleed across the dense 8px grid gaps. Corners are
+   rounded + clipped so headers respect the tile edge. Content, tables, and
+   the header divider stay high-contrast (see soft-ui usage rules). */
 .panel,
 .metric,
 .system-alert {
-  border: 1px solid var(--line);
+  border: none;
+  border-radius: 12px;
   background: var(--surface);
+  box-shadow: var(--soft-raised-sm);
 }
 
 .panel {
@@ -238,11 +295,12 @@ th,
   flex-direction: column;
   min-height: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 .panel > header {
   flex: none;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-subtle);
   padding: 8px 10px;
   background: var(--surface-muted);
 }

@@ -1,22 +1,27 @@
 /* frontend/src/components/marketing/Hero.css
  *
- * Editorial-Finance hero. A live net-worth line chart (driven off
- * SAMPLE_DASHBOARD) reveals on load via a compositor-safe clip-path wipe;
- * floating figure cards fade in over it. Motion touches transform / opacity /
- * clip-path only. Base state is the final, fully-visible state — the reveal
- * animations are gated behind `prefers-reduced-motion: no-preference`, so the
- * reduced-motion fallback (static chart, at every width) is automatic. */
+ * Editorial-finance hero built around ONE coherent "live dashboard" device
+ * (the outcome the product delivers) rather than scattered floating cards.
+ * On load: the net-worth value counts up (JS), the line chart draws in via a
+ * compositor-safe clip wipe, and the KPI tiles + insight strip stagger in.
+ * A subtle pointer tilt (JS) makes the panel feel physical. All motion is
+ * gated behind `prefers-reduced-motion: no-preference`; the base state is the
+ * final, fully-visible layout so the reduced-motion fallback is automatic. */
 
 .hero {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: var(--space-8);
+  grid-template-columns: 1fr 1.05fr;
+  gap: clamp(2rem, 5vw, var(--space-8));
   align-items: center;
   position: relative;
   min-height: 34rem;
 }
 
+/* ── Copy column ─────────────────────────────────────────────────────────── */
 .hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--mk-sans);
   font-size: var(--text-eyebrow);
   letter-spacing: var(--tracking-eyebrow);
@@ -24,6 +29,10 @@
   color: var(--mk-soft);
   margin: 0 0 var(--space-3);
 }
+.hero__eyebrow .live-dot {
+  background: var(--mk-positive);
+}
+
 .hero__headline {
   font-family: var(--mk-serif);
   font-weight: 400;
@@ -32,9 +41,23 @@
   letter-spacing: var(--tracking-head);
   margin: 0 0 var(--space-4);
 }
-.hero__headline em {
-  font-style: italic;
+
+/* "like a company" — a deliberate brand mark: an accent brushstroke that
+   draws in under the phrase, plus a punchy accent full-stop. Replaces the
+   generic lone-italic emphasis. */
+.hero__mark {
+  position: relative;
+  white-space: nowrap;
+  background-image: linear-gradient(var(--mk-accent), var(--mk-accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.06em;
+  padding-bottom: 0.12em;
 }
+.hero__mark-dot {
+  color: var(--mk-accent-strong);
+}
+
 .hero__sub {
   font-family: var(--mk-sans);
   font-size: var(--text-lead);
@@ -48,6 +71,13 @@
   gap: var(--space-5);
   align-items: center;
   flex-wrap: wrap;
+}
+.hero__reassure {
+  margin: var(--space-4) 0 0;
+  font-family: var(--mk-sans);
+  font-size: var(--text-small);
+  color: var(--mk-soft);
+  letter-spacing: 0.01em;
 }
 
 /* ── Mobile static stat row (hidden ≥900px; shown when the visual hides) ── */
@@ -80,75 +110,136 @@
   color: var(--mk-positive);
 }
 
-/* ── Product-proof visual ────────────────────────────────────────────────── */
+/* ── The live dashboard device ───────────────────────────────────────────── */
 .hero__visual {
   position: relative;
-  height: 100%;
-  min-height: 26rem;
+  perspective: 1400px;
 }
 
-.hero__chart {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: var(--space-6);
-  transform: translateY(-50%);
-  margin: 0;
-  background: var(--mk-surface-1);
-  border: 1px solid var(--mk-line);
+.hero__device {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform-style: preserve-3d;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--mk-soft-ground);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-3);
-  padding: var(--space-5) var(--space-5) var(--space-4);
+  box-shadow: var(--mk-soft-raised-lg);
+  overflow: hidden;
+  will-change: transform;
 }
 
-.hero__chart-head {
+/* Browser chrome bar — reads instantly as "this is the real product". */
+.hero__chrome {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  margin-bottom: var(--space-4);
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.7rem var(--space-4);
+  background: var(--mk-soft-ground-2);
+  border-bottom: 1px solid var(--mk-dv-grid);
 }
-.hero__chart-lab {
+.hero__dots {
+  display: inline-flex;
+  gap: 5px;
+}
+.hero__dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mk-dv-grid);
+}
+.hero__dots i:nth-child(1) {
+  background: #e0685f;
+}
+.hero__dots i:nth-child(2) {
+  background: #e6b34d;
+}
+.hero__dots i:nth-child(3) {
+  background: #6bbf7b;
+}
+.hero__url {
+  font-family: var(--mk-sans);
+  font-size: var(--text-small);
+  color: var(--mk-soft);
+}
+.hero__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  font-family: var(--mk-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mk-positive);
+}
+.hero__live .live-dot {
+  background: var(--mk-positive);
+}
+
+.hero__screen {
+  background: var(--mk-card);
+  padding: var(--space-5) var(--space-5) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Dominant net-worth headline — the single most important number. */
+.hero__headrow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.hero__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.hero__metric-lab {
   font-family: var(--mk-sans);
   font-size: var(--text-eyebrow);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--mk-soft);
 }
-.hero__chart-val {
+.hero__metric-val {
   font-family: var(--mk-serif);
-  font-size: var(--text-h2);
-  line-height: 1;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.4rem, 4.4vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
+  color: var(--mk-ink);
 }
-.hero__chart-delta {
-  margin-left: auto;
+.hero__delta {
   font-family: var(--mk-sans);
   font-size: var(--text-small);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--mk-positive);
   font-variant-numeric: tabular-nums;
+  background: color-mix(in srgb, var(--mk-positive) 12%, transparent);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
 }
 
+/* ── Net-worth chart ─────────────────────────────────────────────────────── */
 .hero__plot {
   position: relative;
-  height: 8.5rem;
+  height: 7.5rem;
   border-bottom: 1px solid var(--mk-dv-grid);
 }
 .hero__chart-svg {
   display: block;
   width: 100%;
   height: 100%;
-  /* Base = fully revealed; the wipe animation (below) starts collapsed. */
-  clip-path: inset(0 0 0 0);
-}
-.hero__area {
-  /* fill supplied inline via url(#heroAreaGrad) */
+  clip-path: inset(0 0 0 0); /* base = revealed; wipe starts collapsed */
 }
 .hero__grad-top {
   stop-color: var(--mk-dv-1);
-  stop-opacity: 0.2;
+  stop-opacity: 0.22;
 }
 .hero__grad-bot {
   stop-color: var(--mk-dv-1);
@@ -156,21 +247,28 @@
 }
 .hero__line {
   stroke: var(--mk-dv-1);
-  stroke-width: 2.25;
+  stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .hero__dot {
   position: absolute;
-  width: 0.6rem;
-  height: 0.6rem;
+  width: 0.62rem;
+  height: 0.62rem;
   border-radius: var(--radius-pill);
   background: var(--mk-dv-1);
   border: 2px solid var(--mk-card);
-  box-shadow: var(--shadow-1);
   transform: translate(-50%, -50%);
 }
-
+/* A slow "ping" ring so the latest point reads as live. */
+.hero__dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--mk-dv-1);
+  opacity: 0;
+}
 .hero__axis {
   display: flex;
   justify-content: space-between;
@@ -180,98 +278,130 @@
   color: var(--mk-dv-label);
   font-variant-numeric: tabular-nums;
 }
+.hero__plotwrap {
+  margin: 0;
+}
 
-/* ── Floating figure cards ───────────────────────────────────────────────── */
-.fw {
-  position: absolute;
-  background: var(--mk-card);
-  border: 1px solid var(--mk-line);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  font-family: var(--mk-sans);
-  font-size: var(--text-small);
-  line-height: 1.35;
+/* ── Aligned KPI tiles (inside the panel, no random rotation) ────────────── */
+.hero__kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+.hero__kpi {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  box-shadow: var(--shadow-2);
+  gap: 0.15rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--mk-soft-ground);
+  box-shadow: var(--mk-soft-raised-sm);
 }
-.fw__lab {
+.hero__kpi-lab {
+  font-family: var(--mk-sans);
   font-size: var(--text-eyebrow);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--mk-soft);
 }
-.fw__big {
+.hero__kpi-val {
+  font-family: var(--mk-sans);
   font-size: var(--text-h3);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-.fw__up {
-  color: var(--mk-positive);
-  font-weight: 600;
-}
-.fw__down {
+.hero__kpi-note {
+  font-family: var(--mk-sans);
+  font-size: 0.7rem;
   color: var(--mk-negative);
   font-weight: 600;
 }
-.fw__spark {
+.hero__kpi-note--pos {
+  color: var(--mk-positive);
+}
+.hero__kpi-spark {
   width: 100%;
-  height: 20px;
-  margin-top: var(--space-1);
+  height: 18px;
+  margin-top: 0.2rem;
 }
-.fw--runway {
-  top: 0.5rem;
-  right: 8.5rem;
-  width: 9rem;
-  transform: rotate(-4deg);
-  z-index: 3;
+
+/* ── "Do next" insight strip — the product's actual differentiator ───────── */
+.hero__insight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.7rem var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--mk-accent) 10%, var(--mk-card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mk-accent) 22%, transparent);
 }
-.fw--cash {
-  top: 4.5rem;
-  right: 0;
-  width: 8.5rem;
-  transform: rotate(3deg);
-  z-index: 3;
+.hero__insight-tag {
+  flex: none;
+  font-family: var(--mk-sans);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--mk-accent-strong);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
 }
-.fw--expense {
-  bottom: 1rem;
-  right: 6rem;
-  width: 9.5rem;
-  transform: rotate(-2.5deg);
-  z-index: 3;
+.hero__insight-body {
+  font-family: var(--mk-sans);
+  font-size: var(--text-small);
+  color: var(--mk-ink);
+}
+.hero__insight-body strong {
+  color: var(--mk-accent-strong);
+  font-variant-numeric: tabular-nums;
+}
+.hero__insight-go {
+  margin-left: auto;
+  color: var(--mk-accent-strong);
+  font-weight: 700;
 }
 
 /* ── Reveal-on-load motion (only when motion is welcome) ─────────────────── */
 @media (prefers-reduced-motion: no-preference) {
-  .hero__visual {
-    animation: hero-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  .hero__mark {
+    animation: hero-underline 700ms cubic-bezier(0.16, 1, 0.3, 1) 320ms both;
+  }
+  .hero__device {
+    animation: hero-rise 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .hero__chart-svg {
-    animation: hero-wipe 1000ms cubic-bezier(0.16, 1, 0.3, 1) 220ms both;
+    animation: hero-wipe 1000ms cubic-bezier(0.16, 1, 0.3, 1) 260ms both;
   }
   .hero__dot {
-    animation: hero-fade 260ms ease-out 1080ms both;
+    animation: hero-fade 260ms ease-out 1140ms both;
   }
-  .fw {
-    animation: hero-fade 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  .hero__dot::after {
+    animation: hero-ping 2.4s ease-out 1400ms infinite;
   }
-  .fw--runway {
-    animation-delay: 560ms;
+  .hero__kpi,
+  .hero__insight {
+    animation: hero-tile 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  .fw--cash {
-    animation-delay: 700ms;
+  .hero__kpi:nth-child(1) {
+    animation-delay: 640ms;
   }
-  .fw--expense {
+  .hero__kpi:nth-child(2) {
+    animation-delay: 740ms;
+  }
+  .hero__kpi:nth-child(3) {
     animation-delay: 840ms;
+  }
+  .hero__insight {
+    animation-delay: 980ms;
   }
 }
 
 @keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(20px) rotateX(4deg);
   }
   to {
     opacity: 1;
@@ -286,14 +416,41 @@
     clip-path: inset(0 0 0 0);
   }
 }
-/* Cards keep their static rotation; only opacity animates (compositor-safe,
-   avoids clobbering the per-card `transform: rotate(...)`). */
 @keyframes hero-fade {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+@keyframes hero-tile {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-underline {
+  from {
+    background-size: 0% 0.06em;
+  }
+  to {
+    background-size: 100% 0.06em;
+  }
+}
+@keyframes hero-ping {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
   }
 }
 

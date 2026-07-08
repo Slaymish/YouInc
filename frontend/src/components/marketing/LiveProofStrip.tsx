@@ -74,6 +74,7 @@ function ProofTrack({ duplicate = false }: ProofTrackProps) {
 export function LiveProofStrip() {
   return (
     <section className="proof" aria-label="Supported banks">
+      <p className="proof__lead">Works with the accounts you already have</p>
       <div className="proof__viewport">
         <div className="proof__marquee">
           <ProofTrack />

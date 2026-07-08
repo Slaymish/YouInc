@@ -3,6 +3,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { WidgetPlacement } from "./grid";
 import { useGridResize } from "./useGridResize";
+import { DragIcon, SwapIcon, RemoveIcon } from "./icons";
 
 const ROW_HEIGHT = 80;
 
@@ -61,7 +62,7 @@ export function DashboardPanel({
               {...listeners}
               {...attributes}
             >
-              ⠿
+              <DragIcon />
             </button>
             <button
               className="widget-replace"
@@ -69,7 +70,7 @@ export function DashboardPanel({
               aria-label="Replace widget"
               onClick={() => onReplace(placement.id)}
             >
-              ⇄
+              <SwapIcon />
             </button>
             <button
               className="widget-remove"
@@ -77,7 +78,7 @@ export function DashboardPanel({
               aria-label="Remove"
               onClick={() => onRemove(placement.id)}
             >
-              ×
+              <RemoveIcon />
             </button>
           </>
         )}
@@ -108,7 +109,7 @@ export function DashboardPanel({
             {...listeners}
             {...attributes}
           >
-            ⠿
+            <DragIcon />
           </button>
         )}
         <h2>{title}</h2>
@@ -120,7 +121,7 @@ export function DashboardPanel({
               aria-label="Replace widget"
               onClick={() => onReplace(placement.id)}
             >
-              ⇄
+              <SwapIcon />
             </button>
             <button
               className="widget-remove"
@@ -128,7 +129,7 @@ export function DashboardPanel({
               aria-label="Remove widget"
               onClick={() => onRemove(placement.id)}
             >
-              ×
+              <RemoveIcon />
             </button>
           </>
         )}

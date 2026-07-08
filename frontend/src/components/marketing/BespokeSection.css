@@ -21,10 +21,10 @@
   text-align: left;
   max-width: var(--mk-maxw-narrow);
   margin: 0 auto var(--space-6);
-  background: var(--mk-surface-1);
-  border: 1px solid var(--mk-line);
+  background: var(--mk-soft-ground);
+  border: none;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--mk-soft-raised);
   padding: var(--space-8) var(--space-6);
 }
 

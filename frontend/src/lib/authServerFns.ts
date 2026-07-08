@@ -92,6 +92,15 @@ export const signupWithPassword = createServerFn({ method: "POST" })
     return passwordSignup(data.token, data.password);
   });
 
+export const confirmSignupCode = createServerFn({ method: "POST" })
+  .validator((data: { email: string; token: string }) => data)
+  .handler(async ({ data }): Promise<void> => {
+    const { confirmSignupCode: confirmCode } = await import(
+      "~/server/passkeys"
+    );
+    return confirmCode(data.email, data.token);
+  });
+
 // --- Signin: email → passkey / password -------------------------------------
 
 export const initSigninFlow = createServerFn({ method: "GET" }).handler(

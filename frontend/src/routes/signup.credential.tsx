@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
 import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
+import { EmailCodeConfirm } from "~/components/auth/EmailCodeConfirm";
 import {
   checkAuthed,
   loadFlow,
@@ -116,30 +117,11 @@ function SignupCredentialPage() {
 
   if (pendingEmail) {
     return (
-      <AuthShell>
-        <section className="auth-card" aria-labelledby="confirm-heading">
-          <p className="auth-eyebrow">Almost there</p>
-          <h1 id="confirm-heading">Check your email</h1>
-          <p className="auth-lede">
-            We sent a confirmation link to <strong>{pendingEmail}</strong>.
-            Click it to activate your account — your passkey is already saved.
-          </p>
-          <Link
-            className="auth-primary"
-            to="/signin"
-            style={{ textAlign: "center", textDecoration: "none" }}
-          >
-            Go to sign in →
-          </Link>
-          <AuthCardFooter
-            prompt={
-              <>
-                Already confirmed? <Link to="/signin">Sign in</Link>
-              </>
-            }
-          />
-        </section>
-      </AuthShell>
+      <EmailCodeConfirm
+        email={pendingEmail}
+        note="your passkey is already saved"
+        onVerified={() => void router.navigate({ to: "/onboarding" })}
+      />
     );
   }
 

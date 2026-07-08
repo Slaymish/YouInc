@@ -1,3 +1,10 @@
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { PRODUCT } from "./config";
 import { SAMPLE_DASHBOARD } from "./sampleDashboard";
 import { shortMoney, formatMonths, formatPercent } from "../widgets/format";
@@ -11,7 +18,7 @@ import "./Hero.css";
 const T = SAMPLE_DASHBOARD.totals;
 const TREND = SAMPLE_DASHBOARD.netWorthTrend;
 
-const netWorthLabel = shortMoney(T.netWorthCents); // $142.4k
+const netWorthCents = T.netWorthCents;
 const runwayLabel = formatMonths(T.runwayMonths); // 18.0m
 const cashflowLabel = `+${shortMoney(T.ebitdaCents)}`; // +$3.7k
 
@@ -35,6 +42,10 @@ const lastNetWorth = nwValues[nwValues.length - 1];
 const netWorthDelta = formatPercent(
   prevNetWorth === 0 ? 0 : (lastNetWorth - prevNetWorth) / prevNetWorth,
 ); // ~2.4%
+
+// The surplus the product tells you to act on — its actual differentiator is
+// "the one thing to do next", so we surface it as an insight, not just a stat.
+const surplusLabel = `+${shortMoney(T.ebitdaCents)}`;
 
 // ── Net-worth line-chart geometry (viewBox units; stretched with a
 // non-scaling stroke so the line stays crisp at any width). ─────────────────
@@ -81,29 +92,100 @@ const axisMonths = [
   TREND[TREND.length - 1],
 ];
 
+// SSR-safe layout effect: real layout effect on the client, no-op on server.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/** True when the visitor has asked the OS to reduce motion. */
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return reduced;
+}
+
+/**
+ * Count a number up to `target` on mount. SSR + the first client render show
+ * the final value (so the number is correct without JS and hydration matches);
+ * the layout effect resets to 0 before paint and eases up, so there's no flash.
+ * Skipped entirely under reduced-motion.
+ */
+function useCountUp(target: number, enabled: boolean, durationMs = 1100): number {
+  const [value, setValue] = useState(target);
+  useIsoLayoutEffect(() => {
+    if (!enabled) {
+      setValue(target);
+      return;
+    }
+    let raf = 0;
+    setValue(0);
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      setValue(Math.round(target * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, enabled, durationMs]);
+  return value;
+}
+
 export function Hero() {
-  const headlineWords = PRODUCT.heroHeadline.split(" ");
-  const headlineLead = headlineWords.slice(0, -1).join(" ");
-  const headlineLastWord = headlineWords[headlineWords.length - 1];
+  const reduced = usePrefersReducedMotion();
+  const animatedNetWorth = useCountUp(netWorthCents, !reduced);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Subtle pointer-driven tilt — makes the product panel feel physical without
+  // a library. Disabled for reduced-motion and coarse (touch) pointers.
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (reduced || event.pointerType !== "mouse") return;
+    const el = panelRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    el.style.setProperty("--tilt-y", `${(px * 7).toFixed(2)}deg`);
+    el.style.setProperty("--tilt-x", `${(-py * 5).toFixed(2)}deg`);
+  };
+  const resetTilt = () => {
+    const el = panelRef.current;
+    if (!el) return;
+    el.style.setProperty("--tilt-y", "0deg");
+    el.style.setProperty("--tilt-x", "0deg");
+  };
 
   return (
     <section className="hero" aria-labelledby="hero-heading">
       <div className="hero__copy">
-        <p className="hero__eyebrow">{PRODUCT.heroEyebrow}</p>
+        <p className="hero__eyebrow">
+          <span className="live-dot" aria-hidden="true" />
+          {PRODUCT.heroEyebrow}
+        </p>
         <h1 id="hero-heading" className="hero__headline">
-          {headlineLead} <em>{headlineLastWord}</em>
+          Run yourself{" "}
+          <span className="hero__mark">
+            like a company<span className="hero__mark-dot">.</span>
+          </span>
         </h1>
         <p className="hero__sub">{PRODUCT.heroSub}</p>
         <div className="hero__ctas">
           <StartFreeCta source="hero" withDemo />
         </div>
+        <p className="hero__reassure">{PRODUCT.heroReassurance}</p>
 
-        {/* Mobile-only static stat row: on narrow screens the floating visual
-            is hidden, so surface the same three headline figures statically. */}
+        {/* Mobile-only static stat row: on narrow screens the visual is
+            hidden, so surface the same three headline figures statically. */}
         <dl className="hero__statrow">
           <div className="hero__stat">
             <dt>Net worth</dt>
-            <dd>{netWorthLabel}</dd>
+            <dd>{shortMoney(netWorthCents)}</dd>
           </div>
           <div className="hero__stat">
             <dt>Runway</dt>
@@ -116,89 +198,131 @@ export function Hero() {
         </dl>
       </div>
 
+      {/* One coherent "live dashboard" device — the outcome the product
+          delivers — instead of scattered floating cards. Entirely decorative;
+          the copy + mobile stat row carry the accessible content. */}
       <div className="hero__visual" aria-hidden="true">
-        <figure className="hero__chart">
-          <figcaption className="hero__chart-head">
-            <span className="live-tag">
+        <div
+          className="hero__device"
+          ref={panelRef}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={resetTilt}
+        >
+          <div className="hero__chrome">
+            <span className="hero__dots">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="hero__url">youinc.com/dashboard</span>
+            <span className="hero__live">
               <span className="live-dot" />
-              LIVE
+              LIVE · synced 2m ago
             </span>
-            <span className="hero__chart-lab">Net worth</span>
-            <span className="hero__chart-val">{netWorthLabel}</span>
-            <span className="hero__chart-delta">
-              ▲ {netWorthDelta} this month
-            </span>
-          </figcaption>
-
-          <div className="hero__plot">
-            <svg
-              className="hero__chart-svg"
-              viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-              preserveAspectRatio="none"
-              role="presentation"
-            >
-              <defs>
-                <linearGradient id="heroAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop className="hero__grad-top" offset="0%" />
-                  <stop className="hero__grad-bot" offset="100%" />
-                </linearGradient>
-              </defs>
-              <path
-                className="hero__area"
-                d={areaPath}
-                fill="url(#heroAreaGrad)"
-              />
-              <path
-                className="hero__line"
-                d={linePath}
-                fill="none"
-                vectorEffect="non-scaling-stroke"
-              />
-            </svg>
-            <span
-              className="hero__dot"
-              style={{
-                left: `${lastPoint.x}%`,
-                top: `${(lastPoint.y / CHART_H) * 100}%`,
-              }}
-            />
           </div>
 
-          <div className="hero__axis">
-            {axisMonths.map((point) => (
-              <span key={point.month}>{monthLabel(point.month)}</span>
-            ))}
-          </div>
-        </figure>
+          <div className="hero__screen">
+            <div className="hero__headrow">
+              <div className="hero__metric">
+                <span className="hero__metric-lab">Net worth</span>
+                <span className="hero__metric-val">
+                  {shortMoney(animatedNetWorth)}
+                </span>
+              </div>
+              <span className="hero__delta">▲ {netWorthDelta} this month</span>
+            </div>
 
-        <div className="fw fw--runway">
-          <span className="fw__lab">Runway</span>
-          <span className="fw__big">{runwayLabel}</span>
-          <svg
-            className="fw__spark"
-            viewBox="0 0 100 20"
-            preserveAspectRatio="none"
-          >
-            <polyline
-              points={sparkPoints}
-              fill="none"
-              stroke="var(--mk-dv-1)"
-              strokeWidth="2"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </div>
-        <div className="fw fw--cash">
-          <span className="fw__lab">Cashflow</span>
-          <span className="fw__big">{cashflowLabel}</span>
-          <span className="fw__up">▲ this month</span>
-        </div>
-        <div className="fw fw--expense">
-          <span className="fw__lab">Top expense</span>
-          <span className="fw__big">{topExpenseLabel}</span>
-          <span className="fw__down">
-            {topExpenseName} · {topExpenseShare}
-          </span>
+            <figure className="hero__plotwrap">
+              <div className="hero__plot">
+                <svg
+                  className="hero__chart-svg"
+                  viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+                  preserveAspectRatio="none"
+                  role="presentation"
+                >
+                  <defs>
+                    <linearGradient
+                      id="heroAreaGrad"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop className="hero__grad-top" offset="0%" />
+                      <stop className="hero__grad-bot" offset="100%" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    className="hero__area"
+                    d={areaPath}
+                    fill="url(#heroAreaGrad)"
+                  />
+                  <path
+                    className="hero__line"
+                    d={linePath}
+                    fill="none"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+                <span
+                  className="hero__dot"
+                  style={{
+                    left: `${lastPoint.x}%`,
+                    top: `${(lastPoint.y / CHART_H) * 100}%`,
+                  }}
+                />
+              </div>
+              <figcaption className="hero__axis">
+                {axisMonths.map((point) => (
+                  <span key={point.month}>{monthLabel(point.month)}</span>
+                ))}
+              </figcaption>
+            </figure>
+
+            <div className="hero__kpis">
+              <div className="hero__kpi">
+                <span className="hero__kpi-lab">Runway</span>
+                <span className="hero__kpi-val">{runwayLabel}</span>
+                <svg
+                  className="hero__kpi-spark"
+                  viewBox="0 0 100 20"
+                  preserveAspectRatio="none"
+                >
+                  <polyline
+                    points={sparkPoints}
+                    fill="none"
+                    stroke="var(--mk-dv-1)"
+                    strokeWidth="2"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+              </div>
+              <div className="hero__kpi">
+                <span className="hero__kpi-lab">Cashflow</span>
+                <span className="hero__kpi-val">{cashflowLabel}</span>
+                <span className="hero__kpi-note hero__kpi-note--pos">
+                  ▲ this month
+                </span>
+              </div>
+              <div className="hero__kpi">
+                <span className="hero__kpi-lab">Top expense</span>
+                <span className="hero__kpi-val">{topExpenseLabel}</span>
+                <span className="hero__kpi-note">
+                  {topExpenseName} · {topExpenseShare}
+                </span>
+              </div>
+            </div>
+
+            <div className="hero__insight">
+              <span className="hero__insight-tag">Do next</span>
+              <span className="hero__insight-body">
+                Allocate <strong>{surplusLabel}</strong> surplus toward runway.
+              </span>
+              <span className="hero__insight-go" aria-hidden="true">
+                →
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

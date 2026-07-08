@@ -8,9 +8,10 @@
 .pricing-table__scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--mk-line);
+  border: none;
   border-radius: var(--radius-lg);
-  background: var(--mk-surface-1);
+  background: var(--mk-soft-ground);
+  box-shadow: var(--mk-soft-raised);
 }
 
 .pricing-table {

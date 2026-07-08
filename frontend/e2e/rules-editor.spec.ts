@@ -46,6 +46,10 @@ test.describe(
       const email = `e2e-rules-${Date.now()}@example.com`;
       await signUpIntoWorkspace(page, email, "Rules Co");
 
+      // Classification rules live on the workspace Settings tab.
+      await page.getByRole("link", { name: "Settings" }).click();
+      await expect(page).toHaveURL(/\/workspace\/settings$/);
+
       const rulesPanel = page.locator(".ws-panel:has(#ws-rules-heading)");
       await expect(
         rulesPanel.getByRole("heading", { name: "Classification rules" }),

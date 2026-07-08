@@ -143,14 +143,40 @@ Done:
   files untouched as the source of truth until parity is verified"), so this may have been the
   only copy of ~170 real transactions. Flagged to the user; holding here pending their call on
   recovery/acceptance before this line is trusted as done.
-- [ ] Improve SEO/GEO for whole site. Make it act as a knowledge graph, using Json-LD schema.org types to define the site's structure and content, and link to other pages from others. This includes making auto generated sitemap.xml, llms.txt
+- [X] Improve SEO/GEO for whole site. Make it act as a knowledge graph, using Json-LD schema.org types to define the site's structure and content, and link to other pages from others. This includes making auto generated sitemap.xml, llms.txt (already shipped in commit `d15714c`, just never checked off here: `lib/seo.ts`/`lib/sitemap.ts` + `components/marketing/staticPageRoute.tsx` wire Organization/WebSite/WebPage/BreadcrumbList JSON-LD into all 14 static pages plus index/demo/pricing/custom-builds/widgets/signin/signup; `/sitemap.xml`, `/robots.txt`, `/llms.txt` all verified live and correct against a running dev server)
 - [X] Change the free mode to be different to the demo. The 'free' tier should also provide all the widgets, but only manual accounts can be used. Essentially the self-serve tier is paying for that live connection.
+- [~] Create a akahu app. Have reached out to akahu devs, waiting on response.
 - [ ] Implement stripe/payment gating for features.
 - [ ] Maybe make the email confirmation send a 6-digit code to the user's email address instead of a link, and then the confirm email screen allows them to enter it there. 
 - [X] Ensure the state where the user tries to sign in but isn't reverified yet is handled
 - [X] Allow the user to resend the verification email, so they don't get stuck
 - [ ] Integrate Affiliate Tracking with Stripe Webhooks: Update the signup/checkout workflow to grab the ref URL parameter from local storage and pass it as affiliate_id inside the Stripe Checkout Session metadata object; then, create a /api/webhooks/stripe endpoint that listens for the invoice.paid event, extracts the affiliate_id, calculates the 50% commission split from the total amount paid, and logs the pending payout into a new commissions database ledger with a 30-day payout delay buffer.
 - [ ] Feature: AI create classification rules based on transaction history. (opt in, in self serve/concierge, selling point, background update). Categories are tree based (eg broad category with subcategories). Would need to handle PII well. Also don't know what AI provider I would use. Could just be openrouter or smth, but would need to handle PII well.
+- [X] Creating an account bug: when go create a passkey, i sucessfully make it with the 1password popup, but then it goes the the error making passkey page, and asks me to set a password. Though confusingly, I get the confirmation email sent to be (without enter a password).
+  Root cause (found via systematic debugging, reproduced with a virtual WebAuthn authenticator in
+  Playwright): migration `20260705160000_auth_flows_passkeys.sql` created `passkey_credentials`
+  and granted `select, delete` to `authenticated`, but never granted anything to `service_role`.
+  `service_role`'s `BYPASSRLS` attribute skips RLS policies but still needs an ordinary table GRANT
+  — with none, `finishPasskeyRegistration`'s `admin.from("passkey_credentials").insert(...)` failed
+  with "permission denied for table passkey_credentials" every time, straight after the WebAuthn
+  ceremony succeeded (the account + confirmation email were already created one step earlier in
+  `beginPasskeyRegistration`). The client's catch block then silently fell back to "set a password"
+  since the account already existed. Fixed with a new migration
+  (`20260706120000_passkey_credentials_service_role_grant.sql`, `grant insert ... to service_role`)
+  + a new test (`supabase/tests/passkey_credentials_grants.sql`, 3/3 PASS) proving anon/authenticated
+  still can't insert. Also fixed a real but separate config gap found along the way:
+  `SUPABASE_SERVICE_ROLE_KEY` (required by the passkey admin client, `server/supabaseAdmin.ts`) was
+  never documented in `.env.example`, never set in the local `.env`, and never provisioned as a Fly
+  secret — `docs/deploy_fly.md` even had a stale line claiming "the service_role key is not used by
+  this app." Fixed all three (`.env.example` now documents it, local `.env` has the local-stack demo
+  key so dev/e2e work out of the box, `docs/deploy_fly.md` now includes it in the setup + `fly
+  secrets set` steps). Full `e2e/passkey-flow.spec.ts` (both signup-with-passkey and sign-in-with-it)
+  now passes end to end; `pnpm test` (351/351) and the `leads_feedback`/`feedback_variant_stats` SQL
+  tests re-verified with no regressions. **Deployed to production**: user ran `supabase db push`
+  (migration live on the cloud project) and `fly secrets set SUPABASE_SERVICE_ROLE_KEY=...` on the
+  live `youinc` Fly app — passkey signup should now work end to end in prod. (The Fly "suspended"
+  app status noticed along the way is benign — scale-to-zero labeling with no machine currently
+  running, not a billing issue; the site loads fine on request.)
 
 ***
 

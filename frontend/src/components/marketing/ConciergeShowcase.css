@@ -9,8 +9,8 @@
 .concierge__foot a { color: var(--mk-ink); font-weight: 600; text-decoration-color: var(--mk-line); text-underline-offset: 3px; }
 .concierge__foot a:hover { text-decoration-color: var(--mk-ink); }
 
-.artifact { background: var(--mk-surface-1); border: 1px solid var(--mk-line); border-radius: var(--radius-lg); padding: var(--space-5) var(--space-5); box-shadow: var(--shadow-3); transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease; }
-.artifact:hover, .artifact:focus-within { transform: translateY(-4px); box-shadow: var(--shadow-4); border-color: var(--mk-accent-line); }
+.artifact { background: var(--mk-soft-ground); border: none; border-radius: var(--radius-lg); padding: var(--space-5) var(--space-5); box-shadow: var(--mk-soft-raised); transition: transform 220ms ease, box-shadow 220ms ease; }
+.artifact:hover, .artifact:focus-within { transform: translateY(-4px); box-shadow: var(--mk-soft-raised-lg); }
 .artifact--brief { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; }
 .artifact--opty { grid-column: 2; grid-row: 1; }
 .artifact--anomaly { grid-column: 3; grid-row: 1; }

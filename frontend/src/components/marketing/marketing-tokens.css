@@ -104,4 +104,35 @@
   --shadow-2: 0 8px 20px -8px rgba(40, 40, 30, .14), 0 2px 6px -3px rgba(40, 40, 30, .10); /* hover / floating card */
   --shadow-3: 0 20px 44px -22px rgba(40, 40, 30, .30), 0 6px 16px -8px rgba(40, 40, 30, .14); /* featured tier, artifacts */
   --shadow-4: 0 30px 60px -24px rgba(40, 40, 30, .35), 0 8px 20px -8px rgba(40, 40, 30, .14); /* the DashboardFrame */
+
+  /* ── B6. SOFT-UI (accessible neumorphism) ───────────────────────────────
+   * Dual-light extrusion: a warm dark shadow bottom-right + a white highlight
+   * top-left, on a single mid-tone ground so surfaces look moulded from the
+   * page. Deliberately NOT applied to text, data, inputs' borders, or the
+   * primary CTA fill — those stay high-contrast (see soft-ui usage rules).
+   * The ground is intentionally a touch darker than pure paper so BOTH the
+   * highlight and shadow read; ink (#111) on it is still ~12:1 (WCAG AAA). */
+  --mk-soft-ground: #e9eae3;
+  --mk-soft-ground-2: #e4e5dd; /* recessed wells / insets sit on this */
+
+  --mk-soft-raised:
+    7px 7px 16px rgba(46, 50, 38, 0.16),
+    -7px -7px 16px rgba(255, 255, 255, 0.92);
+  --mk-soft-raised-sm:
+    4px 4px 9px rgba(46, 50, 38, 0.13),
+    -4px -4px 9px rgba(255, 255, 255, 0.85);
+  --mk-soft-raised-lg:
+    12px 12px 28px rgba(46, 50, 38, 0.18),
+    -10px -10px 24px rgba(255, 255, 255, 0.95);
+  --mk-soft-inset:
+    inset 5px 5px 10px rgba(46, 50, 38, 0.16),
+    inset -5px -5px 10px rgba(255, 255, 255, 0.9);
+  --mk-soft-pressed:
+    inset 4px 4px 9px rgba(46, 50, 38, 0.2),
+    inset -3px -3px 7px rgba(255, 255, 255, 0.8);
+  /* Accent-tinted extrusion for the featured / active surfaces. */
+  --mk-soft-accent-glow:
+    7px 7px 16px rgba(46, 50, 38, 0.16),
+    -7px -7px 16px rgba(255, 255, 255, 0.92),
+    0 0 0 1.5px var(--mk-accent-line);
 }

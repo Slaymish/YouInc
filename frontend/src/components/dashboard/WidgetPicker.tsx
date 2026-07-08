@@ -6,6 +6,7 @@ import {
   type WidgetCategory,
 } from "./widgets";
 import type { WidgetPlacement } from "./grid";
+import { RemoveIcon } from "./icons";
 
 interface WidgetPickerProps {
   layout: WidgetPlacement[];
@@ -45,7 +46,7 @@ export function WidgetPicker({
         <header className="widget-picker-header">
           <span>{title}</span>
           <button type="button" className="widget-picker-close" onClick={onClose} aria-label="Close">
-            ×
+            <RemoveIcon size={16} />
           </button>
         </header>
 

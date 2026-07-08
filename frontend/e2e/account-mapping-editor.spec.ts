@@ -47,6 +47,10 @@ test.describe(
       const email = `e2e-mapping-${Date.now()}@example.com`;
       await signUpIntoWorkspace(page, email, "Mapping Co");
 
+      // Account mappings live on the workspace Settings tab.
+      await page.getByRole("link", { name: "Settings" }).click();
+      await expect(page).toHaveURL(/\/workspace\/settings$/);
+
       const panel = page.locator(".ws-panel:has(#ws-account-mappings-heading)");
       await expect(
         panel.getByRole("heading", { name: "Account mappings" }),

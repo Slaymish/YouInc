@@ -30,7 +30,7 @@ export function HowItWorks() {
       <h2 id="how-heading" className="section-heading">
         How it works
       </h2>
-      <ol className="steps__list">
+      <ol className="steps__list steps__list--flow">
         {STEPS.map((s) => (
           <li className="step" key={s.n}>
             <div className="step__media">
@@ -43,9 +43,11 @@ export function HowItWorks() {
                 loading="lazy"
               />
             </div>
-            <span className="step__n">{s.n}</span>
-            <h3 className="step__title">{s.title}</h3>
-            <p className="step__body">{s.body}</p>
+            <div className="step__text">
+              <span className="step__n">{s.n}</span>
+              <h3 className="step__title">{s.title}</h3>
+              <p className="step__body">{s.body}</p>
+            </div>
           </li>
         ))}
       </ol>

@@ -111,13 +111,13 @@
   width: 100%;
   max-width: 28rem;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  border: none;
+  border-radius: 18px;
   padding: clamp(1.75rem, 4vw, 2.5rem);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: 0 20px 44px -28px rgba(30, 30, 20, 0.35);
+  box-shadow: var(--soft-raised-lg);
 }
 
 .auth-card--wide {
@@ -164,13 +164,16 @@
   color: var(--text-muted);
 }
 
+/* Inputs sit in a recessed "well" but keep a real border (soft-ui rule:
+   inputs never rely on shadow alone for affordance / contrast). */
 .auth-field input {
   border: 1px solid var(--line);
-  background: var(--surface);
+  background: var(--surface-muted);
   color: var(--text);
   border-radius: 8px;
   padding: 0.7rem 0.8rem;
   font: inherit;
+  box-shadow: var(--soft-inset);
 }
 
 .auth-field input:focus-visible {
@@ -183,16 +186,26 @@
   color: var(--text-muted);
 }
 
+.auth-code-input {
+  font-size: 1.5rem;
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Primary: solid high-contrast fill (trust/accessibility) with tactile
+   elevation + press-in on click. */
 .auth-primary {
   appearance: none;
-  border: 1px solid var(--line);
+  border: none;
   background: var(--text);
   color: var(--inverse-text);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.8rem 1rem;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: var(--soft-raised-sm);
   transition:
     transform 120ms ease,
     box-shadow 120ms ease;
@@ -200,7 +213,12 @@
 
 .auth-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px -8px rgba(30, 30, 20, 0.45);
+  box-shadow: var(--soft-raised);
+}
+
+.auth-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--soft-pressed);
 }
 
 .auth-primary:disabled {
@@ -208,22 +226,33 @@
   cursor: progress;
 }
 
+/* Secondary: ground-coloured tactile button that depresses on click. */
 .auth-secondary {
   appearance: none;
-  border: 1px solid var(--line);
-  background: transparent;
+  border: none;
+  background: var(--surface);
   color: var(--text);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.7rem 1rem;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
   text-decoration: none;
+  box-shadow: var(--soft-raised-sm);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .auth-secondary:hover {
-  background: var(--surface-muted, var(--code-bg));
+  transform: translateY(-1px);
+  box-shadow: var(--soft-raised);
+}
+
+.auth-secondary:active {
+  transform: translateY(0);
+  box-shadow: var(--soft-pressed);
 }
 
 .auth-error {

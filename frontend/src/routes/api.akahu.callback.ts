@@ -11,7 +11,9 @@ import { createFileRoute } from "@tanstack/react-router";
 const STATE_COOKIE = "akahu_oauth_state";
 
 function redirectToWorkspace(query: string): Response {
-  return new Response(null, { status: 302, headers: { Location: `/workspace?${query}` } });
+  // Bank connection lives on the workspace Settings tab; land the user there
+  // so AkahuConnectPanel (which reads window.location) can pick up the result.
+  return new Response(null, { status: 302, headers: { Location: `/workspace/settings?${query}` } });
 }
 
 export const Route = createFileRoute("/api/akahu/callback")({

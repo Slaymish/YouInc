@@ -21,7 +21,8 @@ export const PRODUCT = {
   heroEyebrow: "Personal ERP · Live bank sync via Akahu",
   heroHeadline: "Run yourself like a company.",
   heroSub:
-    "YouInc turns your accounts into a live double-entry ledger, then gives you the CFO view: net worth, cashflow, runway, and the next thing to look at. Use the standard widgets, or have me build the view your finances need.",
+    "Connect your bank and YouInc keeps a live double-entry ledger of your whole financial life — then shows you the CFO view: net worth, runway, cashflow, and the one thing to do next.",
+  heroReassurance: "No card to start · Read-only bank access · Live in 2 minutes",
 } as const;
 
 // Four tiers, two of them free in different senses — keep them distinct:

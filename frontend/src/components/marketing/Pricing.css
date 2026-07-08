@@ -8,19 +8,20 @@
 .pricing__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-grid, 1.5rem); }
 .tier {
   position: relative;
-  background: var(--mk-surface-1, var(--mk-card));
-  border: 1px solid var(--mk-line);
+  background: var(--mk-soft-ground);
+  border: none;
   border-radius: var(--radius-xl, 16px);
   padding: 1.8rem 1.6rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--mk-soft-raised);
   transition: transform var(--duration-normal, 200ms) ease, box-shadow var(--duration-normal, 200ms) ease;
 }
-.tier:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
-.tier--featured { border-color: var(--mk-accent-line, var(--mk-ink)); box-shadow: var(--shadow-3); }
-.tier--featured:hover { transform: translateY(-2px); box-shadow: var(--shadow-3); }
+.tier:hover { transform: translateY(-3px); box-shadow: var(--mk-soft-raised-lg); }
+/* Featured tier reads as "lifted higher" with an accent-tinted extrusion. */
+.tier--featured { box-shadow: var(--mk-soft-accent-glow); }
+.tier--featured:hover { transform: translateY(-3px); box-shadow: var(--mk-soft-raised-lg), 0 0 0 1.5px var(--mk-accent-line); }
 .tier__chip {
   align-self: flex-start;
   margin: 0;

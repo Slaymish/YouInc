@@ -189,6 +189,29 @@ export async function passwordSignup(
   return { hasSession: Boolean(data.session) };
 }
 
+/**
+ * Redeem the 6-digit code from the "check your email" screen (the code-entry
+ * counterpart of the link-based /auth/confirm route). Sets the session cookie
+ * on success via the same request-cookie client every other server fn uses.
+ */
+export async function confirmSignupCode(
+  email: string,
+  token: string,
+): Promise<void> {
+  const supabase = getSupabaseServerClient();
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "signup",
+  });
+  if (error) {
+    throwServerError(
+      "That code is invalid or has expired — check the digits, or resend the email.",
+      400,
+    );
+  }
+}
+
 /** Generate WebAuthn authentication options and stash the challenge on the flow
  * (used for both conditional-UI autofill and the explicit "Continue with
  * passkey" button). */

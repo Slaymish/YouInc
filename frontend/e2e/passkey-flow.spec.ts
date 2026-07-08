@@ -1,13 +1,14 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// Passkey golden paths for the multi-step auth redesign. These need:
-//   * a running local Supabase stack (`supabase start`), and
-//   * the dev server started with SUPABASE_SERVICE_ROLE_KEY set (the passkey
-//     registration insert + the passkey→session bridge use the service role).
-// Gated on YOUINC_E2E_SUPABASE like signup-flow.spec.ts so the default
-// public-page e2e run stays green with no database.
+// Passkey golden paths for the multi-step auth redesign. These need a running
+// local Supabase stack (`supabase start`) and SUPABASE_SERVICE_ROLE_KEY set
+// for the dev server (the passkey registration insert + the passkey→session
+// bridge use the service role) — already in `.env` for local dev via
+// `supabase status`'s service_role key. Gated on YOUINC_E2E_SUPABASE like
+// signup-flow.spec.ts so the default public-page e2e run stays green with no
+// database.
 //
-//   YOUINC_E2E_SUPABASE=1 SUPABASE_SERVICE_ROLE_KEY=... pnpm test:e2e passkey-flow
+//   YOUINC_E2E_SUPABASE=1 pnpm test:e2e passkey-flow
 const supabaseReady = process.env.YOUINC_E2E_SUPABASE === "1";
 
 /** Attach a virtual platform authenticator with a resident key + auto user

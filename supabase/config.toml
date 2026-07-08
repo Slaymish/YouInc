@@ -223,7 +223,7 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -242,6 +242,13 @@ otp_expiry = 3600
 # pass = "env(SENDGRID_API_KEY)"
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
+
+# Custom confirmation-email template: shows the 6-digit code only (no magic
+# link) — the confirm screen has the user type it in instead of clicking
+# through. See docs/deploy_fly.md for the matching hosted-project step.
+[auth.email.template.confirmation]
+subject = "Confirm your YouInc signup"
+content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

@@ -271,6 +271,10 @@ test.describe(
         await page.getByRole("button", { name: /go to my workspace/i }).click();
         await expect(page).toHaveURL(/\/workspace$/);
 
+        // Bank connection lives on the Settings tab.
+        await page.getByRole("link", { name: "Settings" }).click();
+        await expect(page).toHaveURL(/\/workspace\/settings$/);
+
         // Connect via OAuth: the "Connect with Akahu" link does a full
         // navigation to GET /api/akahu/oauth/start, which 302s to the
         // (mocked) authorize endpoint above, which 302s back to GET
@@ -278,9 +282,9 @@ test.describe(
         // end-to-end redirect chain, no network-layer interception. The
         // callback exchanges the code against the mock /token above;
         // connect_akahu then stores the resulting token in Vault, same as
-        // the old paste-a-token flow did.
+        // the old paste-a-token flow did. The callback lands on Settings.
         await page.getByRole("link", { name: /connect with akahu/i }).click();
-        await expect(page).toHaveURL(/\/workspace\?akahu_connected=1$/);
+        await expect(page).toHaveURL(/\/workspace\/settings\?akahu_connected=1$/);
         await expect(page.getByText(/connected to akahu/i)).toBeVisible();
 
         // List the authorized accounts (hits the mock /accounts).
@@ -299,12 +303,6 @@ test.describe(
           .getByRole("button", { name: "Sync" })
           .click();
         await expect(page.getByText(/synced 2 transactions/i)).toBeVisible();
-        await expect(
-          page.getByRole("heading", { name: "Synced ledger" }),
-        ).toBeVisible();
-        await expect(page.locator(".ws-metric__value").first()).toHaveText(
-          "$4,140.00",
-        );
 
         // The chosen date range produced a sync-log entry, visible in the
         // Sync history panel (akahu_sync_log — server/akahuConnection.ts).
@@ -328,7 +326,20 @@ test.describe(
           .click();
         await expect(page.getByText(/2 already seen/i)).toBeVisible();
 
+        // The synced balance surfaces on the Overview tab (Synced ledger panel
+        // + the net-worth metric): 4200 − 60 = 4140.
+        await page.getByRole("link", { name: "Overview" }).click();
+        await expect(page).toHaveURL(/\/workspace$/);
+        await expect(
+          page.getByRole("heading", { name: "Synced ledger" }),
+        ).toBeVisible();
+        await expect(page.locator(".ws-metric__value").first()).toHaveText(
+          "$4,140.00",
+        );
+
         // Disconnect removes the Vault secret and revokes the connection.
+        await page.getByRole("link", { name: "Settings" }).click();
+        await expect(page).toHaveURL(/\/workspace\/settings$/);
         await page.getByRole("button", { name: /disconnect/i }).click();
         await expect(page.getByText(/akahu disconnected/i)).toBeVisible();
       } finally {
