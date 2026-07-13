@@ -58,7 +58,7 @@ export async function beginPasskeyRegistration(
 ): Promise<BeginRegistrationResult> {
   const flow = await getAuthFlow(token);
   if (!flow || flow.kind !== "signup" || !flow.email) {
-    throwServerError("That signup link expired — start again.", 400);
+    throwServerError("That signup link expired. Start again.", 400);
   }
 
   const displayName =
@@ -99,7 +99,7 @@ export async function finishPasskeyRegistration(
 ): Promise<{ hasSession: boolean }> {
   const flow = await getAuthFlow(token);
   if (!flow || !flow.userId || !flow.challenge) {
-    throwServerError("That signup link expired — start again.", 400);
+    throwServerError("That signup link expired. Start again.", 400);
   }
 
   const verified = await verifyRegistration({
@@ -142,7 +142,7 @@ export async function setSignupPassword(
   }
   const flow = await getAuthFlow(token);
   if (!flow || !flow.userId) {
-    throwServerError("That signup link expired — start again.", 400);
+    throwServerError("That signup link expired. Start again.", 400);
   }
   const admin = getSupabaseAdminClient();
   const { error } = await admin.auth.admin.updateUserById(flow.userId, {
@@ -172,7 +172,7 @@ export async function passwordSignup(
   }
   const flow = await getAuthFlow(token);
   if (!flow || flow.kind !== "signup" || !flow.email) {
-    throwServerError("That signup link expired — start again.", 400);
+    throwServerError("That signup link expired. Start again.", 400);
   }
   const displayName =
     [flow.firstName, flow.lastName].filter(Boolean).join(" ") || null;
@@ -206,7 +206,7 @@ export async function confirmSignupCode(
   });
   if (error) {
     throwServerError(
-      "That code is invalid or has expired — check the digits, or resend the email.",
+      "That code is invalid or has expired. Check the digits, or resend the email.",
       400,
     );
   }

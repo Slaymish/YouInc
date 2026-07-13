@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   redirect,
-  useRouter,
   Link,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -57,7 +56,7 @@ function messageFor(error: unknown): string {
   if (error && typeof error === "object" && "message" in error) {
     return String((error as { message: unknown }).message);
   }
-  return "Something went wrong — please try again.";
+  return "Something went wrong. Please try again.";
 }
 
 function Stepper({ index }: { index: number }) {
@@ -83,9 +82,8 @@ function Stepper({ index }: { index: number }) {
 
 function OnboardingPage() {
   const account = Route.useLoaderData();
-  const router = useRouter();
 
-  // If the user already has a workspace, they've finished onboarding — jump
+  // If the user already has a workspace, they've finished onboarding. Jump
   // straight to the connect/finish step so they can proceed to the dashboard.
   const [step, setStep] = useState<Step>(
     account.tenant ? "connect" : "welcome",
@@ -157,7 +155,7 @@ function OnboardingPage() {
               Here's what you'll set up:
             </p>
             <ul className="onb-benefits">
-              <li>Name your workspace — your personal "You Inc."</li>
+              <li>Name your workspace, your personal "You Inc."</li>
               <li>
                 Connect your bank securely through Akahu (or add accounts
                 manually).
@@ -184,7 +182,7 @@ function OnboardingPage() {
             <p className="auth-eyebrow">Step 1 of 2</p>
             <h1 id="onb-heading">Name your workspace</h1>
             <p className="auth-lede">
-              This is the entity your ledger belongs to — think of it as your
+              This is the entity your ledger belongs to. Think of it as your
               personal company. You can change it later.
             </p>
             <form className="auth-form" onSubmit={createWorkspace} noValidate>
@@ -249,7 +247,7 @@ function OnboardingPage() {
 
             <ul className="onb-benefits">
               <li>
-                Connect a bank via Akahu — choose exactly which accounts to
+                Connect a bank via Akahu and choose exactly which accounts to
                 share.
               </li>
               <li>No bank in Akahu? Add manual accounts and balances.</li>
@@ -269,7 +267,7 @@ function OnboardingPage() {
               <button
                 className="auth-primary"
                 type="button"
-                onClick={() => router.navigate({ to: "/workspace" })}
+                onClick={() => window.location.replace("/workspace")}
               >
                 Go to my workspace →
               </button>

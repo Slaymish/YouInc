@@ -9,7 +9,7 @@ import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 
 const SIGNUP_DESCRIPTION =
-  "Create your YouInc account and set up your own workspace in a couple of minutes — no card required.";
+  "Create your YouInc account and set up your own workspace in a couple of minutes. No card required.";
 
 const SIGNUP_JSON_LD = jsonLdScript(
   jsonLdGraph([
@@ -29,7 +29,7 @@ const SIGNUP_JSON_LD = jsonLdScript(
 export const Route = createFileRoute("/signup/")({
   head: () => ({
     meta: [
-      { title: "Create your account — YouInc" },
+      { title: "Create your account | YouInc" },
       { name: "description", content: SIGNUP_DESCRIPTION },
     ],
     scripts: [SIGNUP_JSON_LD],
@@ -50,7 +50,7 @@ function messageFor(error: unknown): string {
   if (error && typeof error === "object" && "message" in error) {
     return String((error as { message: unknown }).message);
   }
-  return "Something went wrong — please try again.";
+  return "Something went wrong. Please try again.";
 }
 
 function SignupEmailPage() {
@@ -90,12 +90,12 @@ function SignupEmailPage() {
         <h1 id="signup-heading">Create your account</h1>
         <p className="auth-lede">
           Run yourself like a company. Set up your workspace in a couple of
-          minutes — no card required.
+          minutes. No card required.
         </p>
 
         {notice === "expired" ? (
           <p className="auth-notice" role="alert">
-            That link expired — let's start again.
+            That link expired. Let's start again.
           </p>
         ) : null}
 

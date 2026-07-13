@@ -44,9 +44,10 @@ In the dashboard → **Authentication**:
   `supabase/templates/confirmation.html` (the local stack picks this up
   automatically via `[auth.email.template.confirmation]` in
   `supabase/config.toml`; the hosted dashboard template is separate and needs
-  this manual paste after any edit to that file). It shows only the 6-digit
-  `{{ .Token }}` code — no link — which the user types into the confirm
-  screen (`src/components/auth/EmailCodeConfirm.tsx`, calling
+  this manual paste after any edit to that file). It includes both a confirm
+  link using `{{ .TokenHash }}` and the 6-digit `{{ .Token }}` code. The user
+  can choose either option; the code is handled by
+  `src/components/auth/EmailCodeConfirm.tsx`, calling
   `supabase.auth.verifyOtp({ email, token, type: "signup" })`).
 
 Record the project's **URL**, **anon/public key**, and **service_role key** from

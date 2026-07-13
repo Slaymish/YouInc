@@ -15,7 +15,7 @@ interface EmailCodeConfirmProps {
 
 function messageFor(error: unknown): string {
   if (error instanceof Error) return error.message;
-  return "Something went wrong — please try again.";
+  return "Something went wrong. Please try again.";
 }
 
 /**
@@ -52,8 +52,9 @@ export function EmailCodeConfirm({ email, note, onVerified }: EmailCodeConfirmPr
         <p className="auth-eyebrow">Almost there</p>
         <h1 id="confirm-heading">Check your email</h1>
         <p className="auth-lede">
-          We sent a 6-digit code to <strong>{email}</strong>. Enter it below to
-          activate your account{note ? ` — ${note}` : ""}.
+          We sent a confirmation email to <strong>{email}</strong>. Select
+          Confirm email in that message, or enter the 6-digit code below
+          {note ? `. ${note.charAt(0).toUpperCase()}${note.slice(1)}` : ""}.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
@@ -98,7 +99,7 @@ export function EmailCodeConfirm({ email, note, onVerified }: EmailCodeConfirmPr
               ? `resend in ${resend.cooldownSeconds}s`
               : resend.status === "sending"
                 ? "resending…"
-                : "resend the code"}
+                : "resend the email"}
           </button>
           .
         </p>

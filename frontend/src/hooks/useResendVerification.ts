@@ -64,20 +64,20 @@ export function useResendVerification(): UseResendVerificationResult {
         if (error) {
           const kind = classifyAuthError(error);
           if (kind === "rate_limited") {
-            setMessage("You've requested that too many times — try again shortly.");
+            setMessage("You've requested that too many times. Try again shortly.");
             startCooldown(RATE_LIMIT_COOLDOWN_SECONDS);
           } else {
-            setMessage(error.message || "Couldn't resend the email — please try again.");
+            setMessage(error.message || "Couldn't resend the email. Please try again.");
           }
           setStatus("error");
           return;
         }
         setStatus("sent");
-        setMessage("Verification email sent — check your inbox.");
+        setMessage("Verification email sent. Check your inbox.");
         startCooldown(POST_SEND_COOLDOWN_SECONDS);
       } catch {
         setStatus("error");
-        setMessage("Couldn't resend the email — please try again.");
+        setMessage("Couldn't resend the email. Please try again.");
       }
     },
     [status, cooldownSeconds, startCooldown],

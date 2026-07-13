@@ -7,7 +7,7 @@ import { EmailCodeConfirm } from "~/components/auth/EmailCodeConfirm";
 import { checkAuthed, loadFlow, signupWithPassword } from "~/lib/authServerFns";
 
 export const Route = createFileRoute("/signup/password")({
-  head: () => ({ meta: [{ title: "Choose a password — YouInc" }] }),
+  head: () => ({ meta: [{ title: "Choose a password | YouInc" }] }),
   validateSearch: (search: Record<string, unknown>) => ({
     flow: typeof search.flow === "string" ? search.flow : "",
   }),
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/signup/password")({
 
 function messageFor(error: unknown): string {
   if (error instanceof Error) return error.message;
-  return "Something went wrong — please try again.";
+  return "Something went wrong. Please try again.";
 }
 
 function SignupPasswordPage() {

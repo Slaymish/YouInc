@@ -40,7 +40,7 @@ describe("confirmSignupCode", () => {
       confirmSignupCode("person@example.com", "000000"),
     ).rejects.toMatchObject(
       new ServerFnError(
-        "That code is invalid or has expired — check the digits, or resend the email.",
+        "That code is invalid or has expired. Check the digits, or resend the email.",
         400,
       ),
     );

@@ -243,9 +243,8 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Custom confirmation-email template: shows the 6-digit code only (no magic
-# link) — the confirm screen has the user type it in instead of clicking
-# through. See docs/deploy_fly.md for the matching hosted-project step.
+# Custom confirmation-email template: offers both the app confirmation link and
+# a 6-digit code. See docs/deploy_fly.md for the matching hosted-project step.
 [auth.email.template.confirmation]
 subject = "Confirm your YouInc signup"
 content_path = "./supabase/templates/confirmation.html"

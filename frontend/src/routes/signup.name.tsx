@@ -6,7 +6,7 @@ import { AuthStepper } from "~/components/auth/AuthStepper";
 import { checkAuthed, loadFlow, advanceFlow } from "~/lib/authServerFns";
 
 export const Route = createFileRoute("/signup/name")({
-  head: () => ({ meta: [{ title: "Your name — YouInc" }] }),
+  head: () => ({ meta: [{ title: "Your name | YouInc" }] }),
   validateSearch: (search: Record<string, unknown>) => ({
     flow: typeof search.flow === "string" ? search.flow : "",
   }),
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/signup/name")({
 
 function messageFor(error: unknown): string {
   if (error instanceof Error) return error.message;
-  return "Something went wrong — please try again.";
+  return "Something went wrong. Please try again.";
 }
 
 function SignupNamePage() {
@@ -72,7 +72,7 @@ function SignupNamePage() {
         <AuthStepper index={1} count={3} />
         <p className="auth-eyebrow">Step 2 of 3</p>
         <h1 id="name-heading">What should we call you?</h1>
-        <p className="auth-lede">Optional — you can add or change this later.</p>
+        <p className="auth-lede">Optional. You can add or change this later.</p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="auth-field">

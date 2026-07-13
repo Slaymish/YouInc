@@ -13,7 +13,7 @@ import {
 } from "~/lib/authServerFns";
 
 export const Route = createFileRoute("/signup/credential")({
-  head: () => ({ meta: [{ title: "Secure your account — YouInc" }] }),
+  head: () => ({ meta: [{ title: "Secure your account | YouInc" }] }),
   validateSearch: (search: Record<string, unknown>) => ({
     flow: typeof search.flow === "string" ? search.flow : "",
   }),
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/signup/credential")({
 
 function messageFor(error: unknown): string {
   if (error instanceof Error) return error.message;
-  return "Something went wrong — please try again.";
+  return "Something went wrong. Please try again.";
 }
 
 function SignupCredentialPage() {
@@ -135,8 +135,8 @@ function SignupCredentialPage() {
             <p className="auth-eyebrow">Step 3 of 3</p>
             <h1 id="cred-heading">Create a passkey</h1>
             <p className="auth-lede">
-              Sign in with your fingerprint, face, or device PIN — no password to
-              remember or leak.
+              Sign in with your fingerprint, face, or device PIN. There is no
+              password to remember or leak.
             </p>
 
             {error ? (
@@ -174,7 +174,7 @@ function SignupCredentialPage() {
             <p className="auth-eyebrow">Step 3 of 3</p>
             <h1 id="cred-heading">Set a password</h1>
             <p className="auth-lede">
-              We couldn't set up a passkey on this device — choose a password to
+              We couldn't set up a passkey on this device. Choose a password to
               finish instead.
             </p>
             <form
