@@ -40,7 +40,7 @@ export function DashboardPanel({
   const style: React.CSSProperties = {
     gridColumn: `${placement.x + 1} / span ${placement.w}`,
     gridRow: `${placement.y + 1} / span ${placement.h}`,
-    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transform: transform && !isDragging ? CSS.Translate.toString(transform) : undefined,
     zIndex: isDragging ? 100 : undefined,
     opacity: isDragging ? 0.5 : undefined,
     position: "relative",
@@ -50,8 +50,9 @@ export function DashboardPanel({
     return (
       <article
         ref={setNodeRef}
+        data-widget-id={placement.id}
         style={style}
-        className={`metric${isEditing ? " metric--editing" : ""}`}
+        className={`metric widget--${placement.id}${isEditing ? " metric--editing" : ""}`}
       >
         {isEditing && (
           <>
@@ -97,8 +98,9 @@ export function DashboardPanel({
   return (
     <section
       ref={setNodeRef}
+      data-widget-id={placement.id}
       style={style}
-      className={`panel${isEditing ? " panel--editing" : ""}`}
+      className={`panel widget--${placement.id}${isEditing ? " panel--editing" : ""}`}
     >
       <header>
         {isEditing && (

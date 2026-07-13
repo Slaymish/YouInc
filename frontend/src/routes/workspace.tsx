@@ -22,6 +22,7 @@ import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 import "~/styles/auth.css";
 import "~/styles/workspace.css";
 import "~/components/dashboard/dashboard.css";
+import "~/components/marketing/marketing-tokens.css";
 
 export interface WorkspaceLoaderData {
   account: AccountState;
@@ -113,7 +114,7 @@ function WorkspaceLayout() {
   }
 
   return (
-    <div className="ws-shell">
+    <div className="mk ws-shell ws-ledger-shell">
       <RouteLoadDial label="Loading your dashboard" />
       <header className="ws-topbar">
         <Link className="ws-topbar__logo" to="/" aria-label="YouInc home">

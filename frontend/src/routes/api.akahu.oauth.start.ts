@@ -12,6 +12,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { randomBytes } from "node:crypto";
 
 const STATE_COOKIE = "akahu_oauth_state";
+const USER_COOKIE = "akahu_oauth_user";
 const STATE_COOKIE_MAX_AGE_SECONDS = 600;
 
 function redirectToWorkspace(query: string): Response {
@@ -41,10 +42,20 @@ export const Route = createFileRoute("/api/akahu/oauth/start")({
           path: "/",
           maxAge: STATE_COOKIE_MAX_AGE_SECONDS,
         });
+        // Bind this OAuth attempt to the signed-in user as well as the browser.
+        // This prevents an account switch in the same browser during Akahu's
+        // redirect flow from attaching the token to a different YouInc user.
+        setCookie(USER_COOKIE, user.id, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: STATE_COOKIE_MAX_AGE_SECONDS,
+        });
 
         return new Response(null, {
           status: 302,
-          headers: { Location: buildAkahuAuthorizeUrl(state) },
+          headers: { Location: buildAkahuAuthorizeUrl(state, user.email) },
         });
       },
     },

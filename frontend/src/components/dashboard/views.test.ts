@@ -94,7 +94,7 @@ describe("defaultViews (allowlist filtering, e.g. the public /demo route)", () =
     // blueprints, so both tabs survive, each containing just that widget.
     expect(views.length).toBe(2);
     for (const view of views) {
-      expect(view.layout).toEqual([{ id: "metric-net-worth", x: 0, y: 0, w: 2, h: 2 }]);
+      expect(view.layout).toEqual([{ id: "metric-net-worth", x: 0, y: 0, w: 12, h: 2 }]);
     }
   });
 });

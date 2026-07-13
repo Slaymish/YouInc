@@ -63,6 +63,100 @@ export function compact(layout: WidgetPlacement[]): WidgetPlacement[] {
   return result;
 }
 
+/**
+ * Packs widgets into the first available grid cell in their supplied order.
+ * Unlike vertical-only compaction, this repairs horizontal holes and stale
+ * persisted coordinates as well as collisions. The array order is therefore
+ * the dashboard's stable reading and drag-reorder order.
+ */
+export function reflowLayout(layout: WidgetPlacement[]): WidgetPlacement[] {
+  const fullWidth = new Set<string>();
+
+  function pack(): WidgetPlacement[] {
+    const packed: WidgetPlacement[] = [];
+    for (const widget of layout) {
+      const w = fullWidth.has(widget.id) ? 12 : Math.max(1, Math.min(12, widget.w));
+      const h = Math.max(1, widget.h);
+      let placed = false;
+
+      for (let y = 0; !placed; y += 1) {
+        for (let x = 0; x <= 12 - w; x += 1) {
+          const candidate = { ...widget, x, y, w, h };
+          if (!packed.some((existing) => overlaps(existing, candidate))) {
+            packed.push(candidate);
+            placed = true;
+            break;
+          }
+        }
+      }
+    }
+    return packed;
+  }
+
+  let result = pack();
+  for (let pass = 0; pass < layout.length; pass += 1) {
+    const bottom = result.reduce((max, widget) => Math.max(max, widget.y + widget.h), 0);
+    const orphans = result.filter((widget) => {
+      const widgetBottom = widget.y + widget.h;
+      if (widgetBottom >= bottom) return false;
+      return !result.some(
+        (other) =>
+          other.id !== widget.id &&
+          other.y === widgetBottom,
+      );
+    });
+    if (!orphans.length) break;
+    for (const widget of orphans) fullWidth.add(widget.id);
+    result = pack();
+  }
+
+  // A final unopposed row should read as a complete dashboard band rather
+  // than a few tiles marooned on the left. Share its spare columns without
+  // shrinking any widget. Rows beside a taller widget are intentionally left
+  // alone so editorial hero/sidebar compositions keep their proportions.
+  const bands = new Map<string, WidgetPlacement[]>();
+  for (const widget of result) {
+    const key = `${widget.y}:${widget.h}`;
+    bands.set(key, [...(bands.get(key) ?? []), widget]);
+  }
+
+  for (const band of bands.values()) {
+    const { y, h } = band[0];
+    const ids = new Set(band.map((widget) => widget.id));
+    const hasBlocker = result.some(
+      (widget) =>
+        !ids.has(widget.id) && widget.y < y + h && widget.y + widget.h > y,
+    );
+    const used = band.reduce((sum, widget) => sum + widget.w, 0);
+    if (hasBlocker || used >= 12) continue;
+
+    const ordered = [...band].sort((a, b) => a.x - b.x);
+    const spare = 12 - used;
+    let x = 0;
+    for (const [index, widget] of ordered.entries()) {
+      const extra = Math.floor(spare / ordered.length) +
+        (index < spare % ordered.length ? 1 : 0);
+      widget.x = x;
+      widget.w += extra;
+      x += widget.w;
+    }
+  }
+
+  // Mixed-height rows cannot be distributed evenly, but each tile can still
+  // claim empty columns to its right until the next vertically-overlapping
+  // tile. This closes the remaining ragged edge without disturbing order.
+  for (const widget of result) {
+    const rightBoundary = result.reduce((boundary, other) => {
+      if (other.id === widget.id || other.x < widget.x + widget.w) return boundary;
+      const overlapsVertically = other.y < widget.y + widget.h && other.y + other.h > widget.y;
+      return overlapsVertically ? Math.min(boundary, other.x) : boundary;
+    }, 12);
+    widget.w = rightBoundary - widget.x;
+  }
+
+  return result;
+}
+
 export function clampPlacement(
   placement: WidgetPlacement,
   minW: number,

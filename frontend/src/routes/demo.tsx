@@ -16,7 +16,7 @@ import "~/components/marketing/demo.css";
 // Separate from the real dashboard's storage key so demo edits (tab/layout
 // customization on sample data) never read from or clobber a real user's
 // saved layout — see useDashboardLayout's `storageKey` option.
-const DEMO_STORAGE_KEY = "youinc.demo.layout.v1";
+const DEMO_STORAGE_KEY = "youinc.demo.layout.v3";
 
 const DEMO_DESCRIPTION =
   "Explore the full YouInc dashboard on sample data — the same shell and widgets you get once your accounts are connected, with no sign-up and no bank connection.";
@@ -56,12 +56,11 @@ function DemoPage() {
       <RouteLoadDial label="Loading sample dashboard" tone="dark" />
       <header className="mk demo-banner">
         <span className="demo-banner__mode">
-          <span className="demo-banner__mode-dot" aria-hidden="true" />
-          DEMO · SAMPLE DATA · READ-ONLY
+          Sample company data
         </span>
         <div className="demo-banner__copy">
-          <strong>Live demo</strong> — the same dashboard shell and widgets you
-          get once your accounts are connected.
+          <strong>A working ledger.</strong> Move between views, then customize
+          the workspace to see how it adapts.
         </div>
         <nav className="demo-banner__cta">
           <Link className="mk-btn mk-btn--ghost" to="/">
@@ -73,11 +72,14 @@ function DemoPage() {
         </nav>
       </header>
 
-      <main className="system-shell">
+      <main className="mk system-shell dashboard-canvas">
         <header className="system-header">
-          <div>
-            <p>YouInc</p>
-            <h1>Entity Control</h1>
+          <div className="system-header__title">
+            <p>Executive ledger</p>
+            <h1>Your position,<br /><em>made visible.</em></h1>
+            <p className="system-header__lede">
+              One decision surface for cash, runway, wealth and the books behind them.
+            </p>
           </div>
           <div className="header-controls">
             <dl>
@@ -90,9 +92,8 @@ function DemoPage() {
                 <dd>{formatDateTime(dashboard.generatedAt)}</dd>
               </div>
               <div>
-                <dt>Raw / Posted</dt>
+                <dt>Transactions</dt>
                 <dd>
-                  {dashboard.pipeline.rawCached.toLocaleString()} /{" "}
                   {dashboard.totals.transactionCount.toLocaleString()}
                 </dd>
               </div>

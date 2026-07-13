@@ -30,7 +30,7 @@ export function clientId(): string | null {
 }
 
 export function appSecret(): string | null {
-  return envValue("AKAHU_APP_SECRET");
+  return envValue("AKAHU_APP_SECRET") ?? envValue("AKAHU_SECRET");
 }
 
 export function oauthRedirectUri(): string | null {
@@ -41,7 +41,11 @@ export function oauthAuthorizeUrl(): string {
   return envValue("AKAHU_OAUTH_AUTHORIZE_URL") ?? "https://oauth.akahu.nz";
 }
 
-const DEFAULT_OAUTH_SCOPES = "ENDURING_CONSENT ACCOUNTS TRANSACTIONS";
+// Match the app-specific authorization URL supplied by Akahu. The account and
+// transaction permissions enabled for this app are applied by Akahu's static
+// app configuration; ENDURING_CONSENT requests ongoing rather than one-off
+// access. AKAHU_OAUTH_SCOPES remains available if Akahu asks us to override it.
+const DEFAULT_OAUTH_SCOPES = "ENDURING_CONSENT";
 
 export function oauthScopes(): string {
   return envValue("AKAHU_OAUTH_SCOPES") ?? DEFAULT_OAUTH_SCOPES;
@@ -60,10 +64,10 @@ export class AkahuOAuthError extends Error {
 }
 
 /** Build the `GET https://oauth.akahu.nz` authorize URL for a given CSRF state. */
-export function buildAkahuAuthorizeUrl(state: string): string {
+export function buildAkahuAuthorizeUrl(state: string, email?: string | null): string {
   if (!oauthConfigured()) {
     throw new AkahuOAuthError(
-      "Akahu OAuth is not configured (missing AKAHU_APP_SECRET, AKAHU_OAUTH_REDIRECT_URI, " +
+      "Akahu OAuth is not configured (missing AKAHU_SECRET, AKAHU_OAUTH_REDIRECT_URI, " +
         "or a client id).",
     );
   }
@@ -73,6 +77,7 @@ export function buildAkahuAuthorizeUrl(state: string): string {
   url.searchParams.set("redirect_uri", oauthRedirectUri() as string);
   url.searchParams.set("scope", oauthScopes());
   url.searchParams.set("state", state);
+  if (email?.trim()) url.searchParams.set("email", email.trim());
   return url.toString();
 }
 

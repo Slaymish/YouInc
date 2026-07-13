@@ -70,8 +70,12 @@ export function DashboardGrid({ dashboard, storageKey, allowedWidgetIds }: Dashb
   );
 
   function handleDragStart(event: DragStartEvent) {
-    setDraggingId(String(event.active.id));
-    const rect = event.active.rect.current.initial;
+    const id = String(event.active.id);
+    setDraggingId(id);
+    const element = containerRef.current?.querySelector<HTMLElement>(
+      `[data-widget-id="${id}"]`,
+    );
+    const rect = element?.getBoundingClientRect();
     setDraggingSize(rect ? { width: rect.width, height: rect.height } : null);
   }
 
@@ -197,7 +201,7 @@ export function DashboardGrid({ dashboard, storageKey, allowedWidgetIds }: Dashb
           })}
         </div>
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {draggingPlacement && draggingDef ? (
             <div
               className="widget-drag-ghost"

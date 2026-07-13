@@ -72,7 +72,10 @@ Put the Supabase URL + anon key into `fly.toml` `[build.args]`
 ```sh
 fly launch --no-deploy --copy-config --name youinc --region syd   # first time only
 fly secrets set SUPABASE_SERVICE_ROLE_KEY='<service_role_key>'    # required — passkey auth
-fly secrets set AKAHU_APP_TOKEN='<app_token>'                      # enables live Akahu sync
+fly secrets set \
+  AKAHU_APP_TOKEN='<app_token>' \
+  AKAHU_SECRET='<app_secret>' \
+  AKAHU_OAUTH_REDIRECT_URI='https://youinc.hamishburke.dev/api/akahu/callback'
 # optional: fly secrets set YOUINC_LEADS_WEBHOOK_URL='...' YOUINC_FEEDBACK_WEBHOOK_URL='...'
 ```
 

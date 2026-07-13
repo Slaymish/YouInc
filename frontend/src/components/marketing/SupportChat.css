@@ -14,35 +14,43 @@
   font-family: var(--mk-sans);
 }
 
+/* Terminal chip, not an Intercom pill: hairline border, mono label, small
+   avatar. Quietly present rather than floating chrome over the film. */
 .mk .sc-fab {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  padding: 0.45rem 0.85rem 0.45rem 0.5rem;
   background: var(--mk-surface-1);
-  border: 1px solid var(--mk-line);
-  border-radius: var(--radius-pill);
+  border: 1px solid var(--mk-line-strong);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-2);
   cursor: pointer;
-  color: var(--mk-ink);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  color: var(--mk-soft);
+  transition: color 150ms ease, border-color 150ms ease;
 }
 
-.mk .sc-fab:hover { transform: translateY(-2px); box-shadow: var(--shadow-3); }
-.mk .sc-fab:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
+.mk .sc-fab:hover {
+  color: var(--mk-ink);
+  border-color: var(--mk-accent-line);
+}
+.mk .sc-fab:focus-visible { outline: 2px solid var(--mk-focus); outline-offset: 2px; }
 
 .mk .sc-fab__avatar {
   display: block;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  outline: 1px solid var(--mk-line-strong);
 }
 
 .mk .sc-fab__label {
-  font-size: var(--text-small);
-  font-weight: 600;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
   white-space: nowrap;
 }
 

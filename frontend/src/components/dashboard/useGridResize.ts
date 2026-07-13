@@ -39,17 +39,22 @@ export function useGridResize(
 
       function onMove(ev: MouseEvent) {
         if (!state.current) return;
-        const { startX, startY, startW, startH, colPx, id: widgetId } = state.current;
+        const { startX, startY, startW, startH, colPx } = state.current;
         const deltaCol = snapToGrid(ev.clientX - startX, colPx);
         const deltaRow = snapToGrid(ev.clientY - startY, ROW_HEIGHT);
         const newW = Math.max(1, startW + deltaCol);
         const newH = Math.max(1, startH + deltaRow);
         previewRef.current = { w: newW, h: newH };
-        onResize(widgetId, newW, newH);
       }
 
       function onUp() {
+        const current = state.current;
+        const preview = previewRef.current;
+        if (current && preview) {
+          onResize(current.id, preview.w, preview.h);
+        }
         state.current = null;
+        previewRef.current = null;
         document.removeEventListener("mousemove", onMove);
         document.removeEventListener("mouseup", onUp);
       }

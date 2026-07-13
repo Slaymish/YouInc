@@ -40,8 +40,11 @@ function buildEngineScrub({ gsap }: MotionStack) {
   const foot = ".act-engine__ledger-foot";
   if (beats.length === 0 || rows.length === 0) return;
 
+  // The first balanced pair stays visible from the start so the ledger panel
+  // never reads as an empty box while the act scrolls into the pin.
+  const perBeat = Math.ceil(rows.length / beats.length);
   gsap.set(beats.slice(1), { opacity: 0.22, y: 18 });
-  gsap.set(rows, { autoAlpha: 0, x: -10 });
+  gsap.set(rows.slice(perBeat), { autoAlpha: 0, x: -10 });
   gsap.set(foot, { autoAlpha: 0 });
 
   const tl = gsap.timeline({
@@ -56,18 +59,17 @@ function buildEngineScrub({ gsap }: MotionStack) {
     },
   });
 
-  const perBeat = Math.ceil(rows.length / beats.length);
   beats.forEach((beat, i) => {
-    const chunk = rows.slice(i * perBeat, (i + 1) * perBeat);
     if (i > 0) {
+      const chunk = rows.slice(i * perBeat, (i + 1) * perBeat);
       tl.to(beats[i - 1], { opacity: 0.22, duration: 0.3 }, `beat${i}`);
       tl.to(beat, { opacity: 1, y: 0, duration: 0.4 }, `beat${i}`);
+      tl.to(
+        chunk,
+        { autoAlpha: 1, x: 0, duration: 0.35, stagger: 0.18 },
+        `beat${i}+=0.2`,
+      );
     }
-    tl.to(
-      chunk,
-      { autoAlpha: 1, x: 0, duration: 0.35, stagger: 0.18 },
-      i === 0 ? 0.1 : `beat${i}+=0.2`,
-    );
     tl.to({}, { duration: 0.5 }); // hold
   });
   tl.to(foot, { autoAlpha: 1, duration: 0.4 }, "-=0.3");

@@ -9,6 +9,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const STATE_COOKIE = "akahu_oauth_state";
+const USER_COOKIE = "akahu_oauth_user";
 
 function redirectToWorkspace(query: string): Response {
   // Bank connection lives on the workspace Settings tab; land the user there
@@ -26,13 +27,21 @@ export const Route = createFileRoute("/api/akahu/callback")({
         const state = url.searchParams.get("state");
         const error = url.searchParams.get("error");
         const cookieState = getCookie(STATE_COOKIE) ?? null;
+        const initiatingUserId = getCookie(USER_COOKIE) ?? null;
         // Clear the one-time CSRF cookie immediately, regardless of outcome.
         deleteCookie(STATE_COOKIE, { path: "/" });
+        deleteCookie(USER_COOKIE, { path: "/" });
 
         const { resolveAkahuCallback } = await import("~/server/akahuConnection");
         const outcome = resolveAkahuCallback({ code, state, error }, cookieState);
         if (outcome.kind === "denied") return redirectToWorkspace("akahu_error=denied");
         if (outcome.kind === "state_mismatch") return redirectToWorkspace("akahu_error=state");
+
+        const { getServerUser } = await import("~/server/supabaseServer");
+        const user = await getServerUser();
+        if (!user || user.id !== initiatingUserId) {
+          return redirectToWorkspace("akahu_error=state");
+        }
 
         try {
           const { exchangeAkahuOAuthCode, connectAkahu } = await import(

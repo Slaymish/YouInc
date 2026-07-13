@@ -90,14 +90,14 @@ verify your app tier and enable OAuth if needed.
 
 **Required env vars** (server-side secrets only):
 - `AKAHU_APP_TOKEN` — App ID Token (also used as OAuth `client_id`)
-- `AKAHU_APP_SECRET` — App Secret (required for OAuth token exchange)
+- `AKAHU_SECRET` — App Secret (required for OAuth token exchange; `AKAHU_APP_SECRET` is also supported)
 - `AKAHU_OAUTH_REDIRECT_URI` — Registered callback URI
 
 **Optional overrides:**
 - `AKAHU_BASE_URL` (default: `https://api.akahu.io/v1`)
 - `AKAHU_APP_ID_TOKEN` (default: same as `AKAHU_APP_TOKEN`)
 - `AKAHU_OAUTH_AUTHORIZE_URL` (default: `https://oauth.akahu.nz`)
-- `AKAHU_OAUTH_SCOPES` (default: `ENDURING_CONSENT ACCOUNTS TRANSACTIONS`)
+- `AKAHU_OAUTH_SCOPES` (default: `ENDURING_CONSENT`, matching the URL registered by Akahu)
 
 **Registering redirect URIs:** On the Akahu app dashboard, register both:
 - Production: `https://youinc.hamishburke.dev/api/akahu/callback`
@@ -106,6 +106,11 @@ verify your app tier and enable OAuth if needed.
 Without valid app credentials the workspace shows a "live sync not configured" note;
 manual accounts and sample data still work. If the Full App prerequisite is not met,
 the OAuth flow will fail gracefully with a user-friendly error.
+
+Disconnecting revokes the user token at Akahu before removing its encrypted Vault
+copy. This both removes Akahu's access and frees one of the development app's five
+user slots. If a user revokes access through Akahu first, the next API `401` removes
+the now-invalid local token automatically.
 
 ## Feedback & variant voting
 

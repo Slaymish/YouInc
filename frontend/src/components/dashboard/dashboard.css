@@ -485,3 +485,440 @@
     background-image: none;
   }
 }
+
+/* ── Editorial ledger ────────────────────────────────────────────────────
+ * The product now shares the marketing site's terminal-cinema vocabulary:
+ * cold ink, phosphor signal, fine rules, display type, and one composed
+ * financial story. The aliases keep every existing widget functional while
+ * moving the dashboard away from soft-UI cards. */
+
+.dashboard-canvas,
+.ws-ledger-shell {
+  --page: var(--mk-paper);
+  --surface: var(--mk-card);
+  --surface-muted: var(--mk-surface-2);
+  --code-bg: var(--mk-paper);
+  --text: var(--mk-ink);
+  --text-soft: var(--mk-soft);
+  --text-muted: var(--mk-faint);
+  --line: var(--mk-line-strong);
+  --line-subtle: var(--mk-line);
+  --track: var(--mk-surface-3);
+  --danger: var(--mk-negative);
+  --ok: var(--mk-accent);
+  --accent: var(--mk-accent);
+  --accent-strong: var(--mk-accent-strong);
+  --accent-ink: var(--mk-accent-ink);
+  --accent-tint: var(--mk-accent-tint);
+  --accent-line: var(--mk-accent-line);
+  background:
+    radial-gradient(70% 55% at 58% 0%, var(--mk-glow), transparent 72%),
+    var(--mk-paper);
+  color: var(--mk-ink);
+  font-family: var(--mk-sans);
+}
+
+.dashboard-canvas.system-shell {
+  width: min(1540px, calc(100% - 48px));
+  padding: clamp(2rem, 4vw, 4.5rem) 0 5rem;
+}
+
+.dashboard-canvas .system-header {
+  grid-template-columns: minmax(0, 1fr) minmax(480px, 0.8fr);
+  align-items: end;
+  gap: clamp(2rem, 6vw, 7rem);
+  border-bottom: 1px solid var(--mk-line-strong);
+  padding: 0 0 clamp(2rem, 4vw, 3.5rem);
+}
+
+.dashboard-canvas .system-header__title > p:first-child {
+  margin-bottom: 1rem;
+  font-family: var(--mk-mono);
+  color: var(--mk-accent);
+}
+
+.dashboard-canvas .system-header h1 {
+  max-width: 10ch;
+  font-family: var(--mk-serif);
+  font-size: clamp(3.4rem, 6vw, 6.7rem);
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
+.dashboard-canvas .system-header h1 em {
+  color: var(--mk-accent);
+  font-weight: 300;
+}
+
+.dashboard-canvas .system-header__lede {
+  max-width: 46ch;
+  margin-top: 1.4rem;
+  color: var(--mk-soft);
+  font-family: var(--mk-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dashboard-canvas .header-controls {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.dashboard-canvas .system-header dl {
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--mk-line);
+  background: var(--mk-line);
+}
+
+.dashboard-canvas .system-header dl div {
+  min-width: 0;
+  padding: 1rem;
+  background: rgba(17, 20, 26, 0.86);
+}
+
+.dashboard-canvas .system-header dd {
+  color: var(--mk-ink);
+  font-family: var(--mk-mono);
+  font-size: 0.82rem;
+}
+
+.dashboard-canvas .demo-header-cta {
+  justify-content: center;
+  min-height: 44px;
+  border-color: var(--mk-line-strong);
+  color: var(--mk-soft);
+  background: transparent;
+  font-size: 0.8rem;
+}
+
+.dashboard-bar {
+  align-items: center;
+  margin-top: 0;
+  padding: 1.15rem 0 0;
+  border-bottom-color: var(--line-subtle);
+}
+
+.dashboard-tabs {
+  gap: clamp(0.25rem, 1vw, 1.25rem);
+}
+
+.dashboard-tab,
+.dashboard-edit-btn {
+  min-height: 44px;
+  border: 0;
+  padding: 0.75rem 0.6rem;
+  font-family: var(--mk-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  background: transparent;
+  transition:
+    color 150ms ease,
+    background 150ms ease;
+}
+
+.dashboard-tab:hover,
+.dashboard-edit-btn:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.dashboard-tab--active {
+  border: 0;
+  box-shadow: inset 0 -2px 0 var(--accent);
+  color: var(--text);
+  background: transparent;
+}
+
+.dashboard-edit-controls {
+  padding: 0;
+}
+
+.dashboard-edit-btn {
+  border-left: 1px solid var(--line-subtle);
+  padding-inline: 1rem;
+}
+
+.dashboard-edit-btn--done {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.dashboard-grid {
+  --row-height: 80px;
+  gap: 1px;
+  margin-top: 1.5rem;
+  border: 1px solid var(--line-subtle);
+  background: var(--line-subtle);
+}
+
+.dashboard-grid > .panel,
+.dashboard-grid > .metric {
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.018), transparent 48%),
+    var(--surface);
+  box-shadow: none;
+}
+
+.dashboard-grid > .panel {
+  overflow: hidden;
+}
+
+.dashboard-grid .panel > header {
+  min-height: 48px;
+  border-bottom: 1px solid var(--line-subtle);
+  padding: 0.9rem 1.25rem;
+  background: transparent;
+}
+
+.dashboard-grid .panel > header h2 {
+  font-family: var(--mk-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  color: var(--text-muted);
+}
+
+.dashboard-grid .panel .panel-body {
+  padding: clamp(1rem, 2vw, 1.75rem);
+  overflow: hidden;
+}
+
+/* These dense list widgets need predictable bottom breathing room at their
+   minimum supported height. Slightly tighter vertical rhythm keeps the final
+   value/note clear of the panel edge without making the cards taller. */
+.dashboard-grid .widget--net-worth-velocity .panel-body,
+.dashboard-grid .widget--liquidity .panel-body,
+.dashboard-grid .widget--recurring .panel-body {
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+
+.dashboard-grid .widget--net-worth-velocity .stack {
+  gap: 8px;
+}
+
+.dashboard-grid .widget--net-worth-velocity .milestone-item {
+  padding-block: 5px;
+}
+
+.dashboard-grid .widget--liquidity .liquidity-row {
+  padding-block: 6px;
+}
+
+.dashboard-grid .widget--cashflow-waterfall .panel-body,
+.dashboard-grid .widget--operating-statement .panel-body,
+.dashboard-grid .widget--income-breakdown .panel-body,
+.dashboard-grid .widget--runway-projection .panel-body {
+  padding: 1rem;
+}
+
+.dashboard-grid .widget--asset-mix .panel-body {
+  padding: 0.5rem;
+}
+
+.dashboard-grid > .metric {
+  justify-content: flex-end;
+  min-height: 0;
+  padding: clamp(1.1rem, 2vw, 1.75rem);
+}
+
+.dashboard-grid .metric-inner p {
+  font-family: var(--mk-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.dashboard-grid .metric-inner strong {
+  margin-top: 1.1rem;
+  font-family: var(--mk-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: clamp(1.35rem, 2.4vw, 2.35rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  color: var(--text);
+}
+
+.dashboard-grid .widget--metric-net-worth strong {
+  color: var(--accent);
+}
+
+.dashboard-grid .widget--net-worth-trend {
+  background:
+    radial-gradient(90% 80% at 80% 8%, var(--accent-tint), transparent 72%),
+    var(--surface);
+}
+
+.dashboard-grid .widget--net-worth-trend .panel-body {
+  display: flex;
+  align-items: stretch;
+  padding: clamp(1.25rem, 2.5vw, 2.25rem);
+}
+
+.dashboard-grid .widget--net-worth-trend .pnl-chart-wrap {
+  width: 100%;
+  align-content: space-between;
+}
+
+.dashboard-grid .trend-headline strong {
+  font-family: var(--mk-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: clamp(2.15rem, 4vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -0.07em;
+}
+
+.dashboard-grid .trend-headline span,
+.dashboard-grid .form-hint,
+.dashboard-grid .chart-legend,
+.dashboard-grid .chart-label {
+  font-family: var(--mk-mono, "IBM Plex Mono", ui-monospace, monospace);
+}
+
+.dashboard-grid .trend-networth-line,
+.dashboard-grid .trend-assets-line {
+  stroke: var(--accent);
+}
+
+.dashboard-grid .widget--attention .panel-body,
+.dashboard-grid .widget--control-brief .panel-body {
+  padding: 0.9rem 1.25rem;
+}
+
+.dashboard-grid .attention-item {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  padding: 0.9rem 0;
+}
+
+.dashboard-grid .attention-go {
+  grid-column: auto;
+  justify-self: end;
+  min-height: 44px;
+}
+
+.dashboard-grid .widget--control-brief .brief {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dashboard-grid .widget--control-brief .brief h2 {
+  max-width: 11ch;
+  font-family: var(--mk-serif, Fraunces, Georgia, serif);
+  font-size: clamp(1.55rem, 2vw, 2.15rem);
+  font-weight: 300;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+
+.dashboard-grid .widget--control-brief .brief p {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.dashboard-grid .widget--month-pulse .panel-body {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-grid .widget--month-pulse .pulse {
+  width: 100%;
+  grid-template-columns: minmax(9rem, 0.5fr) minmax(0, 1.5fr) auto;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.dashboard-grid .widget--month-pulse .pulse-head {
+  border-bottom: 0;
+}
+
+.dashboard-grid .widget--month-pulse .pulse-foot {
+  max-width: 22ch;
+}
+
+.panel--editing,
+.metric--editing {
+  outline: 1px dashed var(--accent);
+  outline-offset: -5px;
+}
+
+.widget-drag-handle,
+.widget-remove,
+.widget-replace {
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.widget-picker {
+  background: var(--surface);
+  box-shadow: -32px 0 80px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 900px) {
+  .dashboard-canvas.system-shell {
+    width: min(100% - 28px, 1540px);
+    padding-top: 2rem;
+  }
+
+  .dashboard-canvas .system-header {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-canvas .system-header h1 {
+    font-size: clamp(3rem, 11vw, 5.5rem);
+  }
+
+  .dashboard-canvas .header-controls {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1180px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-grid > .panel,
+  .dashboard-grid > .metric {
+    width: 100%;
+    min-height: 150px;
+  }
+
+  .dashboard-grid > .widget--net-worth-trend {
+    min-height: 520px;
+  }
+
+  .dashboard-grid .widget--month-pulse .pulse {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-canvas .system-header dl {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-bar {
+    align-items: stretch;
+  }
+
+  .dashboard-tabs {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+}

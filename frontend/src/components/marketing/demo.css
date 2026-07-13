@@ -12,7 +12,8 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 0.9rem var(--mk-gutter);
+  min-height: 64px;
+  padding: 0.7rem var(--mk-gutter);
   border-bottom: 1px solid var(--mk-line);
   background: var(--mk-paper);
   color: var(--mk-soft);
@@ -23,21 +24,12 @@
 .demo-banner__mode {
   display: inline-flex;
   align-items: center;
-  gap: 0.7ch;
   font-family: var(--mk-mono);
   font-size: var(--mk-text-mono-sm);
   letter-spacing: var(--mk-tracking-mono);
   text-transform: uppercase;
   color: var(--mk-accent);
   white-space: nowrap;
-}
-
-.demo-banner__mode-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--mk-accent);
-  box-shadow: 0 0 8px var(--mk-accent);
 }
 
 .demo-banner__copy {

@@ -68,19 +68,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  font-size: 1.1rem;
-  border: 1px solid var(--mk-line);
-  border-radius: var(--radius-md);
-  background: var(--mk-surface-0);
+  padding: 0.4rem 1.1rem;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+  color: var(--mk-soft);
+  border: 1px solid var(--mk-line-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
   cursor: pointer;
-  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
 }
 
-.mk .fb-vote:hover { transform: translateY(-1px); border-color: var(--mk-accent-line); background: var(--mk-accent-tint); }
+.mk .fb-vote:hover { color: var(--mk-ink); border-color: var(--mk-accent-line); background: var(--mk-accent-tint); }
 .mk .fb-vote:focus-visible { outline: 3px solid var(--mk-focus); outline-offset: 2px; }
-.mk .fb-vote--active { border-color: var(--mk-accent-line); background: var(--mk-accent-tint); }
+.mk .fb-vote--active { color: var(--mk-ink); border-color: var(--mk-accent-line); background: var(--mk-accent-tint); }
 .mk .fb-vote:disabled { opacity: 0.6; cursor: default; }
 
 .mk .fb-note-form {

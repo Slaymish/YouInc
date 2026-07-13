@@ -9,9 +9,12 @@
 // migration 20260704120006). This is exactly what the Python CLI uses.
 
 export class AkahuApiError extends Error {
-  constructor(message: string) {
+  readonly status: number | null;
+
+  constructor(message: string, status: number | null = null) {
     super(message);
     this.name = "AkahuApiError";
+    this.status = status;
   }
 }
 
@@ -100,6 +103,7 @@ export class AkahuClient {
     if (response.status === 401) {
       throw new AkahuApiError(
         "Akahu returned 401 Unauthorized. Your Akahu user token may be wrong or revoked — reconnect it.",
+        response.status,
       );
     }
     if (response.status === 429) {
@@ -122,6 +126,44 @@ export class AkahuClient {
     }
 
     return (await response.json()) as Record<string, unknown>;
+  }
+
+  /**
+   * Revoke this user's enduring access at Akahu. A 401 means the token was
+   * already revoked externally, so the desired end state has been reached.
+   */
+  async revokeToken(): Promise<void> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    let response: Response;
+    try {
+      response = await fetch(`${this.baseUrl}/token`, {
+        method: "DELETE",
+        headers: this.headers(),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (controller.signal.aborted) {
+        throw new AkahuApiError(`Akahu revocation timed out after ${this.timeoutMs}ms.`);
+      }
+      throw new AkahuApiError(`Could not reach Akahu to revoke access: ${message}`);
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (response.ok || response.status === 401) return;
+    if (response.status === 429) {
+      const retryAfter = response.headers.get("Retry-After") ?? "unknown";
+      throw new AkahuApiError(
+        `Akahu rate limit exceeded while revoking access. Retry-After: ${retryAfter}`,
+        response.status,
+      );
+    }
+    throw new AkahuApiError(
+      `Akahu could not revoke access (status ${response.status}). Please try again.`,
+      response.status,
+    );
   }
 
   async listAccounts(): Promise<Record<string, unknown>[]> {

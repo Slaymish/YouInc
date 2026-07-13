@@ -159,12 +159,23 @@ export async function startTrial(): Promise<AkahuConnectionStatus> {
   return getAkahuConnectionStatus();
 }
 
-/** Remove the caller's Akahu token from Vault and revoke the connection. */
-export async function disconnectAkahu(): Promise<AkahuConnectionStatus> {
-  const tenantId = await requireTenantId();
+async function discardLocalConnection(tenantId: string): Promise<void> {
   const supabase = getSupabaseServerClient();
   const { error } = await supabase.rpc("disconnect_akahu", { target_tenant: tenantId });
   if (error) throwServerError(error.message || "Could not disconnect.", 400);
+}
+
+/** Revoke access at Akahu, then remove the caller's local Vault token. */
+export async function disconnectAkahu(): Promise<AkahuConnectionStatus> {
+  const tenantId = await requireTenantId();
+  const token = await userTokenFor(tenantId);
+  try {
+    await buildClient(token).revokeToken();
+  } catch (err) {
+    if (err instanceof AkahuApiError) throwServerError(err.message, 502);
+    throw err;
+  }
+  await discardLocalConnection(tenantId);
   return getAkahuConnectionStatus();
 }
 
@@ -203,7 +214,10 @@ export async function listConnectedAccounts(): Promise<AkahuAccountSummary[]> {
   try {
     raw = await client.listAccounts();
   } catch (err) {
-    if (err instanceof AkahuApiError) throwServerError(err.message, 502);
+    if (err instanceof AkahuApiError) {
+      if (err.status === 401) await discardLocalConnection(tenantId);
+      throwServerError(err.message, 502);
+    }
     throw err;
   }
   return raw
@@ -337,7 +351,10 @@ export async function syncAkahuAccount(
   } catch (err) {
     const message = err instanceof AkahuApiError ? err.message : errorText(err);
     await finishSyncLog(supabase, tenantId, logId, { status: "error", errorMessage: message });
-    if (err instanceof AkahuApiError) throwServerError(err.message, 502);
+    if (err instanceof AkahuApiError) {
+      if (err.status === 401) await discardLocalConnection(tenantId);
+      throwServerError(err.message, 502);
+    }
     throw err;
   }
 }

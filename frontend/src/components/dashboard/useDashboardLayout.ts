@@ -1,9 +1,7 @@
 import { useState, useCallback } from "react";
 import {
-  compact,
   clampPlacement,
-  resolveCollisions,
-  findDropPosition,
+  reflowLayout,
 } from "./grid";
 import type { WidgetPlacement } from "./grid";
 import { WIDGET_MAP } from "./widgets";
@@ -109,15 +107,16 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
   const moveWidget = useCallback(
     (id: string, x: number, y: number) => {
       updateActiveLayout((prev) => {
-        const widget = prev.find((w) => w.id === id);
+        const ordered = [...prev].sort((a, b) => a.y - b.y || a.x - b.x);
+        const widget = ordered.find((w) => w.id === id);
         if (!widget) return prev;
-        const def = WIDGET_MAP.get(id as WidgetId);
-        const moved = clampPlacement(
-          { ...widget, x, y },
-          def?.minW ?? 1,
-          def?.minH ?? 1,
+        const remaining = ordered.filter((w) => w.id !== id);
+        const targetIndex = remaining.findIndex(
+          (placement) => placement.y > y || (placement.y === y && placement.x >= x),
         );
-        return compact(resolveCollisions(prev, moved));
+        const insertion = targetIndex < 0 ? remaining.length : targetIndex;
+        remaining.splice(insertion, 0, widget);
+        return reflowLayout(remaining);
       });
     },
     [updateActiveLayout],
@@ -126,7 +125,8 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
   const resizeWidget = useCallback(
     (id: string, w: number, h: number) => {
       updateActiveLayout((prev) => {
-        const widget = prev.find((wid) => wid.id === id);
+        const ordered = [...prev].sort((a, b) => a.y - b.y || a.x - b.x);
+        const widget = ordered.find((wid) => wid.id === id);
         if (!widget) return prev;
         const def = WIDGET_MAP.get(id as WidgetId);
         const resized = clampPlacement(
@@ -134,7 +134,7 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
           def?.minW ?? 1,
           def?.minH ?? 1,
         );
-        return compact(resolveCollisions(prev, resized));
+        return reflowLayout(ordered.map((item) => (item.id === id ? resized : item)));
       });
     },
     [updateActiveLayout],
@@ -147,15 +147,15 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
         if (prev.find((w) => w.id === id)) return prev;
         const def = WIDGET_MAP.get(id);
         if (!def) return prev;
-        const { x, y } = findDropPosition(prev, id, def.defaultW, def.defaultH);
         const placement: WidgetPlacement = {
           id,
-          x,
-          y,
+          x: 0,
+          y: 0,
           w: def.defaultW,
           h: def.defaultH,
         };
-        return compact([...prev, placement]);
+        const ordered = [...prev].sort((a, b) => a.y - b.y || a.x - b.x);
+        return reflowLayout([...ordered, placement]);
       });
     },
     [updateActiveLayout, isWidgetAllowed],
@@ -163,7 +163,13 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
 
   const removeWidget = useCallback(
     (id: string) => {
-      updateActiveLayout((prev) => compact(prev.filter((w) => w.id !== id)));
+      updateActiveLayout((prev) =>
+        reflowLayout(
+          [...prev]
+            .sort((a, b) => a.y - b.y || a.x - b.x)
+            .filter((w) => w.id !== id),
+        ),
+      );
     },
     [updateActiveLayout],
   );
@@ -174,7 +180,16 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions = {}) {
       updateActiveLayout((prev) => {
         if (!prev.find((w) => w.id === oldId)) return prev;
         if (prev.find((w) => w.id === newId)) return prev;
-        return prev.map((w) => (w.id === oldId ? { ...w, id: newId } : w));
+        const def = WIDGET_MAP.get(newId);
+        if (!def) return prev;
+        const ordered = [...prev].sort((a, b) => a.y - b.y || a.x - b.x);
+        return reflowLayout(
+          ordered.map((w) =>
+            w.id === oldId
+              ? { id: newId, x: 0, y: 0, w: def.defaultW, h: def.defaultH }
+              : w,
+          ),
+        );
       });
     },
     [updateActiveLayout, isWidgetAllowed],

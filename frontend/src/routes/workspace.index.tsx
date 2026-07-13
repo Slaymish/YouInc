@@ -41,24 +41,6 @@ export const Route = createFileRoute("/workspace/")({
   component: WorkspaceOverview,
 });
 
-function Metric({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-}) {
-  return (
-    <div className="ws-metric">
-      <span className="ws-metric__label">{label}</span>
-      <strong className="ws-metric__value">{value}</strong>
-      {hint ? <span className="ws-metric__hint">{hint}</span> : null}
-    </div>
-  );
-}
-
 function WorkspaceOverview() {
   const {
     account,
@@ -116,7 +98,7 @@ function WorkspaceOverview() {
         <p className="ws-lede">
           {isEmpty
             ? "Add your accounts to see your net worth, assets, and liabilities at a glance."
-            : "Your live financial position, from the accounts you're tracking."}
+            : "Your financial position, the decisions it suggests, and the ledger behind it."}
         </p>
       </section>
 
@@ -177,41 +159,16 @@ function WorkspaceOverview() {
         </section>
       ) : null}
 
-      <section className="ws-metrics" aria-label="Financial summary">
-        <Metric
-          label="Net worth"
-          value={formatMoney(ledger.totals.netWorthCents)}
-          hint={
-            ledger.totals.accountCount > 0
-              ? `${ledger.totals.accountCount} account${ledger.totals.accountCount === 1 ? "" : "s"}`
-              : "No accounts yet"
-          }
-        />
-        <Metric label="Assets" value={formatMoney(ledger.totals.assetsCents)} />
-        <Metric
-          label="Liabilities"
-          value={formatMoney(ledger.totals.liabilitiesCents)}
-        />
-        <Metric
-          label="Asset / liability"
-          value={
-            ledger.totals.assetLiabilityRatio != null
-              ? `${ledger.totals.assetLiabilityRatio.toFixed(2)}×`
-              : "—"
-          }
-        />
-      </section>
-
       <section
         className="ws-dashboard-section"
         aria-labelledby="ws-dashboard-heading"
       >
         <h2 id="ws-dashboard-heading" className="ws-section-heading">
-          Dashboard
+          Financial dashboard
         </h2>
         <DashboardGrid
           dashboard={dashboardData}
-          storageKey={`youinc.workspace.layout.v1.${tenant.id}`}
+          storageKey={`youinc.workspace.layout.v3.${tenant.id}`}
           allowedWidgetIds={WORKSPACE_WIDGET_IDS}
         />
       </section>

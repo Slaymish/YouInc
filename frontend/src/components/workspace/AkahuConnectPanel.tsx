@@ -286,6 +286,11 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
                       <div>
                         <strong>{a.name}</strong>
                         <code className="akahu-accounts__id">{a.id}</code>
+                        {a.status?.toUpperCase() === "INACTIVE" ? (
+                          <p className="mb-error" role="alert">
+                            This account needs attention. Reconnect with Akahu to resume updates.
+                          </p>
+                        ) : null}
                       </div>
                       <button type="button" onClick={() => sync(a.id)} disabled={pending}>
                         Sync
@@ -348,7 +353,7 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
         </>
       ) : (
         <p className="akahu-panel__note">
-          Akahu OAuth not configured — set AKAHU_APP_SECRET + AKAHU_OAUTH_REDIRECT_URI
+          Akahu OAuth not configured — set AKAHU_SECRET + AKAHU_OAUTH_REDIRECT_URI
           and verify a Full App with OAuth enabled.
         </p>
       )}

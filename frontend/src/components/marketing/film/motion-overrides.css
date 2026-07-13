@@ -23,11 +23,14 @@
 }
 
 /* Keep the engine act viewport-sized while pinned so the scrub reads as one
- * composed frame. */
+ * composed frame. Flex-centering owns the vertical rhythm here, so the static
+ * section padding collapses — otherwise the scroll-in to the pin traverses a
+ * near-empty viewport. */
 .mk[data-motion="gsap"] .act-engine {
   min-height: 100vh;
   display: flex;
   align-items: center;
+  padding-block: var(--space-6);
 }
 
 .mk[data-motion="gsap"] .act-engine__inner {

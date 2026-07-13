@@ -11,6 +11,7 @@ const ENV_KEYS = [
   "AKAHU_APP_TOKEN",
   "AKAHU_APP_ID_TOKEN",
   "AKAHU_APP_SECRET",
+  "AKAHU_SECRET",
   "AKAHU_OAUTH_REDIRECT_URI",
   "AKAHU_OAUTH_AUTHORIZE_URL",
   "AKAHU_OAUTH_SCOPES",
@@ -51,6 +52,13 @@ describe("oauthConfigured", () => {
     configureOAuthEnv();
     expect(oauthConfigured()).toBe(true);
   });
+
+  it("accepts the existing AKAHU_SECRET name", () => {
+    process.env.AKAHU_APP_TOKEN = "app_token_123";
+    process.env.AKAHU_SECRET = "shh";
+    process.env.AKAHU_OAUTH_REDIRECT_URI = "https://example.com/api/akahu/callback";
+    expect(oauthConfigured()).toBe(true);
+  });
 });
 
 describe("buildAkahuAuthorizeUrl", () => {
@@ -67,7 +75,7 @@ describe("buildAkahuAuthorizeUrl", () => {
     expect(url.searchParams.get("redirect_uri")).toBe(
       "https://example.com/api/akahu/callback",
     );
-    expect(url.searchParams.get("scope")).toBe("ENDURING_CONSENT ACCOUNTS TRANSACTIONS");
+    expect(url.searchParams.get("scope")).toBe("ENDURING_CONSENT");
     expect(url.searchParams.get("state")).toBe("state with spaces");
   });
 
@@ -76,6 +84,12 @@ describe("buildAkahuAuthorizeUrl", () => {
     process.env.AKAHU_APP_ID_TOKEN = "app_id_override";
     const url = new URL(buildAkahuAuthorizeUrl("s"));
     expect(url.searchParams.get("client_id")).toBe("app_id_override");
+  });
+
+  it("prefills the signed-in user's email when one is supplied", () => {
+    configureOAuthEnv();
+    const url = new URL(buildAkahuAuthorizeUrl("s", " person@example.com "));
+    expect(url.searchParams.get("email")).toBe("person@example.com");
   });
 
   it("honours AKAHU_OAUTH_SCOPES and AKAHU_OAUTH_AUTHORIZE_URL overrides", () => {

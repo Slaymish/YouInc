@@ -158,7 +158,7 @@ export function FeedbackWidget({ source = "marketing" }: FeedbackWidgetProps) {
                 disabled={status === "sending"}
                 aria-label="Yes, this was helpful"
               >
-                👍
+                Yes
               </button>
               <button
                 type="button"
@@ -167,7 +167,7 @@ export function FeedbackWidget({ source = "marketing" }: FeedbackWidgetProps) {
                 disabled={status === "sending"}
                 aria-label="No, this was not helpful"
               >
-                👎
+                No
               </button>
             </div>
             {status === "note" ? (

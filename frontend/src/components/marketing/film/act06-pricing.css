@@ -12,19 +12,23 @@
   padding-inline: var(--mk-gutter);
 }
 
+/* Eyebrow rides its own row; the headline and comparison link share the next
+   one so the big serif never collides with the chapter marker. */
 .act-pricing__head {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-2) var(--space-4);
   margin-bottom: var(--space-8);
+}
+
+.act-pricing__head .mk-eyebrow {
+  grid-column: 1 / -1;
 }
 
 .act-pricing__headline {
   font-size: var(--mk-text-act);
   margin: var(--space-4) 0 0;
-  flex: 1 1 20rem;
 }
 
 .act-pricing__compare {
@@ -34,6 +38,7 @@
   color: var(--mk-accent);
   text-decoration: none;
   white-space: nowrap;
+  padding-bottom: 0.5em; /* optically align with the headline's baseline */
 }
 .act-pricing__compare:hover {
   color: var(--mk-accent-strong);
@@ -83,10 +88,11 @@
   color: var(--mk-ink);
 }
 
+/* Inline flow (not flex): long prices like "From NZD $149" may wrap, and the
+   cadence must follow the LAST line of the amount, never float beside the
+   first one. */
 .act-pricing__price {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4ch;
+  line-height: 1.25;
 }
 
 .act-pricing__amount {
@@ -101,6 +107,7 @@
   font-family: var(--mk-mono);
   font-size: var(--mk-text-mono);
   color: var(--mk-faint);
+  margin-left: 0.4ch;
 }
 
 .act-pricing__features {
@@ -148,7 +155,7 @@
   }
   .act-pricing__price {
     grid-area: price;
-    justify-content: end;
+    text-align: right;
   }
   .act-pricing__features {
     grid-area: features;
