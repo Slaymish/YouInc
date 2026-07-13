@@ -16,6 +16,11 @@
   --bar-muted: #777;
   --dash: #999;
   --inverse-text: #fff;
+  --accent: #12a150;
+  --accent-strong: #0e8a44;
+  --accent-ink: #ffffff;
+  --accent-tint: rgba(18, 161, 80, 0.1);
+  --accent-line: rgba(18, 161, 80, 0.32);
 
   /* ── Soft-UI (accessible neumorphism) — light ──────────────────────────
    * Dual-light extrusion tokens shared by panels, metric frames, cards, and
@@ -53,22 +58,30 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --page: #0d0e0d;
-  --surface: #151714;
-  --surface-muted: #20221f;
-  --text: #eeeedf;
-  --text-soft: #cacdbc;
-  --text-muted: #9b9f92;
-  --line: #d8dacb;
-  --line-subtle: #383c34;
-  --track: #292d27;
-  --code-bg: #10110f;
-  --danger: #c94040;
-  --ok: #45a16d;
-  --warn: #c79a4a;
-  --bar-muted: #858b82;
-  --dash: #62675d;
-  --inverse-text: #fff;
+  /* The Incorporation terminal palette — same world as the marketing film
+   * (marketing-tokens.css): cold near-black canvas, lightness-step surfaces,
+   * hairlines, phosphor green signal, semantic ember red. */
+  --page: #0b0d10;
+  --surface: #11141a;
+  --surface-muted: #161b22;
+  --text: #f2f1ec;
+  --text-soft: #c9ccd0;
+  --text-muted: #9ba1a8;
+  --line: #dfe3e7;
+  --line-subtle: rgba(235, 240, 245, 0.14);
+  --track: #1c222b;
+  --code-bg: #0b0d10;
+  --danger: #e56b52;
+  --ok: #34d97b;
+  --warn: #d9a648;
+  --bar-muted: #7a828b;
+  --dash: #5c6269;
+  --inverse-text: #04120a;
+  --accent: #34d97b;
+  --accent-strong: #4cf391;
+  --accent-ink: #04120a;
+  --accent-tint: rgba(52, 217, 123, 0.1);
+  --accent-line: rgba(52, 217, 123, 0.28);
 
   /* Soft-UI — dark: highlight is a faint top-left sheen, shadow a deep well. */
   --soft-raised:

@@ -1,14 +1,46 @@
-/* Self-service signup / onboarding flow styling. Light, calm, and close to the
- * marketing surface without pulling in the whole `.mk` scope. Uses the app's
- * base tokens (--page, --surface, --line, --text*) so it also reads correctly
- * under the dashboard theme. */
+/* Self-service signup / sign-in / onboarding — terminal treatment. The same
+ * world as the marketing film: dark canvas, grain, centered narrow column,
+ * Fraunces step titles, mono meta, hairline fields with accent focus.
+ * Built on the app tokens (--page, --surface, --text, --accent…), which
+ * resolve to the terminal palette under data-theme="dark" (AuthShell forces
+ * dark).
+ * Styling only — every selector the flow logic relies on is unchanged. */
+
+@import "@fontsource/fraunces/latin-300.css";
+@import "@fontsource/fraunces/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
 
 .auth-shell {
+  --auth-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --auth-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  position: relative;
+  isolation: isolate;
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr auto;
   background: var(--page);
   color: var(--text);
+}
+
+/* Film grain — continuous with the marketing canvas. Static, decorative. */
+.auth-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+.auth-topbar,
+.auth-main,
+.auth-footer {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-footer {
@@ -19,7 +51,9 @@
   gap: 0.75rem;
   padding: 1rem clamp(1rem, 4vw, 2.5rem);
   border-top: 1px solid var(--line-subtle, var(--line));
-  font-size: 0.8rem;
+  font-family: var(--auth-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
   color: var(--text-muted);
 }
 
@@ -59,7 +93,9 @@
   border: none;
   padding: 0;
   font: inherit;
-  font-size: 0.85rem;
+  font-family: var(--auth-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
   color: var(--text-muted);
   text-decoration: none;
   cursor: pointer;
@@ -96,7 +132,7 @@
 }
 
 .auth-topbar__aside a {
-  color: var(--text);
+  color: var(--accent, var(--text));
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -110,33 +146,38 @@
 .auth-card {
   width: 100%;
   max-width: 28rem;
-  background: var(--surface);
-  border: none;
-  border-radius: 18px;
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface));
+  border: 1px solid var(--line-subtle, var(--line));
+  border-radius: 10px;
   padding: clamp(1.75rem, 4vw, 2.5rem);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: var(--soft-raised-lg);
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.9);
 }
 
 .auth-card--wide {
   max-width: 34rem;
 }
 
+/* Mono step indicator — `STEP 02 / 04 — CREDENTIAL` territory. */
 .auth-eyebrow {
   margin: 0;
+  font-family: var(--auth-mono);
+  font-weight: 500;
   font-size: 0.7rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--accent, var(--text-muted));
 }
 
 .auth-card h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2rem);
+  font-family: var(--auth-serif);
+  font-weight: 300;
+  font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.3rem);
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .auth-lede {
@@ -158,27 +199,32 @@
 }
 
 .auth-field label {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-family: var(--auth-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-/* Inputs sit in a recessed "well" but keep a real border (soft-ui rule:
-   inputs never rely on shadow alone for affordance / contrast). */
+/* Dark fields: hairline border, accent focus ring. */
 .auth-field input {
-  border: 1px solid var(--line);
-  background: var(--surface-muted);
+  border: 1px solid var(--line-subtle, var(--line));
+  background: var(--page);
   color: var(--text);
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 0.7rem 0.8rem;
   font: inherit;
-  box-shadow: var(--soft-inset);
+  transition: border-color 150ms ease;
+}
+
+.auth-field input:hover {
+  border-color: var(--text-muted);
 }
 
 .auth-field input:focus-visible {
-  outline: 2px solid var(--text);
+  outline: 2px solid var(--accent, var(--text));
   outline-offset: 1px;
+  border-color: var(--accent-line, var(--line));
 }
 
 .auth-field__hint {
@@ -187,38 +233,40 @@
 }
 
 .auth-code-input {
+  font-family: var(--auth-mono);
   font-size: 1.5rem;
   letter-spacing: 0.5em;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
-/* Primary: solid high-contrast fill (trust/accessibility) with tactile
-   elevation + press-in on click. */
+/* Primary: phosphor fill, dark ink. */
 .auth-primary {
   appearance: none;
-  border: none;
-  background: var(--text);
-  color: var(--inverse-text);
-  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--accent, var(--text));
+  color: var(--accent-ink, var(--inverse-text));
+  border-radius: 6px;
   padding: 0.8rem 1rem;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--soft-raised-sm);
   transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
+    background-color 150ms ease,
+    transform 150ms ease;
 }
 
 .auth-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: var(--soft-raised);
+  background: var(--accent-strong, var(--text));
 }
 
 .auth-primary:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: var(--soft-pressed);
+  transform: translateY(1px);
+}
+
+.auth-primary:focus-visible {
+  outline: 2px solid var(--accent, var(--text));
+  outline-offset: 2px;
 }
 
 .auth-primary:disabled {
@@ -226,40 +274,44 @@
   cursor: progress;
 }
 
-/* Secondary: ground-coloured tactile button that depresses on click. */
+/* Secondary: ghost hairline. */
 .auth-secondary {
   appearance: none;
-  border: none;
-  background: var(--surface);
+  border: 1px solid var(--line-subtle, var(--line));
+  background: transparent;
   color: var(--text);
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 0.7rem 1rem;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  box-shadow: var(--soft-raised-sm);
   transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
 }
 
 .auth-secondary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--soft-raised);
+  border-color: var(--accent-line, var(--line));
+  color: var(--accent, var(--text));
 }
 
 .auth-secondary:active {
-  transform: translateY(0);
-  box-shadow: var(--soft-pressed);
+  transform: translateY(1px);
+}
+
+.auth-secondary:focus-visible {
+  outline: 2px solid var(--accent, var(--text));
+  outline-offset: 2px;
 }
 
 .auth-error {
   margin: 0;
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--danger);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--danger);
   font-size: 0.85rem;
 }
@@ -268,7 +320,7 @@
   margin: 0;
   padding: 0.75rem 0.85rem;
   border: 1px solid var(--warn);
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -293,7 +345,7 @@
 }
 
 .auth-note a {
-  color: var(--text);
+  color: var(--accent, var(--text));
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -303,7 +355,7 @@
   border: none;
   padding: 0;
   font: inherit;
-  color: var(--text);
+  color: var(--accent, var(--text));
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -314,8 +366,9 @@
   align-items: center;
   gap: 0.75rem;
   color: var(--text-muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  font-family: var(--auth-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -324,7 +377,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--line);
+  background: var(--line-subtle, var(--line));
 }
 
 /* ── Onboarding stepper ────────────────────────────────────────────────── */
@@ -337,9 +390,9 @@
 
 .onb-steps__dot {
   flex: 1;
-  height: 4px;
+  height: 3px;
   border-radius: 999px;
-  background: var(--line);
+  background: var(--line-subtle, var(--line));
 }
 
 .onb-steps__dot--active {
@@ -386,18 +439,19 @@
 }
 
 .onb-summary {
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  border: 1px solid var(--line-subtle, var(--line));
+  border-radius: 8px;
   padding: 1rem 1.1rem;
-  background: var(--surface-muted, var(--code-bg));
+  background: var(--page);
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
 .onb-summary dt {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-family: var(--auth-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -405,4 +459,5 @@
 .onb-summary dd {
   margin: 0 0 0.5rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }

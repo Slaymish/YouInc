@@ -13,7 +13,8 @@ export function useTheme() {
       setTheme(storedTheme);
       return;
     }
-    setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    // Dark is home for the terminal system; light remains a persisted toggle.
+    setTheme("dark");
   }, []);
 
   useEffect(() => {
@@ -23,5 +24,5 @@ export function useTheme() {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
-  return [theme ?? "light", setTheme] as const;
+  return [theme ?? "dark", setTheme] as const;
 }

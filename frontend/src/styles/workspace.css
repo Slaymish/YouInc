@@ -309,7 +309,7 @@
 .ws-status__row.is-done .ws-status__mark {
   background: var(--accent, #12a150);
   border-color: var(--accent, #12a150);
-  color: #fff;
+  color: var(--accent-ink, #fff);
 }
 
 .ws-status__row h3 {

@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { useLightTheme } from "~/components/marketing/useLightTheme";
+import { useTheme } from "~/hooks/useTheme";
 import { Logo } from "~/components/Logo";
 import type { AccountState } from "~/server/accounts";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
@@ -94,7 +94,7 @@ export const Route = createFileRoute("/workspace")({
 function WorkspaceLayout() {
   const { account } = Route.useLoaderData();
   const router = useRouter();
-  useLightTheme();
+  const [theme, setTheme] = useTheme();
   const [busy, setBusy] = useState(false);
 
   async function signOut() {
@@ -115,10 +115,18 @@ function WorkspaceLayout() {
     <div className="ws-shell">
       <header className="ws-topbar">
         <Link className="ws-topbar__logo" to="/" aria-label="YouInc home">
-          <Logo height={24} />
+          <Logo variant={theme === "dark" ? "inverted" : "wordmark"} height={24} />
         </Link>
         <div className="ws-topbar__account">
           <span>{account.email}</span>
+          <button
+            className="ws-signout"
+            type="button"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+          >
+            {theme === "dark" ? "Light" : "Dark"}
+          </button>
           <button
             className="ws-signout"
             type="button"

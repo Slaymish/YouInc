@@ -11,7 +11,7 @@
 // friendly "not authorized" state rather than letting it crash the loader.
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useLightTheme } from "~/components/marketing/useLightTheme";
+import { useTheme } from "~/hooks/useTheme";
 import { formatPercent } from "~/components/widgets/format";
 import type { AccountState } from "~/server/accounts";
 import type { FeedbackVariantStatsResult } from "~/server/feedbackStats";
@@ -125,7 +125,7 @@ function StatsTable({ stats }: { stats: FeedbackVariantStatsResult }) {
 
 function AdminFeedbackPage() {
   const { account, outcome } = Route.useLoaderData();
-  useLightTheme();
+  useTheme(); // dark by default; honours the persisted app toggle
 
   return (
     <div className="ws-shell">
