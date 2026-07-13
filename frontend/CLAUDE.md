@@ -53,6 +53,23 @@ All paths default relative to the `frontend/` cwd and assume the standard parent
 - `YOUINC_ENROLLMENT_TOKEN` — set temporarily to enrol a passkey via the `/login` "Enrol a new passkey" form, then unset to disable registration. Unset by default (registration disabled).
 - `YOUINC_RP_ID` / `YOUINC_RP_ORIGIN` — WebAuthn relying-party id/origin. Derived from the request by default (works for localhost and a deployed domain); override only behind a proxy that rewrites Host/Origin.
 - `YOUINC_AUTH_DB_PATH` — passkey credential + session store (default `../data/youinc-auth.sqlite3`, separate from the ledger).
+- `RESEND_API_KEY` / `EMAIL_FROM` — transactional email (Resend) for the live-sync
+  trial reminder. If either is unset, `server/email.ts` no-ops with a log (nothing
+  is sent); the app otherwise works. `EMAIL_FROM` must be a verified Resend sender.
+- `CRON_SECRET` — bearer token guarding `POST /api/cron/trial-reminders`. If unset,
+  the endpoint fails closed (refuses all requests). Must match the `CRON_SECRET`
+  GitHub Actions secret used by `.github/workflows/trial-reminders.yml`.
+
+### Live-sync trial (Phase B) — deploy runbook
+
+The 14-day no-card trial + day-12 email reminder need one-time owner setup:
+1. Apply migration `supabase/migrations/20260713120000_tenant_trial.sql` to Supabase.
+2. Create a Resend account, verify the sending domain (`youinc.hamishburke.dev`),
+   and set `RESEND_API_KEY` + `EMAIL_FROM` on the Fly app.
+3. Set `CRON_SECRET` on the Fly app; add `CRON_SECRET` (same value) and
+   `CRON_TARGET_URL` (the app origin) as GitHub Actions repo secrets.
+4. The `trial-reminders` workflow then runs daily; it's idempotent (a tenant is
+   reminded at most once, tracked by `tenants.trial_reminded_at`).
 
 ## Architecture
 

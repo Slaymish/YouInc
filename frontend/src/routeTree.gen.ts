@@ -44,6 +44,7 @@ import { Route as SignupCredentialRouteImport } from './routes/signup.credential
 import { Route as SigninPasswordRouteImport } from './routes/signin.password'
 import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
+import { Route as ApiCronTrialRemindersRouteImport } from './routes/api.cron.trial-reminders'
 import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
 import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
 
@@ -222,6 +223,11 @@ const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
   path: '/admin/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronTrialRemindersRoute = ApiCronTrialRemindersRouteImport.update({
+  id: '/api/cron/trial-reminders',
+  path: '/api/cron/trial-reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAkahuCallbackRoute = ApiAkahuCallbackRouteImport.update({
   id: '/api/akahu/callback',
   path: '/api/akahu/callback',
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/signup/': typeof SignupIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
+  '/api/cron/trial-reminders': typeof ApiCronTrialRemindersRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesByTo {
@@ -306,6 +313,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupIndexRoute
   '/workspace': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
+  '/api/cron/trial-reminders': typeof ApiCronTrialRemindersRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesById {
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/signup/': typeof SignupIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
+  '/api/cron/trial-reminders': typeof ApiCronTrialRemindersRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRouteTypes {
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/signup/'
     | '/workspace/'
     | '/api/akahu/callback'
+    | '/api/cron/trial-reminders'
     | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/workspace'
     | '/api/akahu/callback'
+    | '/api/cron/trial-reminders'
     | '/api/akahu/oauth/start'
   id:
     | '__root__'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/signup/'
     | '/workspace/'
     | '/api/akahu/callback'
+    | '/api/cron/trial-reminders'
     | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
 }
@@ -494,6 +506,7 @@ export interface RootRouteChildren {
   AdminFeedbackRoute: typeof AdminFeedbackRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
+  ApiCronTrialRemindersRoute: typeof ApiCronTrialRemindersRoute
   ApiAkahuOauthStartRoute: typeof ApiAkahuOauthStartRoute
 }
 
@@ -744,6 +757,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/trial-reminders': {
+      id: '/api/cron/trial-reminders'
+      path: '/api/cron/trial-reminders'
+      fullPath: '/api/cron/trial-reminders'
+      preLoaderRoute: typeof ApiCronTrialRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/akahu/callback': {
       id: '/api/akahu/callback'
       path: '/api/akahu/callback'
@@ -834,6 +854,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminFeedbackRoute: AdminFeedbackRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,
+  ApiCronTrialRemindersRoute: ApiCronTrialRemindersRoute,
   ApiAkahuOauthStartRoute: ApiAkahuOauthStartRoute,
 }
 export const routeTree = rootRouteImport

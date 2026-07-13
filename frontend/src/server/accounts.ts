@@ -26,6 +26,8 @@ export interface TenantSummary {
   slug: string;
   tier: TenantTier;
   defaultCurrency: string;
+  /** ISO end of the Free-tier live-sync trial, or null if never started. */
+  trialEndsAt: string | null;
 }
 
 export interface AccountState {
@@ -42,6 +44,7 @@ interface TenantRow {
   slug: string;
   tier: TenantTier;
   default_currency: string;
+  trial_ends_at: string | null;
 }
 
 /**
@@ -57,7 +60,7 @@ export async function getAccountState(): Promise<AccountState | null> {
 
   const { data: tenantRows } = await supabase
     .from("tenants")
-    .select("id, name, slug, tier, default_currency")
+    .select("id, name, slug, tier, default_currency, trial_ends_at")
     .order("created_at", { ascending: true })
     .limit(1);
 
@@ -69,6 +72,7 @@ export async function getAccountState(): Promise<AccountState | null> {
         slug: row.slug,
         tier: row.tier,
         defaultCurrency: row.default_currency,
+        trialEndsAt: row.trial_ends_at,
       }
     : null;
 
@@ -131,6 +135,7 @@ export async function createTenant(name: string): Promise<TenantSummary> {
     slug: row.slug,
     tier: row.tier,
     defaultCurrency: row.default_currency,
+    trialEndsAt: row.trial_ends_at,
   };
 }
 

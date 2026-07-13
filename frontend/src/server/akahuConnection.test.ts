@@ -12,7 +12,7 @@ const getServerUserMock = vi.fn();
 const rpcMock = vi.fn();
 
 /** The one row `requireTenant()` reads; null means "no tenant yet". */
-let tenantRow: { id: string; tier: string } | null = null;
+let tenantRow: { id: string; tier: string; trial_ends_at?: string | null } | null = null;
 /** The one row the akahu_connections status lookup reads. */
 let akahuConnectionRow: { status: string; connected_at: string | null; last_synced_at: string | null } | null =
   null;
@@ -66,6 +66,29 @@ describe("Akahu tier gating", () => {
         status: 403,
       });
       await expect(connectAkahu("user_token_abc")).rejects.toThrow(/TIER_RESTRICTED/);
+      expect(rpcMock).not.toHaveBeenCalled();
+    });
+
+    it("allows a free-tier tenant with an ACTIVE trial to connect", async () => {
+      // Arrange — trial ends far in the future.
+      tenantRow = { id: "tenant-trial", tier: "free", trial_ends_at: "2999-01-01T00:00:00.000Z" };
+
+      // Act
+      await connectAkahu("user_token_abc");
+
+      // Assert
+      expect(rpcMock).toHaveBeenCalledWith("connect_akahu", {
+        target_tenant: "tenant-trial",
+        user_token: "user_token_abc",
+      });
+    });
+
+    it("rejects a free-tier tenant whose trial has EXPIRED", async () => {
+      // Arrange — trial ended in the past.
+      tenantRow = { id: "tenant-expired", tier: "free", trial_ends_at: "2000-01-01T00:00:00.000Z" };
+
+      // Act & Assert
+      await expect(connectAkahu("user_token_abc")).rejects.toMatchObject({ status: 403 });
       expect(rpcMock).not.toHaveBeenCalled();
     });
 
@@ -123,6 +146,21 @@ describe("Akahu tier gating", () => {
       // Assert
       expect(status.tier).toBe("free");
       expect(status.canConnectLive).toBe(false);
+      expect(status.trialEndsAt).toBeNull();
+      expect(status.trialDaysLeft).toBeNull();
+    });
+
+    it("reports canConnectLive: true and days remaining for a free tenant mid-trial", async () => {
+      // Arrange
+      tenantRow = { id: "tenant-trial", tier: "free", trial_ends_at: "2999-01-01T00:00:00.000Z" };
+
+      // Act
+      const status = await getAkahuConnectionStatus();
+
+      // Assert
+      expect(status.canConnectLive).toBe(true);
+      expect(status.trialEndsAt).toBe("2999-01-01T00:00:00.000Z");
+      expect(status.trialDaysLeft !== null && status.trialDaysLeft > 0).toBe(true);
     });
 
     it.each(["self-serve", "concierge"] as const)(
