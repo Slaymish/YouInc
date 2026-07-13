@@ -14,6 +14,7 @@ import { Route as WidgetsRouteImport } from './routes/widgets'
 import { Route as UseCasesRouteImport } from './routes/use-cases'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
@@ -69,6 +70,11 @@ const TermsRoute = TermsRouteImport.update({
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninRouteWithChildren
   '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start': typeof StartRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start': typeof StartRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/signin': typeof SigninRouteWithChildren
   '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start': typeof StartRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -361,6 +370,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
+    | '/start'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -397,6 +407,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/security'
     | '/sitemap.xml'
+    | '/start'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
+    | '/start'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -473,6 +485,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRouteWithChildren
   SignupRoute: typeof SignupRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StartRoute: typeof StartRoute
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
   UseCasesRoute: typeof UseCasesRoute
@@ -519,6 +532,13 @@ declare module '@tanstack/react-router' {
       path: '/status'
       fullPath: '/status'
       preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -805,6 +825,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRouteWithChildren,
   SignupRoute: SignupRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StartRoute: StartRoute,
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
   UseCasesRoute: UseCasesRoute,
