@@ -9,7 +9,7 @@
  */
 
 .mk {
-  background: var(--mk-soft-ground);
+  background: var(--mk-paper);
   color: var(--mk-ink);
   font-family: var(--mk-sans);
   font-size: var(--text-body);

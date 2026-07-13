@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
 import { formatDateTime } from "~/components/widgets/format";
-import { useLightTheme } from "~/components/marketing/useLightTheme";
+import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
 import { DEMO_WIDGET_IDS } from "~/components/marketing/demoWidgets";
 import { BOOKING_URL } from "~/components/marketing/config";
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/demo")({
 });
 
 function DemoPage() {
-  useLightTheme();
+  useDarkTheme();
   const dashboard = SAMPLE_DASHBOARD;
 
   return (

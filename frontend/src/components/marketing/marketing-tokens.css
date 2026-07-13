@@ -1,138 +1,161 @@
 /* frontend/src/components/marketing/marketing-tokens.css
  *
- * Foundation design tokens for the `.mk` marketing scope. This file defines
- * ONLY the `.mk { --mk-*: ...; }` custom-property block (design-direction
- * spec section B) — no selectors, no component rules. Every other marketing
- * CSS file consumes these variables; do not hardcode palette, type, spacing,
- * radius, or shadow literals anywhere else.
+ * "The Incorporation" — dark terminal cinema design tokens for the `.mk`
+ * marketing scope. This file defines ONLY the `.mk { --mk-*: ...; }` custom
+ * property block plus the self-hosted @font-face imports. No selectors, no
+ * component rules. Every other marketing CSS file consumes these variables;
+ * do not hardcode palette, type, spacing, radius, or motion literals anywhere
+ * else.
  *
- * Self-hosted font faces (spec B2) — Fraunces 400 (display/serif) + Inter
- * 400/600 (body/sans), both `font-display: swap` via @fontsource. No
- * external font requests.
+ * Register: Bloomberg terminal directed by Denis Villeneuve. Near-black,
+ * volumetric, restrained. Data is the atmosphere.
+ *
+ * Type system (3 families, each a strict job):
+ *   Display  Fraunces 300/400 (+ 300/400 italic) — headlines, pull quotes
+ *   Body     Inter 400/600 — paragraphs, UI copy, buttons
+ *   Data     IBM Plex Mono 400/500 — ALL numbers, ledger rows, labels, eyebrows
  */
+@import "@fontsource/fraunces/latin-300.css";
 @import "@fontsource/fraunces/latin-400.css";
+@import "@fontsource/fraunces/latin-300-italic.css";
+@import "@fontsource/fraunces/latin-400-italic.css";
 @import "@fontsource/inter/latin-400.css";
 @import "@fontsource/inter/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
 
 .mk {
-  /* ── B5. Core palette (unchanged) ───────────────────────────────── */
-  --mk-paper: #fbfbf9;
-  --mk-ink: #111111;
-  --mk-soft: #55534d;
-  --mk-line: #e3e3dd;
-  --mk-accent: #12a150;
-  --mk-card: #ffffff;
+  /* ── Canvas & surfaces — elevation via lightness steps + hairlines ──── */
+  --mk-paper: #0b0d10; /* the void — cold near-black canvas */
+  --mk-card: #11141a; /* surface-1 — panels, cards */
+  --mk-surface-2: #161b22; /* surface-2 — raised elements, hovers */
+  --mk-surface-3: #1c222b; /* surface-3 — deepest raise / active */
+  --mk-line: rgba(235, 240, 245, 0.09); /* hairline strokes */
+  --mk-line-strong: rgba(235, 240, 245, 0.16);
+  --mk-line-faint: rgba(235, 240, 245, 0.045); /* ledger grid at rest */
 
-  /* ── B5. Semantic — collapse the two reds (#d4553f AND #c0492f) into ONE.
-     Coherence rule: every up/gain/positive pixel = --mk-positive; every
-     down/loss/negative pixel = --mk-negative. No other reds/greens anywhere. */
-  --mk-positive: var(--mk-accent);
-  --mk-negative: #c0492f;
-  --mk-negative-tint: #fbf1ee;
-  --mk-negative-line: #e2b3a8;
-
-  /* ── B5. Accent tints — highlights, hovers, active tabs, brand focus. */
-  --mk-accent-strong: #0e8a44;
-  --mk-accent-tint: #e7f4ec;
-  --mk-accent-line: #bfe3cd;
-
-  /* ── B5. Surface layers — depth via distinct surfaces, not just shadow. */
+  /* surface aliases kept for shared widget consumers */
   --mk-surface-0: var(--mk-paper);
   --mk-surface-1: var(--mk-card);
-  --mk-surface-2: #f4f4f0;
 
-  /* ── B5. Focus ring — replaces the stray #6ea8fe blue with an on-brand
-     ink ring. Coherence rule: focus is always --mk-focus. */
-  --mk-focus: #111111;
+  /* ── Ink ───────────────────────────────────────────────────────────── */
+  --mk-ink: #f2f1ec; /* warm white — headings, primary text */
+  --mk-soft: #9ba1a8; /* secondary text — 7.5:1 on paper */
+  /* tertiary — mono labels, axis text, eyebrows. Bumped from the spec's
+     #5C6269 (3.2:1, fails AA) to ~4.6:1 so chapter-marker eyebrows and axis
+     labels stay legible as real text. */
+  --mk-faint: #7a828b;
 
-  /* ── B5. Data-viz palette — derived from --mk-accent, colorblind-safe,
-     light-mode. Charts pull series colors only from --mk-dv-*, structure
-     from --mk-dv-grid / --mk-dv-label. */
-  --mk-dv-1: #12a150; /* accent green — primary series (net worth, income) */
-  --mk-dv-2: #1f6f8b; /* teal-blue — secondary (assets vs liabilities) */
-  --mk-dv-3: #c98a2b; /* ochre — tertiary (housing/rent) */
-  --mk-dv-4: #7d5ba6; /* muted violet — quaternary (transport/other) */
-  --mk-dv-5: #b0aea6; /* warm grey — "other"/inactive */
-  --mk-dv-neg: var(--mk-negative); /* expenses / down */
-  --mk-dv-grid: var(--mk-line); /* gridlines, axes */
-  --mk-dv-label: var(--mk-soft); /* axis + data labels */
+  /* ── The ONE signal color — phosphor green, from brand #12a150 ──────── */
+  --mk-accent: #34d97b; /* live data, CTAs, positive deltas ONLY */
+  --mk-accent-strong: #4cf391; /* hover / active */
+  --mk-accent-dim: #12a150; /* large glow fields, charts at rest */
+  --mk-accent-tint: rgba(52, 217, 123, 0.1);
+  --mk-accent-line: rgba(52, 217, 123, 0.28);
+  --mk-glow: rgba(52, 217, 123, 0.14); /* WebGL / radial atmosphere only */
+  --mk-accent-ink: #04120a; /* text/icon on an accent fill */
 
-  /* ── B1. Container width (Samsung "wider") ──────────────────────── */
-  --mk-maxw: 1280px; /* was 1200px — shared .mk section + nav + footer max-width */
-  --mk-maxw-narrow: 720px; /* prose measure: hero sub, faq answers, bespoke body, ledes */
-  --mk-maxw-frame: 1140px; /* DashboardFrame stage (was 1080) — scales with new width */
+  /* ── Semantic — positive = accent, negative = debits/losses ONLY ────── */
+  --mk-positive: var(--mk-accent);
+  --mk-negative: #e56b52;
+  --mk-negative-tint: rgba(229, 107, 82, 0.1);
+  --mk-negative-line: rgba(229, 107, 82, 0.3);
 
-  /* ── B2. Font pairing — self-hosted, Georgia/system are fallbacks only. */
+  --mk-focus: var(--mk-accent);
+
+  /* ── Data-viz series — rebalanced for the dark canvas ───────────────── */
+  --mk-dv-1: #34d97b; /* phosphor — primary series */
+  --mk-dv-2: #4fa3c7; /* cold blue — secondary */
+  --mk-dv-3: #d9a648; /* amber — tertiary */
+  --mk-dv-4: #9c7fc9; /* muted violet — quaternary */
+  --mk-dv-5: #6b7280; /* graphite — "other" / inactive */
+  --mk-dv-neg: var(--mk-negative);
+  --mk-dv-grid: var(--mk-line);
+  --mk-dv-label: var(--mk-faint);
+
+  /* ── Layout widths ──────────────────────────────────────────────────── */
+  --mk-maxw: 1280px;
+  --mk-maxw-narrow: 720px; /* prose measure */
+  --mk-maxw-frame: 1180px; /* command deck / dashboard replica */
+
+  /* ── Font pairing — self-hosted; fallbacks only ─────────────────────── */
   --mk-serif: "Fraunces", Georgia, "Times New Roman", serif;
   --mk-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mk-mono:
+    "IBM Plex Mono", ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
 
-  /* ── B2. Type scale — replaces scattered literals across every file. */
-  --text-hero: clamp(2.8rem, 1.4rem + 6vw, 5rem); /* .hero__headline */
-  --text-h2: clamp(1.9rem, 1.2rem + 2.6vw, 2.8rem); /* .section-heading */
-  --text-h3: clamp(1.15rem, 1rem + 0.6vw, 1.35rem); /* step/card/tier titles */
-  --text-lead: clamp(1.05rem, 1rem + 0.4vw, 1.2rem); /* hero sub, section ledes */
-  --text-body: 1rem; /* default body */
-  --text-small: 0.85rem; /* meta, footer, captions */
-  --text-eyebrow: 0.7rem; /* mk-eyebrow, unchanged */
+  /* ── Type scale (fluid) ─────────────────────────────────────────────── */
+  --mk-text-hero: clamp(3.25rem, 1.5rem + 7.5vw, 8.5rem);
+  --mk-text-act: clamp(2.25rem, 1.25rem + 4vw, 4.5rem);
+  --mk-text-section: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+  --mk-text-lead: clamp(1.05rem, 1rem + 0.4vw, 1.25rem);
+  --mk-text-base: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  --mk-text-small: 0.875rem;
+  --mk-text-mono: 0.8125rem; /* mono labels; letter-spacing 0.04em */
+  --mk-text-mono-sm: 0.6875rem;
 
-  --leading-tight: 0.98; /* hero */
-  --leading-head: 1.08; /* h2/h3 */
-  --leading-body: 1.6; /* prose */
-  --tracking-head: -0.025em;
-  --tracking-eyebrow: 0.2em;
+  /* back-compat aliases for any not-yet-migrated shared consumers */
+  --text-hero: var(--mk-text-hero);
+  --text-h2: var(--mk-text-act);
+  --text-h3: var(--mk-text-section);
+  --text-lead: var(--mk-text-lead);
+  --text-body: var(--mk-text-base);
+  --text-small: var(--mk-text-small);
+  --text-eyebrow: var(--mk-text-mono);
 
-  /* ── B3. Spacing scale — intentional rhythm, not uniform. ───────── */
+  --mk-leading-hero: 0.95;
+  --mk-leading-head: 1.06;
+  --mk-leading-body: 1.62;
+  --mk-tracking-head: -0.02em;
+  --mk-tracking-mono: 0.04em;
+  --mk-tracking-eyebrow: 0.22em;
+  --leading-tight: var(--mk-leading-hero);
+  --leading-head: var(--mk-leading-head);
+  --leading-body: var(--mk-leading-body);
+  --tracking-head: var(--mk-tracking-head);
+  --tracking-eyebrow: var(--mk-tracking-eyebrow);
+
+  /* ── Spacing — intentional rhythm, not uniform ──────────────────────── */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.5rem;
   --space-6: 2rem;
+  --space-7: 2.5rem;
   --space-8: 3rem;
-  --space-section: clamp(3.5rem, 3rem + 5vw, 7rem); /* section V-padding, was clamp(3,6vw,6) */
-  --gap-grid: 1.5rem; /* pricing/steps/faq column gap */
+  --space-10: 4rem;
+  --space-section: clamp(4.5rem, 3rem + 6vw, 9rem);
+  --gap-grid: 1.5rem;
+  --mk-gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
 
-  /* ── B4. Radius scale ────────────────────────────────────────────── */
-  --radius-sm: 6px; /* buttons, inputs, url pill */
-  --radius-md: 10px; /* chips, small cards */
-  --radius-lg: 12px; /* panels, artifacts, frame */
-  --radius-xl: 16px; /* pricing tiers (was 14) */
+  /* ── Radius — tight, terminal, mostly square ────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
   --radius-pill: 999px;
 
-  /* ── B4. Elevation (shadow) scale — 4 steps, systematized. ──────── */
-  --shadow-1: 0 1px 2px rgba(40, 40, 30, .06), 0 2px 6px -2px rgba(40, 40, 30, .08); /* resting card */
-  --shadow-2: 0 8px 20px -8px rgba(40, 40, 30, .14), 0 2px 6px -3px rgba(40, 40, 30, .10); /* hover / floating card */
-  --shadow-3: 0 20px 44px -22px rgba(40, 40, 30, .30), 0 6px 16px -8px rgba(40, 40, 30, .14); /* featured tier, artifacts */
-  --shadow-4: 0 30px 60px -24px rgba(40, 40, 30, .35), 0 8px 20px -8px rgba(40, 40, 30, .14); /* the DashboardFrame */
+  /* ── Elevation — dark: soft ambient + faint accent lift, never soft-UI ─ */
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.02), 0 8px 24px -16px rgba(0, 0, 0, 0.8);
+  --shadow-2: 0 24px 60px -30px rgba(0, 0, 0, 0.85), 0 2px 0 rgba(255, 255, 255, 0.02);
+  --shadow-3: 0 40px 90px -40px rgba(0, 0, 0, 0.9);
+  --shadow-4: 0 60px 140px -50px rgba(0, 0, 0, 0.95);
 
-  /* ── B6. SOFT-UI (accessible neumorphism) ───────────────────────────────
-   * Dual-light extrusion: a warm dark shadow bottom-right + a white highlight
-   * top-left, on a single mid-tone ground so surfaces look moulded from the
-   * page. Deliberately NOT applied to text, data, inputs' borders, or the
-   * primary CTA fill — those stay high-contrast (see soft-ui usage rules).
-   * The ground is intentionally a touch darker than pure paper so BOTH the
-   * highlight and shadow read; ink (#111) on it is still ~12:1 (WCAG AAA). */
-  --mk-soft-ground: #e9eae3;
-  --mk-soft-ground-2: #e4e5dd; /* recessed wells / insets sit on this */
+  /* ── Motion vocabulary ──────────────────────────────────────────────── */
+  --mk-dur-fast: 150ms;
+  --mk-dur-base: 300ms;
+  --mk-dur-slow: 700ms;
+  --mk-dur-cine: 1200ms;
+  --mk-ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* expo-out — entrances */
+  --mk-ease-inout: cubic-bezier(0.65, 0, 0.35, 1); /* scene transitions */
 
-  --mk-soft-raised:
-    7px 7px 16px rgba(46, 50, 38, 0.16),
-    -7px -7px 16px rgba(255, 255, 255, 0.92);
-  --mk-soft-raised-sm:
-    4px 4px 9px rgba(46, 50, 38, 0.13),
-    -4px -4px 9px rgba(255, 255, 255, 0.85);
-  --mk-soft-raised-lg:
-    12px 12px 28px rgba(46, 50, 38, 0.18),
-    -10px -10px 24px rgba(255, 255, 255, 0.95);
-  --mk-soft-inset:
-    inset 5px 5px 10px rgba(46, 50, 38, 0.16),
-    inset -5px -5px 10px rgba(255, 255, 255, 0.9);
-  --mk-soft-pressed:
-    inset 4px 4px 9px rgba(46, 50, 38, 0.2),
-    inset -3px -3px 7px rgba(255, 255, 255, 0.8);
-  /* Accent-tinted extrusion for the featured / active surfaces. */
-  --mk-soft-accent-glow:
-    7px 7px 16px rgba(46, 50, 38, 0.16),
-    -7px -7px 16px rgba(255, 255, 255, 0.92),
-    0 0 0 1.5px var(--mk-accent-line);
+  /* ── Grain / atmosphere ─────────────────────────────────────────────── */
+  --mk-grain-opacity: 0.05;
+  --mk-vignette:
+    radial-gradient(
+      130% 130% at 50% 38%,
+      transparent 62%,
+      rgba(0, 0, 0, 0.38) 100%
+    );
 }

@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BOOKING_URL, PRICING } from "~/components/marketing/config";
-import { useLightTheme } from "~/components/marketing/useLightTheme";
-import { MarketingHeader } from "~/components/marketing/MarketingHeader";
-import { MarketingFooter } from "~/components/marketing/MarketingFooter";
+import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
+import { Atmosphere } from "~/components/marketing/system/Atmosphere";
+import { MarketingHeader } from "~/components/marketing/shell/MarketingHeader";
+import { MarketingFooter } from "~/components/marketing/shell/MarketingFooter";
 import { ConciergeShowcase } from "~/components/marketing/ConciergeShowcase";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 import "~/components/marketing/marketing-tokens.css";
+import "~/components/marketing/system/base.css";
+import "~/components/marketing/system/primitives.css";
 import "~/components/marketing/marketing-shared.css";
 // Reuses `.steps__list` / `.step*` (HowItWorks.css) for its own 4-step
 // engagement list, widened via the `.cb-steps` override in custom-builds.css.
@@ -101,11 +104,12 @@ const ENGAGEMENT_STEPS = [
 ];
 
 function CustomBuildsPage() {
-  useLightTheme();
+  useDarkTheme();
   return (
     <div className="mk">
+      <Atmosphere />
       <MarketingHeader />
-      <main>
+      <main className="mk-content mk-page">
         <section className="cb-hero" aria-labelledby="cb-heading">
           <p className="mk-eyebrow">
             Concierge · bespoke work on your live ledger

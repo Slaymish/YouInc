@@ -1,0 +1,111 @@
+/* Base canvas for the terminal marketing world. Establishes the dark ground,
+ * the content-layering stack (canvas z0 · content z1 · vignette z2 · grain z3 ·
+ * header z50), and shared prose/utility helpers. Tokens only. */
+
+.mk {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow-x: clip;
+  background-color: var(--mk-paper);
+  color: var(--mk-ink);
+  font-family: var(--mk-sans);
+  font-size: var(--mk-text-base);
+  line-height: var(--mk-leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Content sits above the fixed ledger grid (z0) but below vignette/grain. */
+.mk-content {
+  position: relative;
+  z-index: 1;
+}
+
+.mk main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Secondary pages (not the full-bleed film) clear the fixed header. */
+.mk-page {
+  padding-top: clamp(5rem, 4rem + 4vw, 7rem);
+}
+
+.mk ::selection {
+  background-color: var(--mk-accent);
+  color: var(--mk-accent-ink);
+}
+
+.mk a {
+  color: var(--mk-accent);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Shared display / prose helpers used across acts and pages. */
+.mk-display {
+  font-family: var(--mk-serif);
+  font-weight: 300;
+  line-height: var(--mk-leading-head);
+  letter-spacing: var(--mk-tracking-head);
+  color: var(--mk-ink);
+  margin: 0;
+}
+
+.mk-display em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--mk-accent);
+}
+
+.mk-lede {
+  font-family: var(--mk-sans);
+  font-size: var(--mk-text-lead);
+  line-height: var(--mk-leading-body);
+  color: var(--mk-soft);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.mk-prose {
+  max-width: 68ch;
+  color: var(--mk-soft);
+  line-height: var(--mk-leading-body);
+}
+
+.mk-prose p {
+  margin: 0 0 1.1em;
+}
+
+.mk-num {
+  font-family: var(--mk-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-num--pos {
+  color: var(--mk-positive);
+}
+
+.mk-num--neg {
+  color: var(--mk-negative);
+}
+
+/* When a real widget (a <section>) embeds inside a marketing page, neutralize
+ * any inherited section rhythm so the widget owns its own box. Opt-in via the
+ * wrapper class on the embedding container. */
+.mk-embed section {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}

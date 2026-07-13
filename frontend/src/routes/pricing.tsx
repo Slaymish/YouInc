@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useLightTheme } from "~/components/marketing/useLightTheme";
-import { MarketingHeader } from "~/components/marketing/MarketingHeader";
-import { MarketingFooter } from "~/components/marketing/MarketingFooter";
+import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
+import { Atmosphere } from "~/components/marketing/system/Atmosphere";
+import { MarketingHeader } from "~/components/marketing/shell/MarketingHeader";
+import { MarketingFooter } from "~/components/marketing/shell/MarketingFooter";
 import { PricingTable } from "~/components/marketing/PricingTable";
 import { PRICING } from "~/components/marketing/config";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 import "~/components/marketing/marketing-tokens.css";
+import "~/components/marketing/system/base.css";
+import "~/components/marketing/system/primitives.css";
 import "~/components/marketing/marketing-shared.css";
 import "~/components/marketing/PricingTable.css";
 import "~/components/marketing/pricing-page.css";
@@ -61,11 +64,12 @@ export const Route = createFileRoute("/pricing")({
 });
 
 function PricingPage() {
-  useLightTheme();
+  useDarkTheme();
   return (
     <div className="mk">
+      <Atmosphere />
       <MarketingHeader />
-      <main>
+      <main className="mk-content mk-page">
         <section
           className="pricing-page__intro"
           aria-labelledby="pricing-page-heading"

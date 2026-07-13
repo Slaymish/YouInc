@@ -1,0 +1,156 @@
+/* System primitives for the terminal marketing scope. Consumes tokens only. */
+
+/* ── Eyebrow / chapter marker ────────────────────────────────────────────── */
+.mk .mk-eyebrow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6ch;
+  margin: 0;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono);
+  font-weight: 500;
+  letter-spacing: var(--mk-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--mk-faint);
+}
+
+.mk .mk-eyebrow__index {
+  color: var(--mk-accent);
+}
+
+.mk .mk-eyebrow__sep {
+  color: var(--mk-line-strong);
+}
+
+.mk .mk-eyebrow__label {
+  color: var(--mk-faint);
+}
+
+/* ── Inline mono meta ────────────────────────────────────────────────────── */
+.mk .mk-mono {
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono);
+  letter-spacing: var(--mk-tracking-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk .mk-mono--faint {
+  color: var(--mk-faint);
+}
+
+.mk .mk-mono--accent {
+  color: var(--mk-accent);
+}
+
+/* ── Button ──────────────────────────────────────────────────────────────── */
+.mk .mk-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5ch;
+  padding: 0.8em 1.5em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--mk-sans);
+  font-size: var(--mk-text-small);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    color var(--mk-dur-fast) var(--mk-ease-out),
+    border-color var(--mk-dur-fast) var(--mk-ease-out),
+    background-color var(--mk-dur-fast) var(--mk-ease-out),
+    transform var(--mk-dur-fast) var(--mk-ease-out);
+}
+
+.mk .mk-btn__label {
+  position: relative;
+  z-index: 1;
+}
+
+/* fill-wipe layer */
+.mk .mk-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--mk-dur-base) var(--mk-ease-out);
+}
+
+.mk .mk-btn:active {
+  transform: translateY(1px);
+}
+
+.mk .mk-btn:focus-visible {
+  outline: 2px solid var(--mk-focus);
+  outline-offset: 2px;
+}
+
+/* primary — phosphor fill, dark ink */
+.mk .mk-btn--primary {
+  background-color: var(--mk-accent);
+  color: var(--mk-accent-ink);
+}
+
+.mk .mk-btn--primary::before {
+  background-color: var(--mk-accent-strong);
+}
+
+.mk .mk-btn--primary:hover::before {
+  transform: scaleX(1);
+}
+
+/* ghost — hairline border, ink text, underline sweep */
+.mk .mk-btn--ghost {
+  background-color: transparent;
+  border-color: var(--mk-line-strong);
+  color: var(--mk-ink);
+}
+
+.mk .mk-btn--ghost::before {
+  background-color: var(--mk-surface-2);
+}
+
+.mk .mk-btn--ghost:hover {
+  border-color: var(--mk-accent-line);
+  color: var(--mk-accent-strong);
+}
+
+.mk .mk-btn--ghost:hover::before {
+  transform: scaleX(1);
+}
+
+/* ── SectionShell ────────────────────────────────────────────────────────── */
+.mk .mk-section {
+  position: relative;
+  padding-block: var(--space-section);
+}
+
+.mk .mk-section__inner {
+  width: 100%;
+  max-width: var(--mk-maxw);
+  margin-inline: auto;
+  padding-inline: var(--mk-gutter);
+}
+
+.mk .mk-section--bleed {
+  padding-block: 0;
+}
+
+.mk .mk-section__bleed {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk .mk-btn,
+  .mk .mk-btn::before {
+    transition: none;
+  }
+}

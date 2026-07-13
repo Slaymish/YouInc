@@ -13,13 +13,16 @@ import {
 } from "~/components/dashboard/renderWidget";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
 import { noop } from "~/components/marketing/noop";
-import { useLightTheme } from "~/components/marketing/useLightTheme";
-import { MarketingHeader } from "~/components/marketing/MarketingHeader";
-import { MarketingFooter } from "~/components/marketing/MarketingFooter";
+import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
+import { Atmosphere } from "~/components/marketing/system/Atmosphere";
+import { MarketingHeader } from "~/components/marketing/shell/MarketingHeader";
+import { MarketingFooter } from "~/components/marketing/shell/MarketingFooter";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 import "~/components/dashboard/dashboard.css";
 import "~/components/marketing/marketing-tokens.css";
+import "~/components/marketing/system/base.css";
+import "~/components/marketing/system/primitives.css";
 import "~/components/marketing/marketing-shared.css";
 import "~/components/marketing/widgets.css";
 
@@ -107,12 +110,13 @@ function LiveWidget({ def }: { def: WidgetDefinition }) {
 }
 
 function WidgetLibraryPage() {
-  useLightTheme();
+  useDarkTheme();
 
   return (
     <div className="mk">
+      <Atmosphere />
       <MarketingHeader />
-      <main>
+      <main className="mk-content mk-page">
         <section className="wl-hero" aria-labelledby="wl-heading">
           <p className="mk-eyebrow">
             Widget library · rendered live on sample data

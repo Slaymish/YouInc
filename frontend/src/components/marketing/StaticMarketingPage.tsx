@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { MarketingHeader } from "./MarketingHeader";
-import { MarketingFooter } from "./MarketingFooter";
-import { useLightTheme } from "./useLightTheme";
+import { MarketingHeader } from "./shell/MarketingHeader";
+import { MarketingFooter } from "./shell/MarketingFooter";
+import { Atmosphere } from "./system/Atmosphere";
+import { useDarkTheme } from "./system/useDarkTheme";
 import { pageData, type StaticPageId } from "./staticPages";
 import "./marketing-tokens.css";
+import "./system/base.css";
+import "./system/primitives.css";
 import "./marketing-shared.css";
 import "./static-page.css";
 
@@ -12,13 +15,14 @@ interface StaticMarketingPageProps {
 }
 
 export function StaticMarketingPage({ id }: StaticMarketingPageProps) {
-  useLightTheme();
+  useDarkTheme();
   const page = pageData(id);
 
   return (
     <div className="mk">
+      <Atmosphere />
       <MarketingHeader />
-      <main className="static-page">
+      <main className="static-page mk-content mk-page">
         <section className="static-page__hero" aria-labelledby="static-page-heading">
           <p className="mk-eyebrow">{page.eyebrow}</p>
           <h1 id="static-page-heading" className="static-page__heading">
