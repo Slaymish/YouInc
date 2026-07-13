@@ -12,26 +12,20 @@ test("book-a-call links to the scheduler in a new tab", async ({ page }) => {
   await expect(bookLink).toHaveAttribute("target", "_blank");
 });
 
-test("hero 'Start free' CTA routes to the signup flow", async ({ page }) => {
+test("hero CTA routes into the quiz funnel, not straight to signup", async ({ page }) => {
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  const cta = page
-    .locator(".hero .start-free")
-    .getByRole("link", { name: /start free/i });
+  const cta = page.getByRole("link", { name: /see your picture/i }).first();
   await expect(cta).toBeVisible();
+  await expect(cta).toHaveAttribute("href", /\/start/);
   await cta.click();
-  await expect(page).toHaveURL(/\/signup$/);
+  await expect(page).toHaveURL(/\/start$/);
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /create your account/i,
+      name: /what are you trying to get a handle on/i,
     }),
   ).toBeVisible();
-  // Multi-step signup: step 1 asks only for the email, then advances.
-  await expect(page.getByLabel("Email")).toBeVisible();
-  await expect(page.getByRole("button", { name: /continue/i })).toBeVisible();
-  // Password is collected on a later step, not on the first screen.
-  await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
 });
 
 test("signup page links back to sign-in and to the demo", async ({ page }) => {
