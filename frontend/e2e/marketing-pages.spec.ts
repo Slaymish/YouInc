@@ -34,7 +34,8 @@ test("widgets page loads publicly and renders live widgets", async ({
 test("landing nav reaches both new pages", async ({ page }) => {
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Main navigation" });
-  await nav.getByRole("link", { name: "Widgets", exact: true }).click();
+  // "Product" is the terminal-redesign label for the widget library route.
+  await nav.getByRole("link", { name: "Product", exact: true }).click();
   await expect(page).toHaveURL(/\/widgets$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
@@ -110,11 +111,16 @@ test("footer trust links are discoverable and route correctly", async ({
   }
 });
 
-test("header exposes docs and security to visitors", async ({ page }) => {
+test("footer exposes docs and security to visitors", async ({ page }) => {
+  // In the terminal redesign the header nav is trimmed to Product/Pricing/
+  // Demo/Custom builds; Docs lives under the footer's Resources column and
+  // Security under Trust. Both must stay discoverable.
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  const nav = page.getByRole("navigation", { name: "Main navigation" });
-  await nav.getByRole("link", { name: "Docs", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Resources" })
+    .getByRole("link", { name: "Docs", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/docs$/);
   await expect(
     page.getByRole("heading", { level: 1, name: /documentation/i }),
@@ -122,30 +128,26 @@ test("header exposes docs and security to visitors", async ({ page }) => {
 
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  await nav.getByRole("link", { name: "Security", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Trust" })
+    .getByRole("link", { name: "Security", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/security$/);
   await expect(
     page.getByRole("heading", { level: 1, name: /security at youinc/i }),
   ).toBeVisible();
 });
 
-test("session-gated widgets show placeholders, not live forms, on /widgets", async ({
+test("public /widgets exposes no session-gated mutation controls", async ({
   page,
 }) => {
   await page.goto("/widgets");
-  // All four gated widgets appear as designed placeholders...
-  await expect(page.getByText("Connects to your live account")).toHaveCount(4);
-  for (const label of [
-    "Ingestion",
-    "Manual Accounts",
-    "Source Systems",
-    "Suspense Queue",
-  ]) {
-    await expect(
-      page.getByRole("heading", { name: label, exact: true }),
-    ).toBeVisible();
-  }
-  // ...and none of their live mutation controls are rendered.
+  // The read-only Suspense Queue is catalogued (rendered on sample data)...
+  await expect(
+    page.getByRole("heading", { name: "Suspense Queue", exact: true }),
+  ).toBeVisible();
+  // ...but none of the session-gated mutation controls are ever rendered on the
+  // public page (these would 401 without a session — see demoWidgets allowlist).
   await expect(page.getByRole("button", { name: "Sync" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /add account/i })).toHaveCount(
     0,

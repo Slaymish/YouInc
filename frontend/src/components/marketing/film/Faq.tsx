@@ -1,7 +1,12 @@
-// frontend/src/components/marketing/Faq.tsx
-import "./Faq.css";
+import type { ReactNode } from "react";
+import "./faq.css";
 
-const FAQS = [
+interface FaqItem {
+  readonly q: string;
+  readonly a: ReactNode;
+}
+
+const FAQS: readonly FaqItem[] = [
   {
     q: "Is my bank data safe?",
     a: "Connections are read-only and made through Akahu, New Zealand's regulated open-banking provider. YouInc never sees or stores your bank login, you choose which accounts are shared, and you can revoke access anytime.",
@@ -17,9 +22,8 @@ const FAQS = [
         <a href="https://akahu.nz" target="_blank" rel="noopener noreferrer">
           Akahu
         </a>{" "}
-        is New Zealand's open-finance hub — it's the secure bridge that lets
-        apps read your transactions with your consent, without handing over
-        passwords.
+        is New Zealand's open-finance hub — it's the secure bridge that lets apps
+        read your transactions with your consent, without handing over passwords.
       </>
     ),
   },
@@ -51,20 +55,35 @@ const FAQS = [
 
 export function Faq() {
   return (
-    <section className="faq" aria-labelledby="faq-heading">
-      <h2 id="faq-heading" className="section-heading">
-        Questions
-      </h2>
-      <div className="faq__list">
-        {FAQS.map((f, i) => (
-          <details className="faq__item" key={f.q} open={i === 0}>
-            <summary className="faq__q">
-              {f.q}
-              <span className="faq__icon" aria-hidden="true" />
-            </summary>
-            <div className="faq__a">{f.a}</div>
-          </details>
-        ))}
+    <section className="act-faq" aria-labelledby="faq-heading">
+      <div className="act-faq__inner">
+        <header className="act-faq__head">
+          <p className="mk-eyebrow">
+            <span className="mk-eyebrow__index">Q</span>
+            <span className="mk-eyebrow__sep" aria-hidden="true">
+              /
+            </span>
+            <span className="mk-eyebrow__label">Frequently asked</span>
+          </p>
+          <h2 id="faq-heading" className="act-faq__headline mk-display">
+            Questions
+          </h2>
+        </header>
+
+        <div className="act-faq__list">
+          {FAQS.map((f, i) => (
+            <details className="act-faq__item" key={f.q} open={i === 0}>
+              <summary className="act-faq__q">
+                <span className="act-faq__index">{`Q.${String(i + 1).padStart(2, "0")}`}</span>
+                <span className="act-faq__q-text">{f.q}</span>
+                <span className="act-faq__icon" aria-hidden="true" />
+              </summary>
+              <div className="act-faq__a">
+                <p>{f.a}</p>
+              </div>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -1,0 +1,272 @@
+/* CommandDeck — dark CFO dashboard replica. Bento composition. Tokens only. */
+
+.mk .cd {
+  border: 1px solid var(--mk-line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(120% 120% at 50% -10%, rgba(52, 217, 123, 0.06), transparent 60%),
+    linear-gradient(180deg, var(--mk-surface-2), var(--mk-card));
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+}
+
+.cd__chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem var(--space-5);
+  border-bottom: 1px solid var(--mk-line);
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+}
+
+.cd__title {
+  color: var(--mk-ink);
+}
+
+.cd__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6ch;
+  color: var(--mk-accent);
+}
+
+.cd__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mk-accent);
+  box-shadow: 0 0 8px var(--mk-accent);
+}
+
+/* ── Bento grid ──────────────────────────────────────────────────────────── */
+.cd__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--mk-line);
+}
+
+.cd__tile {
+  background: var(--mk-card);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* Bento packing across 6 cols:
+ *   row1  hero(3)   runway(3)
+ *   row2  trend(4)  liquidity(2)
+ *   row3  cashflow(2) balance(4) */
+.cd__tile--hero {
+  grid-column: span 3;
+}
+.cd__tile--metric {
+  grid-column: span 3;
+}
+.cd__tile--trend {
+  grid-column: span 4;
+}
+.cd__tile--liquidity {
+  grid-column: span 2;
+}
+.cd__tile--cashflow {
+  grid-column: span 2;
+}
+.cd__tile--balance {
+  grid-column: span 4;
+}
+
+.cd__tile-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cd__k {
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+  color: var(--mk-faint);
+}
+.cd__k--val {
+  color: var(--mk-accent);
+}
+
+.cd__v {
+  font-family: var(--mk-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.5rem;
+  color: var(--mk-ink);
+  line-height: 1;
+}
+
+.cd__v--xl {
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+}
+
+.cd__delta {
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  font-variant-numeric: tabular-nums;
+}
+.cd__delta--pos {
+  color: var(--mk-accent);
+}
+
+.cd__sub {
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  color: var(--mk-faint);
+}
+
+/* ── Trend chart ─────────────────────────────────────────────────────────── */
+.cd__tile--trend .cd-trend__svg {
+  width: 100%;
+  height: 110px;
+  margin-top: var(--space-2);
+}
+
+.cd-trend__line {
+  fill: none;
+  stroke: var(--mk-accent);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.cd-trend__dot {
+  fill: var(--mk-accent);
+  filter: drop-shadow(0 0 4px var(--mk-accent));
+}
+
+/* ── Cashflow bars ───────────────────────────────────────────────────────── */
+.cd-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 110px;
+  margin-top: var(--space-2);
+}
+
+.cd-bars__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  height: 100%;
+  min-width: 0;
+}
+
+.cd-bars__pair {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 100%;
+  justify-content: center;
+}
+
+.cd-bars__bar {
+  width: 40%;
+  min-height: 2px;
+  border-radius: 1px 1px 0 0;
+}
+.cd-bars__bar--in {
+  background: var(--mk-accent);
+}
+.cd-bars__bar--out {
+  background: var(--mk-dv-2);
+}
+
+.cd-bars__label {
+  font-family: var(--mk-mono);
+  font-size: 0.6rem;
+  color: var(--mk-faint);
+}
+
+.cd__legend {
+  display: inline-flex;
+  gap: var(--space-3);
+  font-family: var(--mk-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cd__legend-in {
+  color: var(--mk-accent);
+}
+.cd__legend-out {
+  color: var(--mk-dv-2);
+}
+
+/* ── Balance sheet ───────────────────────────────────────────────────────── */
+.cd-balance {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.cd-balance__row {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.cd-balance__name {
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  color: var(--mk-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cd-balance__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mk-surface-3);
+  overflow: hidden;
+}
+
+.cd-balance__fill {
+  display: block;
+  height: 100%;
+  background: var(--mk-accent);
+  border-radius: 3px;
+}
+.cd-balance__fill--neg {
+  background: var(--mk-negative);
+}
+
+.cd-balance__amt {
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--mk-ink);
+  text-align: right;
+}
+.cd-balance__amt--neg {
+  color: var(--mk-negative);
+}
+
+@media (max-width: 760px) {
+  .cd__tile {
+    grid-column: span 6 !important;
+  }
+  .cd-balance__row {
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) auto;
+  }
+}

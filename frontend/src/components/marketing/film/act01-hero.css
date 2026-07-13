@@ -1,0 +1,168 @@
+/* Act I — Chaos (hero). Full-viewport terminal cinema. Tokens only. */
+
+.mk .act-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: clamp(6rem, 12vh, 9rem) var(--mk-gutter) clamp(4rem, 10vh, 7rem);
+  overflow: hidden;
+}
+
+.act-hero__backdrop {
+  position: absolute;
+}
+
+/* Drifting sprite labels over the particle field. */
+.act-hero__sprites {
+  position: absolute;
+  inset: 0;
+}
+
+.act-hero__sprite {
+  position: absolute;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: act-hero-sprite 9s ease-in-out infinite;
+  animation-delay: calc(var(--d) * 1.3s);
+}
+
+.act-hero__sprite--pos {
+  color: var(--mk-accent);
+}
+.act-hero__sprite--neg {
+  color: var(--mk-negative);
+}
+
+@keyframes act-hero-sprite {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  12%,
+  30% {
+    opacity: 0.72;
+    transform: translateY(0);
+  }
+  42% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Foreground — server-rendered, the LCP element. Sits above the backdrop. */
+.act-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: min(100%, 60rem);
+}
+
+.act-hero__eyebrow {
+  margin-bottom: var(--space-6);
+}
+
+.act-hero__headline {
+  font-size: var(--mk-text-hero);
+  margin: 0;
+}
+
+.act-hero__line {
+  display: block;
+}
+
+/* Masked line reveal on load. */
+.act-hero__line {
+  overflow: hidden;
+}
+.act-hero__line > * {
+  display: inline-block;
+}
+
+.act-hero__sub {
+  margin: var(--space-6) 0 0;
+  max-width: 34ch;
+  font-size: var(--mk-text-lead);
+  line-height: var(--mk-leading-body);
+  color: var(--mk-soft);
+}
+
+.act-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.act-hero__reassurance {
+  margin: var(--space-6) 0 0;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+  color: var(--mk-faint);
+}
+
+/* Scroll cue. */
+.act-hero__cue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.5rem, 4vh, 2.5rem);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  z-index: 1;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: 0.28em;
+  color: var(--mk-faint);
+}
+
+.act-hero__cue-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--mk-accent), transparent);
+  transform-origin: top center;
+  animation: act-hero-cue 2.2s var(--mk-ease-inout) infinite;
+}
+
+@keyframes act-hero-cue {
+  0% {
+    transform: scaleY(0.2);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.2);
+    opacity: 0.3;
+    transform-origin: bottom center;
+  }
+}
+
+@media (max-width: 640px) {
+  .act-hero__sprite {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .act-hero__sprite {
+    animation: none;
+    opacity: 0.5;
+    transform: none;
+  }
+  .act-hero__cue-line {
+    animation: none;
+    opacity: 0.6;
+  }
+}

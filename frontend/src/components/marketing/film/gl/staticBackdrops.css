@@ -1,0 +1,97 @@
+/* Pre-designed CSS/SVG backdrops used wherever the WebGL film can't run
+ * (reduced motion, no WebGL, low memory) and as the LCP-safe base beneath the
+ * canvas before it loads. Same composition as the GL scenes: a phosphor glow
+ * field plus a scattered 1px particle dust. Static — no animation. Tokens only.
+ */
+
+.mk-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Volumetric phosphor glow — off-centre, like a distant terminal. */
+.mk-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(
+      40% 50% at 62% 42%,
+      var(--mk-glow) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      55% 60% at 28% 68%,
+      rgba(18, 161, 80, 0.09) 0%,
+      transparent 60%
+    );
+}
+
+/* Particle dust — a tiled dot field, faded top/bottom so it reads as depth. */
+.mk-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(155, 210, 180, 0.5) 0.6px,
+    transparent 0.9px
+  );
+  background-size: 34px 34px;
+  opacity: 0.35;
+  -webkit-mask-image: radial-gradient(
+    120% 90% at 55% 45%,
+    #000 0%,
+    #000 45%,
+    transparent 80%
+  );
+  mask-image: radial-gradient(
+    120% 90% at 55% 45%,
+    #000 0%,
+    #000 45%,
+    transparent 80%
+  );
+}
+
+/* Denser, centred variant for the closing act. */
+.mk-backdrop--close::before {
+  background: radial-gradient(
+    46% 52% at 50% 46%,
+    rgba(52, 217, 123, 0.16) 0%,
+    var(--mk-glow) 30%,
+    transparent 66%
+  );
+}
+
+.mk-backdrop--close::after {
+  background-size: 26px 26px;
+  opacity: 0.4;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 46%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(70% 70% at 50% 46%, #000 0%, transparent 75%);
+}
+
+/* Streams/lattice hint for the engine act's static backdrop — faint horizontal
+ * balanced lanes. */
+.mk-backdrop--streams::before {
+  background: radial-gradient(
+    60% 80% at 50% 50%,
+    rgba(18, 161, 80, 0.08) 0%,
+    transparent 65%
+  );
+}
+
+.mk-backdrop--streams::after {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 26px,
+    rgba(155, 210, 180, 0.16) 26px,
+    rgba(155, 210, 180, 0.16) 27px
+  );
+  background-size: auto;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(90% 80% at 50% 50%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(90% 80% at 50% 50%, #000 0%, transparent 78%);
+}

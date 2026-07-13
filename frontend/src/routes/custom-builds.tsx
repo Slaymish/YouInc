@@ -11,9 +11,6 @@ import "~/components/marketing/marketing-tokens.css";
 import "~/components/marketing/system/base.css";
 import "~/components/marketing/system/primitives.css";
 import "~/components/marketing/marketing-shared.css";
-// Reuses `.steps__list` / `.step*` (HowItWorks.css) for its own 4-step
-// engagement list, widened via the `.cb-steps` override in custom-builds.css.
-import "~/components/marketing/HowItWorks.css";
 import "~/components/marketing/custom-builds.css";
 
 const CUSTOM_BUILDS_JSON_LD = jsonLdScript(
