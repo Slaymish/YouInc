@@ -17,20 +17,22 @@ interface TierRow {
     | { readonly kind: "external"; readonly href: string };
 }
 
+// Ordered to anchor high: Concierge (from $149) first, then the emphasized
+// Self-serve, then Free. Demo is no longer a plan — it's an inline "see a live
+// demo" link on the pricing page, not a ledger row.
 const ROWS: readonly TierRow[] = [
-  { key: "demo", tier: PRICING.demo, cta: { kind: "link", to: "/demo" } },
-  { key: "free", tier: PRICING.free, cta: { kind: "link", to: "/signup" } },
-  {
-    key: "selfServe",
-    tier: PRICING.selfServe,
-    featured: true,
-    cta: { kind: "link", to: "/signup" },
-  },
   {
     key: "concierge",
     tier: PRICING.concierge,
     cta: { kind: "external", href: BOOKING_URL },
   },
+  {
+    key: "selfServe",
+    tier: PRICING.selfServe,
+    featured: true,
+    cta: { kind: "link", to: "/start" },
+  },
+  { key: "free", tier: PRICING.free, cta: { kind: "link", to: "/start" } },
 ];
 
 function hasCadence(tier: Tier): tier is Tier & { cadence: string } {

@@ -18,8 +18,8 @@ export function Act07Close() {
           Incorporate <em>yourself.</em>
         </h2>
         <div className="act-close__cta start-free">
-          <Link className="mk-btn mk-btn--primary" to="/signup">
-            <span className="mk-btn__label">Start free</span>
+          <Link className="mk-btn mk-btn--primary" to="/start">
+            <span className="mk-btn__label">See your picture</span>
           </Link>
         </div>
         <p className="act-close__reassurance">{CLOSE.reassurance}</p>

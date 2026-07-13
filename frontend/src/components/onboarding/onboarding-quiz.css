@@ -1,0 +1,230 @@
+/* Anonymous quiz-funnel onboarding (/start). Lives inside the `.mk` marketing
+ * scope for palette + .mk-btn, but deliberately NOT `.mk-page` so the marketing
+ * section-rhythm padding never applies. Motion stays on transform/opacity/width. */
+
+.quiz-flow,
+.reveal {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem clamp(1rem, 5vw, 3rem);
+  max-width: 40rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Progress bar */
+.quiz-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  width: 100%;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+}
+.quiz-progress__fill {
+  height: 100%;
+  background: currentColor;
+  transition: width var(--duration-normal, 300ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+  transform-origin: left;
+}
+
+/* Screens */
+.quiz-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+}
+.quiz-screen__headline {
+  font-size: clamp(1.75rem, 1rem + 3vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.quiz-screen__hint {
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* Goal options */
+.quiz-goal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+.quiz-goal__option {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklab, currentColor 22%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast, 150ms) ease,
+    background var(--duration-fast, 150ms) ease,
+    border-color var(--duration-fast, 150ms) ease;
+}
+.quiz-goal__option:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, currentColor 45%, transparent);
+}
+.quiz-goal__option:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.quiz-goal__option.is-selected {
+  background: color-mix(in oklab, currentColor 12%, transparent);
+  border-color: currentColor;
+}
+
+/* Balance entry */
+.quiz-balance__value {
+  font-size: clamp(2rem, 1rem + 5vw, 3.5rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.quiz-flow input[type="range"] {
+  width: 100%;
+  accent-color: currentColor;
+}
+.quiz-balance__exact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  width: 100%;
+  max-width: 16rem;
+}
+.quiz-balance__exact input {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklab, currentColor 22%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+.quiz-screen__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Reveal */
+.reveal__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0;
+}
+.reveal__networth {
+  font-size: clamp(3rem, 1rem + 10vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+.reveal__label {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0;
+}
+.reveal__split {
+  display: flex;
+  gap: 2.5rem;
+}
+.reveal__split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.reveal__split-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+.reveal__mix {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.reveal__mix-row {
+  display: grid;
+  grid-template-columns: 8rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+.reveal__mix-tier {
+  text-align: left;
+  opacity: 0.8;
+}
+.reveal__mix-track {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+  overflow: hidden;
+}
+.reveal__mix-bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  background: currentColor;
+}
+.reveal__mix-amount {
+  font-variant-numeric: tabular-nums;
+}
+.reveal__debts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.reveal__debts li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.reveal__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.reveal__reassure {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin: 0;
+}
+
+@media (max-width: 30rem) {
+  .reveal__mix-row {
+    grid-template-columns: 6rem 1fr auto;
+  }
+  .reveal__split {
+    gap: 1.5rem;
+  }
+}

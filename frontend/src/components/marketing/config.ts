@@ -50,9 +50,9 @@ export const PRICING = {
     name: "Free",
     price: "$0",
     cadence: "/mo",
-    cta: "Sign up free",
+    cta: "Start — no card needed",
     features: [
-      "Your own account — sign up in minutes",
+      "Start in two minutes — no card, no commitment",
       "Manual accounts (no live bank sync)",
       "Full widget gallery on your real data",
       "Export your full ledger anytime — plain-text journals, no lock-in",
@@ -62,8 +62,9 @@ export const PRICING = {
     name: "Self-serve",
     price: "NZD $15",
     cadence: "/mo",
-    cta: "Start free",
+    cta: "Add live sync",
     features: [
+      "14-day free trial — no card up front",
       "Everything in Free",
       "Live bank sync via Akahu",
       "Customize widget order and layout",

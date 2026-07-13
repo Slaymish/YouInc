@@ -54,8 +54,8 @@ export function Act01Hero() {
         <p className="act-hero__sub">{PRODUCT.heroSub}</p>
 
         <div className="act-hero__ctas start-free">
-          <Link className="mk-btn mk-btn--primary" to="/signup">
-            <span className="mk-btn__label">Start free</span>
+          <Link className="mk-btn mk-btn--primary" to="/start">
+            <span className="mk-btn__label">See your picture</span>
           </Link>
           <Link className="mk-btn mk-btn--ghost" to="/demo">
             <span className="mk-btn__label">Watch the demo</span>

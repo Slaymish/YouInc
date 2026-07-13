@@ -38,12 +38,15 @@ function ComparisonCell({ value }: { value: boolean | string }): ReactNode {
 
 export function PricingTable() {
   return (
-    <div className="pricing-table__scroll">
+    <>
+      <p className="pricing-table__demo-link">
+        Just want to look around? <a href="/demo">See a live demo →</a>
+      </p>
+      <div className="pricing-table__scroll">
       <table className="pricing-table">
         <caption className="pricing-table__caption">
-          Compare {PRICING.demo.name}, {PRICING.free.name},{" "}
-          {PRICING.selfServe.name}, and {PRICING.concierge.name} feature by
-          feature.
+          Compare {PRICING.concierge.name}, {PRICING.selfServe.name}, and{" "}
+          {PRICING.free.name} feature by feature.
         </caption>
         <thead>
           <tr>
@@ -52,20 +55,12 @@ export function PricingTable() {
             </th>
             <th scope="col">
               <span className="pricing-table__tier-name">
-                {PRICING.demo.name}
+                {PRICING.concierge.name}
               </span>
               <span className="pricing-table__tier-price">
-                {PRICING.demo.price}
-              </span>
-            </th>
-            <th scope="col">
-              <span className="pricing-table__tier-name">
-                {PRICING.free.name}
-              </span>
-              <span className="pricing-table__tier-price">
-                {PRICING.free.price}
+                {PRICING.concierge.price}
                 <span className="pricing-table__cadence">
-                  {PRICING.free.cadence}
+                  {PRICING.concierge.cadence}
                 </span>
               </span>
             </th>
@@ -83,12 +78,12 @@ export function PricingTable() {
             </th>
             <th scope="col">
               <span className="pricing-table__tier-name">
-                {PRICING.concierge.name}
+                {PRICING.free.name}
               </span>
               <span className="pricing-table__tier-price">
-                {PRICING.concierge.price}
+                {PRICING.free.price}
                 <span className="pricing-table__cadence">
-                  {PRICING.concierge.cadence}
+                  {PRICING.free.cadence}
                 </span>
               </span>
             </th>
@@ -100,19 +95,6 @@ export function PricingTable() {
               <span className="visually-hidden">Get started</span>
             </th>
             <td>
-              <a className="mk-btn mk-btn--ghost" href="/demo">
-                Open the demo →
-              </a>
-            </td>
-            <td>
-              <Link className="mk-btn mk-btn--ghost" to="/signup">
-                {PRICING.free.cta} →
-              </Link>
-            </td>
-            <td className="pricing-table__featured">
-              <StartFreeCta source="pricing-table" />
-            </td>
-            <td>
               <a
                 className="mk-btn mk-btn--primary"
                 href={BOOKING_URL}
@@ -122,26 +104,32 @@ export function PricingTable() {
                 {PRICING.concierge.cta}
               </a>
             </td>
+            <td className="pricing-table__featured">
+              <StartFreeCta source="pricing-table" />
+            </td>
+            <td>
+              <Link className="mk-btn mk-btn--ghost" to="/start">
+                {PRICING.free.cta} →
+              </Link>
+            </td>
           </tr>
           {PRICING_COMPARISON.map((row) => (
             <tr key={row.feature}>
               <th scope="row">{row.feature}</th>
               <td>
-                <ComparisonCell value={row.demo} />
-              </td>
-              <td>
-                <ComparisonCell value={row.free} />
+                <ComparisonCell value={row.concierge} />
               </td>
               <td className="pricing-table__featured">
                 <ComparisonCell value={row.selfServe} />
               </td>
               <td>
-                <ComparisonCell value={row.concierge} />
+                <ComparisonCell value={row.free} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 }

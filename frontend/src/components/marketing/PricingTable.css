@@ -4,6 +4,16 @@
  * hairline rules, accent ticks. Semantic <table>, tokens only, scoped `.mk`.
  * The wrapper scrolls horizontally on narrow viewports.
  */
+.pricing-table__demo-link {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+.pricing-table__demo-link a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .pricing-table__scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
