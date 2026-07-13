@@ -41,9 +41,13 @@ export function Act01Hero() {
         </p>
 
         <h1 id="hero-heading" className="act-hero__headline mk-display">
-          <span className="act-hero__line">Run yourself</span>
           <span className="act-hero__line">
-            like a <em>company.</em>
+            <span className="act-hero__line-inner">Run yourself</span>
+          </span>
+          <span className="act-hero__line">
+            <span className="act-hero__line-inner">
+              like a <em>company.</em>
+            </span>
           </span>
         </h1>
 

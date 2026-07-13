@@ -72,15 +72,14 @@
   margin: 0;
 }
 
+/* Masked line reveal (GSAP translates the inner span up out of the
+ * overflow-hidden line wrapper; static mode simply shows it in place). */
 .act-hero__line {
   display: block;
-}
-
-/* Masked line reveal on load. */
-.act-hero__line {
   overflow: hidden;
 }
-.act-hero__line > * {
+
+.act-hero__line-inner {
   display: inline-block;
 }
 

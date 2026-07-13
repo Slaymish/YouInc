@@ -1,9 +1,10 @@
 // frontend/src/components/marketing/MarketingPage.tsx
 //
 // "The Incorporation" — the landing film. Seven acts, dark terminal cinema.
-// Phase 1 composes the full static (reduced-motion) experience; Lenis/GSAP
-// choreography (phase 2) and the WebGL particle film (phase 3) layer on top
-// without changing this DOM.
+// The DOM below is the complete static (reduced-motion) experience; the
+// Lenis/GSAP choreography (useFilmMotion) and the WebGL particle film
+// (CinematicCanvas) layer on top at runtime without changing it.
+import { useRef } from "react";
 import { useDarkTheme } from "./system/useDarkTheme";
 import { Atmosphere } from "./system/Atmosphere";
 import { MarketingHeader } from "./shell/MarketingHeader";
@@ -17,19 +18,24 @@ import { Act05Concierge } from "./film/Act05Concierge";
 import { Act06Pricing } from "./film/Act06Pricing";
 import { Act07Close } from "./film/Act07Close";
 import { Faq } from "./film/Faq";
+import { useFilmMotion } from "./film/useFilmMotion";
 import { FeedbackWidget } from "./FeedbackWidget";
 import { SupportChat } from "./SupportChat";
 import "./marketing-tokens.css";
 import "./system/base.css";
 import "./system/primitives.css";
 import "./film/gl/staticBackdrops.css";
+import "./film/motion-overrides.css";
 import "./FeedbackWidget.css";
 import "./SupportChat.css";
 
 export function MarketingPage() {
   useDarkTheme();
+  const rootRef = useRef<HTMLDivElement>(null);
+  useFilmMotion(rootRef);
+
   return (
-    <div className="mk">
+    <div className="mk" ref={rootRef}>
       <Atmosphere />
       <MarketingHeader />
       <main className="mk-content">
