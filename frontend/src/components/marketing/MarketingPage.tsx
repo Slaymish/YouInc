@@ -19,6 +19,7 @@ import { Act06Pricing } from "./film/Act06Pricing";
 import { Act07Close } from "./film/Act07Close";
 import { Faq } from "./film/Faq";
 import { useFilmMotion } from "./film/useFilmMotion";
+import { CinematicCanvas } from "./film/gl/CinematicCanvas";
 import { FeedbackWidget } from "./FeedbackWidget";
 import { SupportChat } from "./SupportChat";
 import "./marketing-tokens.css";
@@ -37,6 +38,7 @@ export function MarketingPage() {
   return (
     <div className="mk" ref={rootRef}>
       <Atmosphere />
+      <CinematicCanvas />
       <MarketingHeader />
       <main className="mk-content">
         <Act01Hero />
