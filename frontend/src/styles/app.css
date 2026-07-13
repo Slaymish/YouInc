@@ -125,6 +125,95 @@ body {
   background: var(--page);
 }
 
+.route-load {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--page) 96%, transparent);
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.route-load--dark {
+  --route-load-page: #0b0d10;
+  --route-load-text: #f2f1ec;
+  --route-load-muted: #9ba1a8;
+  --route-load-line: rgba(235, 240, 245, 0.16);
+  --route-load-accent: #34d97b;
+  background: color-mix(in srgb, var(--route-load-page) 96%, transparent);
+}
+
+.route-load--exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.route-load__content {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.route-load__dial {
+  position: relative;
+  width: 88px;
+  height: 88px;
+}
+
+.route-load__dial svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.route-load__track,
+.route-load__fill {
+  fill: none;
+  stroke-width: 3;
+}
+
+.route-load__track {
+  stroke: var(--route-load-line, var(--line-subtle));
+}
+
+.route-load__fill {
+  stroke: var(--route-load-accent, var(--accent));
+  stroke-dasharray: 100;
+  stroke-linecap: round;
+}
+
+.route-load__dial span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--route-load-text, var(--text));
+  font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.route-load__dial span::after {
+  content: "%";
+  margin-left: 0.1em;
+  color: var(--route-load-muted, var(--text-muted));
+  font-size: 0.65em;
+}
+
+.route-load__content p {
+  margin: 0;
+  color: var(--route-load-muted, var(--text-muted));
+  font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 button,
 input,
 textarea,

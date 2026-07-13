@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
+import { RouteLoadDial } from "~/components/dashboard/RouteLoadDial";
 import { formatDateTime } from "~/components/widgets/format";
 import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
@@ -52,6 +53,7 @@ function DemoPage() {
 
   return (
     <>
+      <RouteLoadDial label="Loading sample dashboard" tone="dark" />
       <header className="mk demo-banner">
         <span className="demo-banner__mode">
           <span className="demo-banner__mode-dot" aria-hidden="true" />

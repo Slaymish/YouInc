@@ -9,6 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useTheme } from "~/hooks/useTheme";
 import { Logo } from "~/components/Logo";
+import { RouteLoadDial } from "~/components/dashboard/RouteLoadDial";
 import type { AccountState } from "~/server/accounts";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
 import type {
@@ -113,6 +114,7 @@ function WorkspaceLayout() {
 
   return (
     <div className="ws-shell">
+      <RouteLoadDial label="Loading your dashboard" />
       <header className="ws-topbar">
         <Link className="ws-topbar__logo" to="/" aria-label="YouInc home">
           <Logo variant={theme === "dark" ? "inverted" : "wordmark"} height={24} />
