@@ -68,17 +68,14 @@
     transform var(--mk-dur-fast) var(--mk-ease-out);
 }
 
-.mk .mk-btn__label {
-  position: relative;
-  z-index: 1;
-}
-
-/* fill-wipe layer */
+/* fill-wipe layer — z-index:-1 inside the button's isolated stacking context
+ * paints above the button background but below its text, so buttons work with
+ * or without an inner .mk-btn__label span. */
 .mk .mk-btn::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform var(--mk-dur-base) var(--mk-ease-out);

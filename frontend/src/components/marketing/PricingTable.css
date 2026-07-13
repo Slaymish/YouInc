@@ -1,17 +1,16 @@
 /* frontend/src/components/marketing/PricingTable.css
  *
- * Full plan comparison table for /pricing (design-direction spec E4).
- * Semantic <table>, tokenized, scoped under `.mk`. The table has a
- * `min-width` so small text/CTAs stay legible; the wrapper scrolls
- * horizontally instead of the table squeezing or the page overflowing.
+ * Full plan comparison for /pricing as a ledger table: sticky mono header row,
+ * hairline rules, accent ticks. Semantic <table>, tokens only, scoped `.mk`.
+ * The wrapper scrolls horizontally on narrow viewports.
  */
 .pricing-table__scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: none;
+  border: 1px solid var(--mk-line);
   border-radius: var(--radius-lg);
-  background: var(--mk-soft-ground);
-  box-shadow: var(--mk-soft-raised);
+  background: linear-gradient(180deg, var(--mk-surface-2), var(--mk-card));
+  box-shadow: var(--shadow-1);
 }
 
 .pricing-table {
@@ -25,10 +24,11 @@
 .pricing-table__caption {
   caption-side: top;
   text-align: left;
-  font-family: var(--mk-serif);
-  font-weight: 400;
-  font-size: var(--text-h3);
-  color: var(--mk-ink);
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+  color: var(--mk-faint);
   padding: var(--space-5) var(--space-5) var(--space-4);
 }
 
@@ -40,99 +40,105 @@
   vertical-align: middle;
 }
 
+.pricing-table tbody tr:last-child th,
+.pricing-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .pricing-table th[scope="row"] {
   text-align: left;
   font-family: var(--mk-sans);
-  font-weight: 600;
-  font-size: var(--text-small);
-  color: var(--mk-ink);
+  font-weight: 400;
+  font-size: var(--mk-text-small);
+  color: var(--mk-soft);
 }
 
 .pricing-table thead th {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: var(--mk-surface-1);
+  background: var(--mk-surface-2);
   vertical-align: bottom;
   padding: var(--space-5) var(--space-4);
-  border-bottom: 2px solid var(--mk-line);
+  border-bottom: 1px solid var(--mk-line-strong);
 }
 
 .pricing-table__corner {
-  background: var(--mk-surface-1);
+  background: var(--mk-surface-2);
 }
 
 .pricing-table__tier-name {
   display: block;
-  font-family: var(--mk-sans);
+  font-family: var(--mk-mono);
   text-transform: uppercase;
-  letter-spacing: var(--tracking-eyebrow, 0.08em);
-  font-size: var(--text-eyebrow, 0.7rem);
-  color: var(--mk-soft);
+  letter-spacing: var(--mk-tracking-mono);
+  font-size: var(--mk-text-mono-sm);
+  color: var(--mk-faint);
 }
 
 .pricing-table__tier-price {
   display: block;
-  font-family: var(--mk-serif);
-  font-size: 1.5rem;
+  font-family: var(--mk-mono);
+  font-weight: 500;
+  font-size: 1.35rem;
   color: var(--mk-ink);
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
+  white-space: nowrap;
 }
 
 .pricing-table__cadence {
-  font-family: var(--mk-sans);
-  font-size: var(--text-small);
-  color: var(--mk-soft);
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  color: var(--mk-faint);
   margin-left: 0.15rem;
 }
 
 .pricing-table__badge {
   display: inline-block;
-  margin-bottom: 0.4rem;
-  padding: 0.15rem 0.6rem;
-  border-radius: var(--radius-pill, 999px);
-  background: var(--mk-accent-tint);
-  color: var(--mk-accent-strong, var(--mk-accent));
-  font-family: var(--mk-sans);
-  font-size: 0.65rem;
+  margin-bottom: 0.45rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: var(--mk-accent);
+  color: var(--mk-accent-ink);
+  font-family: var(--mk-mono);
+  font-weight: 500;
+  font-size: 0.62rem;
   text-transform: uppercase;
-  letter-spacing: var(--tracking-eyebrow, 0.08em);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
-/* Featured (Self-serve) column — accent tint wash + hairline sides, per the
-   B5 coherence rule: highlights use --mk-accent-tint / --mk-accent-line, not
-   a raw accent fill. */
+/* Featured (Self-serve) column — accent tint field + hairline walls. */
 .pricing-table__featured {
   background: var(--mk-accent-tint);
   border-left: 1px solid var(--mk-accent-line);
   border-right: 1px solid var(--mk-accent-line);
 }
 .pricing-table thead th.pricing-table__featured {
-  border-top: 1px solid var(--mk-accent-line);
-}
-.pricing-table tbody tr:last-child td.pricing-table__featured {
-  border-bottom: 1px solid var(--mk-accent-line);
+  border-top: 2px solid var(--mk-accent);
 }
 
 .pricing-table__yes {
   color: var(--mk-accent);
-  font-weight: 700;
-  font-size: 1.5rem;
+  font-family: var(--mk-mono);
+  font-weight: 500;
+  font-size: 1.1rem;
   line-height: 1;
 }
 .pricing-table__no {
-  color: var(--mk-soft);
-  font-size: 1.5rem;
+  color: var(--mk-faint);
+  font-size: 1.1rem;
   line-height: 1;
 }
 .pricing-table__note {
   color: var(--mk-soft);
-  font-size: var(--text-small);
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
 }
 
 .pricing-table tbody tr:hover td,
 .pricing-table tbody tr:hover th[scope="row"] {
-  background: var(--mk-surface-2);
+  background: rgba(235, 240, 245, 0.02);
 }
 .pricing-table tbody tr:hover td.pricing-table__featured {
   background: var(--mk-accent-tint);
@@ -140,20 +146,19 @@
 
 .pricing-table__cta-row td,
 .pricing-table__cta-row th {
-  border-bottom: 2px solid var(--mk-line);
+  border-bottom: 1px solid var(--mk-line-strong);
   padding-bottom: var(--space-5);
 }
 .pricing-table__cta-row td {
   text-align: center;
 }
-.pricing-table__cta-row .waitlist-form,
 .pricing-table__cta-row .start-free {
   justify-content: center;
 }
 
 .pricing-table a:focus-visible,
 .pricing-table button:focus-visible {
-  outline: 3px solid var(--mk-focus, #111);
+  outline: 2px solid var(--mk-focus);
   outline-offset: 2px;
 }
 

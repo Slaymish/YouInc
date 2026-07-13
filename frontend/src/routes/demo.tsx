@@ -53,22 +53,21 @@ function DemoPage() {
   return (
     <>
       <header className="mk demo-banner">
-        <div>
-          <strong>Live demo</strong> — sample data, same dashboard shell and
-          widgets you get once your accounts are connected.
+        <span className="demo-banner__mode">
+          <span className="demo-banner__mode-dot" aria-hidden="true" />
+          DEMO · SAMPLE DATA · READ-ONLY
+        </span>
+        <div className="demo-banner__copy">
+          <strong>Live demo</strong> — the same dashboard shell and widgets you
+          get once your accounts are connected.
         </div>
         <nav className="demo-banner__cta">
           <Link className="mk-btn mk-btn--ghost" to="/">
             ← Back
           </Link>
-          <a
-            className="mk-btn mk-btn--primary"
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Book a call
-          </a>
+          <Link className="mk-btn mk-btn--primary" to="/signup">
+            Start free
+          </Link>
         </nav>
       </header>
 

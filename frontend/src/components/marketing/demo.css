@@ -1,11 +1,64 @@
-/* frontend/src/components/marketing/demo.css */
-.demo-banner {
-  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
-  flex-wrap: wrap; padding: 1rem 1.5rem; max-width: var(--mk-maxw); margin: 0 auto;
-  border-bottom: 1px solid var(--mk-line); font-family: var(--mk-sans); font-size: 0.9rem;
+/* frontend/src/components/marketing/demo.css
+ * Terminal chrome around the real dashboard on /demo. */
+/* The banner reuses the .mk scope for tokens only — undo the base canvas's
+ * full-viewport sizing so it stays a slim bar above the dashboard. */
+.mk.demo-banner {
+  min-height: 0;
 }
-.demo-banner__cta { display: flex; gap: 0.8rem; align-items: center; }
+
+.demo-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.9rem var(--mk-gutter);
+  border-bottom: 1px solid var(--mk-line);
+  background: var(--mk-paper);
+  color: var(--mk-soft);
+  font-family: var(--mk-sans);
+  font-size: 0.9rem;
+}
+
+.demo-banner__mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7ch;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+  color: var(--mk-accent);
+  white-space: nowrap;
+}
+
+.demo-banner__mode-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mk-accent);
+  box-shadow: 0 0 8px var(--mk-accent);
+}
+
+.demo-banner__copy {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.demo-banner__copy strong {
+  color: var(--mk-ink);
+}
+
+.demo-banner__cta {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
 
 /* /demo's system-header CTA replaces the real dashboard's "Log out" button —
    same .theme-toggle box treatment, but it's an <a>, so undo link defaults. */
-.demo-header-cta { display: inline-flex; align-items: center; text-decoration: none; }
+.demo-header-cta {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}

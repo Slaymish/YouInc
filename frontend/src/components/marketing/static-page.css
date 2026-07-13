@@ -10,12 +10,12 @@
 
 .static-page__heading {
   font-family: var(--mk-serif);
-  font-weight: 400;
-  font-size: var(--text-hero);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-head);
-  max-width: 13ch;
-  margin: 0 0 var(--space-5);
+  font-weight: 300;
+  font-size: var(--mk-text-act);
+  line-height: var(--mk-leading-head);
+  letter-spacing: var(--mk-tracking-head);
+  max-width: 16ch;
+  margin: var(--space-5) 0 var(--space-5);
 }
 
 .static-page__subheading {
@@ -28,8 +28,11 @@
 
 .static-page__updated {
   margin: var(--space-5) 0 0;
-  color: var(--mk-soft);
-  font-size: var(--text-small);
+  color: var(--mk-faint);
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
   font-variant-numeric: tabular-nums;
 }
 
@@ -73,10 +76,13 @@
 }
 
 .static-page__section a {
-  color: var(--mk-ink);
+  color: var(--mk-accent);
   font-weight: 600;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
+}
+.static-page__section a:hover {
+  color: var(--mk-accent-strong);
 }
 
 .static-page__cta {

@@ -1,21 +1,33 @@
 /* frontend/src/components/marketing/pricing-page.css
  * ─────────────────────────────────────────────────────────────
- * /pricing route — owns the intro section only; the comparison
- * table itself is styled in PricingTable.css.
+ * /pricing route — intro + section rhythm; tier ledger styles come
+ * from film/act06-pricing.css, the table from PricingTable.css.
  * ───────────────────────────────────────────────────────────── */
-.pricing-page__intro { max-width: var(--mk-maxw-narrow, 720px); }
+.mk .pricing-page__intro {
+  padding-block: var(--space-8) var(--space-6);
+}
+
 .pricing-page__headline {
   font-family: var(--mk-serif);
-  font-weight: 400;
-  font-size: clamp(2.2rem, 1.3rem + 3.5vw, 3.4rem);
-  line-height: var(--leading-head, 1.08);
-  letter-spacing: var(--tracking-head, -0.025em);
-  margin: 0 0 1rem;
+  font-weight: 300;
+  font-size: var(--mk-text-act);
+  line-height: var(--mk-leading-head);
+  letter-spacing: var(--mk-tracking-head);
+  margin: var(--space-5) 0 var(--space-4);
 }
+
 .pricing-page__sub {
-  font-size: var(--text-lead, 1.05rem);
+  max-width: 60ch;
+  font-size: var(--mk-text-lead);
   color: var(--mk-soft);
-  line-height: var(--leading-body, 1.6);
+  line-height: var(--mk-leading-body);
   margin: 0;
 }
-.pricing-page__table { padding-top: 0; }
+
+.mk .pricing-page__tiers {
+  padding-block: 0 var(--space-8);
+}
+
+.mk .pricing-page__table {
+  padding-block: 0 var(--space-section);
+}

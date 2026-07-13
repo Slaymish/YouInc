@@ -4,6 +4,7 @@ import { Atmosphere } from "~/components/marketing/system/Atmosphere";
 import { MarketingHeader } from "~/components/marketing/shell/MarketingHeader";
 import { MarketingFooter } from "~/components/marketing/shell/MarketingFooter";
 import { PricingTable } from "~/components/marketing/PricingTable";
+import { PricingLedger } from "~/components/marketing/film/PricingLedger";
 import { PRICING } from "~/components/marketing/config";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
@@ -74,7 +75,13 @@ function PricingPage() {
           className="pricing-page__intro"
           aria-labelledby="pricing-page-heading"
         >
-          <p className="mk-eyebrow">Pricing</p>
+          <p className="mk-eyebrow">
+            <span className="mk-eyebrow__index">§</span>
+            <span className="mk-eyebrow__sep" aria-hidden="true">
+              /
+            </span>
+            <span className="mk-eyebrow__label">Pricing</span>
+          </p>
           <h1 id="pricing-page-heading" className="pricing-page__headline">
             Every plan, every detail.
           </h1>
@@ -84,6 +91,16 @@ function PricingPage() {
             Exports are included, and the differences are clear before you sign
             up.
           </p>
+        </section>
+
+        <section
+          className="pricing-page__tiers"
+          aria-labelledby="pricing-page-tiers-heading"
+        >
+          <h2 id="pricing-page-tiers-heading" className="visually-hidden">
+            Plans
+          </h2>
+          <PricingLedger />
         </section>
 
         <section

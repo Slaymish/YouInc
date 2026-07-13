@@ -1,99 +1,34 @@
 /* frontend/src/components/marketing/marketing-shared.css
  *
  * Cross-route globals for the `.mk` scope — loaded by every marketing entry
- * point (MarketingPage, /demo, /custom-builds, /widgets) alongside
- * marketing-tokens.css. Per-section rules live in their own co-located CSS
- * files; this file only holds chrome shared by all of them: buttons, the
- * section shell, nav, waitlist form, live-tag/dot, and the reduced motion
- * block. Footer rules live in MarketingFooter.css (owned by MarketingFooter.tsx).
+ * point alongside marketing-tokens.css + system/base.css + system/primitives.css.
+ * This file holds only the legacy shared chrome still consumed by secondary
+ * pages: the section rhythm, section headings, waitlist form (concierge lead
+ * capture), and tabular-number emphasis. Buttons/eyebrows live in
+ * system/primitives.css; the canvas and prose helpers in system/base.css.
  */
 
-.mk {
-  background: var(--mk-paper);
+/* Section rhythm — secondary pages (under .mk-page) compose from bare
+ * <section>s. Scoped away from the landing film acts (which own their own
+ * full-bleed layout) and kept at low specificity via :where() so existing
+ * per-page overrides keep winning. */
+.mk-page :where(section) {
+  padding: var(--space-section) var(--mk-gutter);
+  max-width: var(--mk-maxw);
+  margin: 0 auto;
+}
+
+.section-heading {
+  font-family: var(--mk-serif);
+  font-weight: 300;
+  font-size: var(--mk-text-act);
+  line-height: var(--mk-leading-head);
+  letter-spacing: var(--mk-tracking-head);
   color: var(--mk-ink);
-  font-family: var(--mk-sans);
-  font-size: var(--text-body);
+  margin: 0 0 2rem;
 }
 
-.visually-hidden {
-  position: absolute !important;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.mk-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--mk-sans);
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 0.7rem 1.2rem;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease,
-    background 150ms ease;
-}
-/* Primary CTA stays a solid high-contrast fill (accessibility + trust), but
-   gains soft elevation and a tactile press-in on :active. */
-.mk-btn--primary {
-  background: var(--mk-ink);
-  color: #fff;
-  box-shadow:
-    5px 5px 12px rgba(46, 50, 38, 0.24),
-    -4px -4px 10px rgba(255, 255, 255, 0.7);
-}
-.mk-btn--primary:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    7px 9px 18px rgba(46, 50, 38, 0.3),
-    -5px -5px 12px rgba(255, 255, 255, 0.75);
-}
-.mk-btn--primary:active {
-  transform: translateY(1px);
-  box-shadow:
-    2px 2px 6px rgba(46, 50, 38, 0.28),
-    inset 0 2px 5px rgba(0, 0, 0, 0.35);
-}
-.mk-btn--ghost {
-  background: transparent;
-  color: var(--mk-ink);
-  border-bottom: 2px solid var(--mk-ink);
-  border-radius: 0;
-  padding: 0.5rem 0;
-}
-.mk-btn:focus-visible {
-  outline: 3px solid var(--mk-focus);
-  outline-offset: 2px;
-}
-
-/* Soft "tactile" button — ground-coloured, extruded, depresses on click.
-   Text stays ink so contrast holds. Use for secondary/utility actions. */
-.mk-btn--soft {
-  background: var(--mk-soft-ground);
-  color: var(--mk-ink);
-  box-shadow: var(--mk-soft-raised-sm);
-}
-.mk-btn--soft:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--mk-soft-raised);
-}
-.mk-btn--soft:active {
-  transform: translateY(0);
-  box-shadow: var(--mk-soft-pressed);
-}
-
-/* Waitlist form */
+/* Waitlist form (concierge lead capture surfaces only). */
 .waitlist-form {
   display: flex;
   gap: 0.6rem;
@@ -103,13 +38,15 @@
 .waitlist-form input[type="email"] {
   font: inherit;
   padding: 0.7rem 0.9rem;
-  border: 1px solid var(--mk-line);
+  border: 1px solid var(--mk-line-strong);
   border-radius: var(--radius-sm);
   min-width: 15rem;
-  /* Recessed "well": keeps a real border for affordance/contrast (soft-ui
-     rule: inputs never rely on shadow alone) but sits inset for tactility. */
-  background: var(--mk-soft-ground-2);
-  box-shadow: var(--mk-soft-inset);
+  background: var(--mk-card);
+  color: var(--mk-ink);
+}
+.waitlist-form input[type="email"]:focus-visible {
+  outline: 2px solid var(--mk-focus);
+  outline-offset: 2px;
 }
 .waitlist-error {
   color: var(--mk-negative);
@@ -121,179 +58,7 @@
   font-family: var(--mk-sans);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mk-btn,
-  .mk-btn--primary:hover {
-    transition: none;
-    transform: none;
-  }
-  .live-dot {
-    animation: none;
-  }
-  .mk-btn:hover,
-  .bank-chip:hover,
-  .artifact:hover {
-    transform: none;
-  }
-  .bank-chip,
-  .artifact,
-  .mk-nav__links a {
-    transition: none;
-  }
-}
-
-/* Section rhythm */
-.section-heading {
-  font-family: var(--mk-serif);
-  font-weight: 400;
-  font-size: var(--text-h2);
-  line-height: var(--leading-head);
-  letter-spacing: var(--tracking-head);
-  margin: 0 0 2rem;
-}
-.mk-eyebrow {
-  font-size: var(--text-eyebrow);
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
-  color: var(--mk-soft);
-  margin: 0 0 0.8rem;
-}
-.mk section {
-  padding: var(--space-section) clamp(1.25rem, 5vw, 4rem);
-  max-width: var(--mk-maxw);
-  margin: 0 auto;
-}
-
-.live-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--mk-accent);
-}
-.live-tag a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  transition: text-decoration-color 150ms ease;
-}
-.live-tag a:hover,
-.live-tag a:focus-visible {
-  text-decoration-color: currentColor;
-}
-.live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--mk-accent);
-}
-@keyframes mk-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-.live-dot {
-  animation: mk-pulse 1.7s infinite;
-}
-
-/* Nav */
-.mk-nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.1rem clamp(1.25rem, 5vw, 4rem);
-  max-width: var(--mk-maxw);
-  margin: 0 auto;
-  border-bottom: 1px solid var(--mk-line);
-}
-.mk-nav__logo {
-  display: inline-flex;
-  align-items: center;
-  color: var(--mk-ink);
-  text-decoration: none;
-}
-.mk-nav__links {
-  display: flex;
-  gap: 1.4rem;
-  align-items: center;
-  font-size: 0.9rem;
-}
-.mk-nav__links a {
-  color: var(--mk-ink);
-  text-decoration: none;
-  opacity: 0.85;
-  /* Restrained accent affordance: an underline that grows in on hover/focus,
-     so interactive nav items read as interactive without shouting. */
-  background-image: linear-gradient(var(--mk-accent), var(--mk-accent));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 2px;
-  transition:
-    opacity 150ms ease,
-    background-size 180ms ease;
-}
-.mk-nav__links a:hover,
-.mk-nav__links a:focus-visible {
-  opacity: 1;
-  background-size: 100% 2px;
-}
-/* The two button-style nav items (Sign in / Start free) keep their own chrome
-   and shouldn't grow an underline. */
-.mk-nav__signin,
-.mk-nav__cta {
-  background-image: none;
-}
-.mk-nav__signin {
-  padding: 0.45rem 0.95rem;
-  border-radius: var(--radius-pill);
-  background: var(--mk-soft-ground);
-  box-shadow: var(--mk-soft-raised-sm);
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease;
-}
-.mk-nav__signin:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--mk-soft-raised);
-}
-.mk-nav__signin:active {
-  transform: translateY(0);
-  box-shadow: var(--mk-soft-pressed);
-}
-.mk-nav__cta {
-  background: var(--mk-ink);
-  color: #fff !important;
-  opacity: 1 !important;
-  padding: 0.45rem 0.95rem;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  box-shadow:
-    4px 4px 10px rgba(46, 50, 38, 0.24),
-    -3px -3px 8px rgba(255, 255, 255, 0.7);
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease,
-    background 150ms ease;
-}
-.mk-nav__cta:hover {
-  background: var(--mk-accent-strong);
-  transform: translateY(-1px);
-}
-.mk-nav__cta:active {
-  transform: translateY(1px);
-  box-shadow:
-    2px 2px 5px rgba(46, 50, 38, 0.26),
-    inset 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* Shared tabular-number emphasis (positive/negative deltas quoted in prose) */
+/* Shared tabular-number emphasis (deltas quoted in prose/artifacts). */
 .num {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
