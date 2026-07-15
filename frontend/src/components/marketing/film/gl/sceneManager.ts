@@ -80,7 +80,7 @@ export function computeFilmUniforms(
   const morph1 = progress(mid, r.engineTop, engineMid);
   const morph2 = progress(mid, engineMid, r.engineBottom);
 
-  // Close-act return: condensed, denser center.
+  // Bring the particle field back for the closing act without condensing it.
   const closeIn = progress(mid, r.closeTop - viewportH * 0.5, r.closeTop + viewportH * 0.3);
 
   // Intensity: hero 1 → engine 0.8 → command 0.45 → 0 after command → close 1.
@@ -90,5 +90,5 @@ export function computeFilmUniforms(
   const base = Math.min(heroOut, commandDim) * fadeOut;
   const intensity = clamp01(Math.max(base, closeIn));
 
-  return { morph1, morph2, intensity, focus: closeIn };
+  return { morph1, morph2, intensity, focus: 0 };
 }
