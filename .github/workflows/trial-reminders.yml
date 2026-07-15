@@ -18,7 +18,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger trial-reminder run
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          CRON_TARGET_URL: ${{ secrets.CRON_TARGET_URL }}
         run: |
+          if [ -z "$CRON_SECRET" ] || [ -z "$CRON_TARGET_URL" ]; then
+            echo "::error::Missing required GitHub Actions secrets: CRON_SECRET and/or CRON_TARGET_URL"
+            exit 1
+          fi
+
           curl -fsS -X POST \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "${{ secrets.CRON_TARGET_URL }}/api/cron/trial-reminders"
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "${CRON_TARGET_URL%/}/api/cron/trial-reminders"
