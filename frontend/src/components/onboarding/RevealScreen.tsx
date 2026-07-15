@@ -3,6 +3,7 @@ import { buildRevealDashboard } from "./buildRevealDashboard";
 import { type QuizState } from "./quizModel";
 import { assetMix } from "~/components/widgets/derive";
 import { formatMoney, leafAccount } from "~/components/widgets/format";
+import { trackProductEvent } from "~/lib/productAnalytics";
 
 const GOAL_CALLBACK: Record<string, string> = {
   "net-worth": "Here's your true net worth.",
@@ -74,7 +75,13 @@ export function RevealScreen({
       )}
 
       <div className="reveal__actions">
-        <Link className="mk-btn mk-btn--primary" to="/signup">
+        <Link
+          className="mk-btn mk-btn--primary"
+          to="/signup"
+          onClick={() =>
+            trackProductEvent("marketing_cta_clicked", { placement: "quiz-reveal" })
+          }
+        >
           Save your picture →
         </Link>
         <button type="button" className="mk-btn mk-btn--ghost" onClick={onRestart}>

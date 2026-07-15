@@ -43,7 +43,9 @@ import { Route as SignupNameRouteImport } from './routes/signup.name'
 import { Route as SignupCredentialRouteImport } from './routes/signup.credential'
 import { Route as SigninPasswordRouteImport } from './routes/signin.password'
 import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
+import { Route as ApiAnalyticsRouteImport } from './routes/api.analytics'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as ApiCronTrialRemindersRouteImport } from './routes/api.cron.trial-reminders'
 import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
 import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
@@ -218,9 +220,19 @@ const AuthConfirmRoute = AuthConfirmRouteImport.update({
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAnalyticsRoute = ApiAnalyticsRouteImport.update({
+  id: '/api/analytics',
+  path: '/api/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
   id: '/admin/feedback',
   path: '/admin/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCronTrialRemindersRoute = ApiCronTrialRemindersRouteImport.update({
@@ -265,7 +277,9 @@ export interface FileRoutesByFullPath {
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/api/analytics': typeof ApiAnalyticsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
@@ -302,7 +316,9 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/api/analytics': typeof ApiAnalyticsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
@@ -343,7 +359,9 @@ export interface FileRoutesById {
   '/use-cases': typeof UseCasesRoute
   '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/api/analytics': typeof ApiAnalyticsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
@@ -385,7 +403,9 @@ export interface FileRouteTypes {
     | '/use-cases'
     | '/widgets'
     | '/workspace'
+    | '/admin/analytics'
     | '/admin/feedback'
+    | '/api/analytics'
     | '/auth/confirm'
     | '/signin/password'
     | '/signup/credential'
@@ -422,7 +442,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/use-cases'
     | '/widgets'
+    | '/admin/analytics'
     | '/admin/feedback'
+    | '/api/analytics'
     | '/auth/confirm'
     | '/signin/password'
     | '/signup/credential'
@@ -462,7 +484,9 @@ export interface FileRouteTypes {
     | '/use-cases'
     | '/widgets'
     | '/workspace'
+    | '/admin/analytics'
     | '/admin/feedback'
+    | '/api/analytics'
     | '/auth/confirm'
     | '/signin/password'
     | '/signup/credential'
@@ -503,7 +527,9 @@ export interface RootRouteChildren {
   UseCasesRoute: typeof UseCasesRoute
   WidgetsRoute: typeof WidgetsRoute
   WorkspaceRoute: typeof WorkspaceRouteWithChildren
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
+  ApiAnalyticsRoute: typeof ApiAnalyticsRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
   ApiCronTrialRemindersRoute: typeof ApiCronTrialRemindersRoute
@@ -750,11 +776,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/analytics': {
+      id: '/api/analytics'
+      path: '/api/analytics'
+      fullPath: '/api/analytics'
+      preLoaderRoute: typeof ApiAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/feedback': {
       id: '/admin/feedback'
       path: '/admin/feedback'
       fullPath: '/admin/feedback'
       preLoaderRoute: typeof AdminFeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/cron/trial-reminders': {
@@ -851,7 +891,9 @@ const rootRouteChildren: RootRouteChildren = {
   UseCasesRoute: UseCasesRoute,
   WidgetsRoute: WidgetsRoute,
   WorkspaceRoute: WorkspaceRouteWithChildren,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
+  ApiAnalyticsRoute: ApiAnalyticsRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,
   ApiCronTrialRemindersRoute: ApiCronTrialRemindersRoute,

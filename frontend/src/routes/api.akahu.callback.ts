@@ -17,6 +17,15 @@ function redirectToWorkspace(query: string): Response {
   return new Response(null, { status: 302, headers: { Location: `/workspace/settings?${query}` } });
 }
 
+async function recordOAuthFailure(reason: string): Promise<void> {
+  try {
+    const { recordServerProductEvent } = await import("~/server/productAnalytics");
+    await recordServerProductEvent("akahu_oauth_failed", { reason });
+  } catch (error) {
+    console.error("[analytics] could not record akahu_oauth_failed", error);
+  }
+}
+
 export const Route = createFileRoute("/api/akahu/callback")({
   server: {
     handlers: {
@@ -34,12 +43,19 @@ export const Route = createFileRoute("/api/akahu/callback")({
 
         const { resolveAkahuCallback } = await import("~/server/akahuConnection");
         const outcome = resolveAkahuCallback({ code, state, error }, cookieState);
-        if (outcome.kind === "denied") return redirectToWorkspace("akahu_error=denied");
-        if (outcome.kind === "state_mismatch") return redirectToWorkspace("akahu_error=state");
+        if (outcome.kind === "denied") {
+          await recordOAuthFailure("denied");
+          return redirectToWorkspace("akahu_error=denied");
+        }
+        if (outcome.kind === "state_mismatch") {
+          await recordOAuthFailure("state");
+          return redirectToWorkspace("akahu_error=state");
+        }
 
         const { getServerUser } = await import("~/server/supabaseServer");
         const user = await getServerUser();
         if (!user || user.id !== initiatingUserId) {
+          await recordOAuthFailure("identity");
           return redirectToWorkspace("akahu_error=state");
         }
 
@@ -57,6 +73,7 @@ export const Route = createFileRoute("/api/akahu/callback")({
             "[akahu-oauth] callback failed:",
             err instanceof Error ? err.message : "unknown error",
           );
+          await recordOAuthFailure("exchange");
           return redirectToWorkspace("akahu_error=exchange");
         }
 

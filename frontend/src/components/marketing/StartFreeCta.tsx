@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { trackProductEvent } from "~/lib/productAnalytics";
 import "./StartFreeCta.css";
 
 interface StartFreeCtaProps {
@@ -16,7 +17,11 @@ interface StartFreeCtaProps {
 export function StartFreeCta({ source, withDemo = false }: StartFreeCtaProps) {
   return (
     <div className="start-free" data-source={source}>
-      <Link className="mk-btn mk-btn--primary" to="/start">
+      <Link
+        className="mk-btn mk-btn--primary"
+        to="/start"
+        onClick={() => trackProductEvent("marketing_cta_clicked", { placement: source })}
+      >
         Start free →
       </Link>
       {withDemo ? (

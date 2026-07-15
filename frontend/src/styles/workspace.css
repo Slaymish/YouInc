@@ -848,6 +848,119 @@
   color: var(--danger, #c0492f);
 }
 
+/* ── Admin product analytics ─────────────────────────────────────────── */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
+  gap: 1rem;
+}
+
+.analytics-funnel,
+.analytics-ranking {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.analytics-funnel__meta,
+.analytics-ranking li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.analytics-funnel__meta span,
+.analytics-ranking span {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.analytics-funnel__meta small,
+.analytics-ranking code {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.analytics-priority {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.85rem;
+  border-left: 3px solid var(--accent, #12a150);
+  background: var(--surface-muted, var(--code-bg));
+  font-size: 0.82rem;
+}
+
+.analytics-priority span {
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.analytics-bar {
+  height: 6px;
+  margin-top: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line-subtle);
+}
+
+.analytics-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent, #12a150);
+}
+
+.analytics-note {
+  margin: 1rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.analytics-days {
+  height: 10rem;
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.45rem;
+  padding-top: 1rem;
+}
+
+.analytics-day {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.analytics-day__bar {
+  width: min(100%, 2.5rem);
+  min-height: 1px;
+  border-radius: 4px 4px 1px 1px;
+  background: var(--accent, #12a150);
+}
+
+.analytics-day small {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+@media (max-width: 760px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Sync history panel ──────────────────────────────────────────────── */
 .sync-history__status {
   font-weight: 600;

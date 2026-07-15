@@ -33,6 +33,13 @@ export const Route = createFileRoute("/api/akahu/oauth/start")({
         );
         if (!oauthConfigured()) return redirectToWorkspace("akahu_error=not_configured");
 
+        try {
+          const { recordServerProductEvent } = await import("~/server/productAnalytics");
+          await recordServerProductEvent("akahu_connect_started", { source: "settings" });
+        } catch (error) {
+          console.error("[analytics] could not record akahu_connect_started", error);
+        }
+
         const { setCookie } = await import("@tanstack/react-start/server");
         const state = randomBytes(32).toString("base64url");
         setCookie(STATE_COOKIE, state, {

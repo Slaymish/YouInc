@@ -176,5 +176,15 @@ export async function loadSampleData(): Promise<IngestResult> {
   );
   if (rulesRes.error) throwServerError(rulesRes.error.message, 400);
 
-  return ingestTenantPayloads(SAMPLE_PAYLOADS);
+  const result = await ingestTenantPayloads(SAMPLE_PAYLOADS);
+  if (result.posted > 0) {
+    try {
+      const { recordServerProductEvent } = await import("./productAnalytics");
+      await recordServerProductEvent("sample_data_loaded", { source: "workspace" });
+    } catch (error) {
+      // Telemetry must never make an otherwise-successful ledger import fail.
+      console.error("[analytics] could not record sample_data_loaded", error);
+    }
+  }
+  return result;
 }

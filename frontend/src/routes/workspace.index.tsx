@@ -5,7 +5,7 @@ import {
   Link,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DashboardGrid } from "~/components/dashboard/DashboardGrid";
 import { ManualBalancesEditor } from "~/components/workspace/ManualBalancesEditor";
 import { WORKSPACE_WIDGET_IDS } from "~/components/workspace/workspaceWidgetIds";
@@ -13,6 +13,7 @@ import { formatMoney } from "~/components/widgets/format";
 import { workspaceStage } from "~/server/workspaceStage";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
+import { trackProductEvent } from "~/lib/productAnalytics";
 
 const loadSampleDataFn = createServerFn({ method: "POST" }).handler(
   async () => {
@@ -53,6 +54,10 @@ function WorkspaceOverview() {
   const [ledger, setLedger] = useState(initialLedger);
   const [dashboardData, setDashboardData] = useState(dashboard);
   const tenant = account.tenant!;
+
+  useEffect(() => {
+    trackProductEvent("dashboard_viewed");
+  }, []);
 
   const stage = workspaceStage({
     accountCount: ledger.totals.accountCount,

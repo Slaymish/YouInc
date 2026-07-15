@@ -8,13 +8,13 @@ describe("validateAnalyticsEvent", () => {
         eventName: "marketing_cta_clicked",
         anonymousId: "2eb0ed46-eef6-43ce-946f-168cb9b15b4d",
         sessionId: "9a497bc7-1b00-49ba-ac65-26f7e02d6062",
-        properties: { placement: "hero" },
+        properties: { placement: "pricing-table" },
       }),
     ).toEqual({
       eventName: "marketing_cta_clicked",
       anonymousId: "2eb0ed46-eef6-43ce-946f-168cb9b15b4d",
       sessionId: "9a497bc7-1b00-49ba-ac65-26f7e02d6062",
-      properties: { placement: "hero" },
+      properties: { placement: "pricing-table" },
     });
   });
 
@@ -35,6 +35,12 @@ describe("validateAnalyticsEvent", () => {
       validateAnalyticsEvent({
         eventName: "marketing_cta_clicked",
         properties: { placement: "https://example.com/start?email=person@example.com" },
+      }),
+    ).toThrow(/value/i);
+    expect(() =>
+      validateAnalyticsEvent({
+        eventName: "marketing_cta_clicked",
+        properties: { placement: "123456" },
       }),
     ).toThrow(/value/i);
   });

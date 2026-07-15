@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useRouter, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
 import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
@@ -7,6 +7,7 @@ import { checkAuthed, startSignupFlow, advanceFlow } from "~/lib/authServerFns";
 import { isValidEmail } from "~/server/authFlowSteps";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
+import { trackProductEvent } from "~/lib/productAnalytics";
 
 const SIGNUP_DESCRIPTION =
   "Create your YouInc account and set up your own workspace in a couple of minutes. No card required.";
@@ -59,6 +60,10 @@ function SignupEmailPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    trackProductEvent("signup_started", { entrypoint: "signup" });
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

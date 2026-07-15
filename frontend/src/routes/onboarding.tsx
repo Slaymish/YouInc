@@ -10,6 +10,7 @@ import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import type { AccountState, TenantSummary } from "~/server/accounts";
 import { clearQuizState, loadQuizState } from "~/components/onboarding/quizStorage";
 import { quizToLedger } from "~/components/onboarding/quizToLedger";
+import { trackProductEvent } from "~/lib/productAnalytics";
 
 // --- Server functions --------------------------------------------------------
 
@@ -82,6 +83,10 @@ function Stepper({ index }: { index: number }) {
 
 function OnboardingPage() {
   const account = Route.useLoaderData();
+
+  useEffect(() => {
+    trackProductEvent("onboarding_started");
+  }, []);
 
   // If the user already has a workspace, they've finished onboarding. Jump
   // straight to the connect/finish step so they can proceed to the dashboard.

@@ -132,6 +132,7 @@ function AdminFeedbackPage() {
       <header className="ws-topbar">
         <span className="ws-topbar__logo">Feedback stats</span>
         <div className="ws-topbar__account">
+          <a href="/admin/analytics">Product analytics</a>
           <span>{account.email}</span>
         </div>
       </header>

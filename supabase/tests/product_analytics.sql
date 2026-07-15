@@ -16,7 +16,7 @@ select public.record_analytics_event(
   'marketing_cta_clicked',
   '20000000-0000-0000-0000-000000000001',
   '30000000-0000-0000-0000-000000000001',
-  '{"placement":"hero"}'::jsonb
+  '{"placement":"pricing-table"}'::jsonb
 );
 
 do $$
@@ -43,6 +43,22 @@ values ('40000000-0000-0000-0000-000000000001', 'Analytics Inc.', 'analytics-inc
 insert into public.memberships (tenant_id, user_id, role)
 values ('40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002', 'owner');
 
+do $$
+declare before_count bigint;
+declare after_count bigint;
+begin
+  select count(*) into before_count from public.analytics_events
+  where event_name = 'workspace_created'
+    and tenant_id = '40000000-0000-0000-0000-000000000001';
+  insert into public.memberships (tenant_id, user_id, role)
+  values ('40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'owner');
+  select count(*) into after_count from public.analytics_events
+  where event_name = 'workspace_created'
+    and tenant_id = '40000000-0000-0000-0000-000000000001';
+  assert after_count = before_count, 'second owner emitted duplicate workspace_created';
+  raise notice 'PASS: workspace creation is tied to tenant, not owner membership';
+end $$;
+
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"10000000-0000-0000-0000-000000000002","role":"authenticated"}';
 select public.record_analytics_event(
@@ -53,6 +69,22 @@ select public.record_analytics_event(
 );
 
 reset role;
+insert into public.journal_transactions (
+  tenant_id, external_id, transaction_date, description, source_account_id, status
+) values
+  ('40000000-0000-0000-0000-000000000001', 'analytics-value-1', current_date, 'test', 'test', 'SETTLED'),
+  ('40000000-0000-0000-0000-000000000001', 'analytics-value-2', current_date, 'test', 'test', 'SETTLED');
+
+do $$
+begin
+  assert (
+    select count(*) from public.analytics_events
+    where event_name = 'ledger_value_created'
+      and tenant_id = '40000000-0000-0000-0000-000000000001'
+  ) = 1, 'first ledger value event was not once-per-workspace';
+  raise notice 'PASS: first ledger value is durable and deduplicated';
+end $$;
+
 do $$
 begin
   assert exists (

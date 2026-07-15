@@ -142,6 +142,27 @@ insert into public.app_admins (user_id)
 select id from auth.users where email = 'you@example.com';
 ```
 
+## Product analytics
+
+The app has first-party, privacy-safe product analytics backed by Supabase. The
+owner view is **`/admin/analytics`** and uses the same `app_admins` allowlist as
+`/admin/feedback`. It shows the 30-day value funnel, 7-day engaged workspaces,
+7-day activation, sync reliability, event ranking, and daily signal volume.
+
+Durable outcomes (`signup_succeeded`, `email_confirmed`, `workspace_created`,
+`manual_account_created`, `ledger_value_created`, `akahu_connection_created`, `sync_started`,
+`sync_succeeded`, `sync_failed`) are emitted by database triggers. Application
+telemetry is intentionally limited to coarse intent/view events:
+`marketing_cta_clicked`, `signup_started`, `onboarding_started`,
+`akahu_connect_started`, `akahu_oauth_failed`, `dashboard_viewed`,
+`settings_opened`, and `sample_data_loaded`.
+
+The event store must never contain email addresses, URLs/query strings, IPs,
+user agents, transaction or merchant details, account/provider identifiers,
+balances, tokens, or free text. Client roles cannot read raw events; the admin
+RPC returns aggregates only. Apply migration
+`20260715120000_product_analytics.sql` before deploying the instrumented app.
+
 ## Deployment
 
 Hosted on Fly.io (stateless, scale-to-zero) backed by a Supabase Cloud project.

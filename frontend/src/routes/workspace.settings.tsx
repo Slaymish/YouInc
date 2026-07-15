@@ -1,11 +1,12 @@
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AkahuConnectPanel } from "~/components/workspace/AkahuConnectPanel";
 import { RulesEditor } from "~/components/workspace/RulesEditor";
 import { AccountMappingEditor } from "~/components/workspace/AccountMappingEditor";
 import { SyncHistoryPanel } from "~/components/workspace/SyncHistoryPanel";
 import { useScrollSpy } from "~/hooks/useScrollSpy";
 import { workspaceStage } from "~/server/workspaceStage";
+import { trackProductEvent } from "~/lib/productAnalytics";
 
 export const Route = createFileRoute("/workspace/settings")({
   component: WorkspaceSettings,
@@ -25,6 +26,10 @@ function WorkspaceSettings() {
   const router = useRouter();
   const [syncRefreshToken, setSyncRefreshToken] = useState(0);
   const activeId = useScrollSpy(SECTIONS.map((s) => s.id));
+
+  useEffect(() => {
+    trackProductEvent("settings_opened");
+  }, []);
 
   const stage = workspaceStage({
     accountCount: ledger.totals.accountCount,
