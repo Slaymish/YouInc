@@ -37,8 +37,10 @@ for f in supabase/tests/*.sql; do psql "$CLOUD_DB_URL" -v ON_ERROR_STOP=1 -f "$f
 
 In the dashboard → **Authentication**:
 
-- **URL Configuration:** Site URL = `https://youinc.hamishburke.dev`; add
-  `https://youinc.hamishburke.dev/**` to Redirect URLs.
+- **URL Configuration:** Site URL = `https://youinc.net`; add
+  `https://youinc.net/**` to Redirect URLs. Keep
+  `https://youinc.hamishburke.dev/**` temporarily while existing confirmation
+  emails or browser sessions may still refer to the old hostname.
 - **Email → Confirm email:** ON.
 - **Email Templates → Confirm signup:** paste the contents of
   `supabase/templates/confirmation.html` (the local stack picks this up
@@ -58,12 +60,12 @@ build-arg or `VITE_`-prefixed var.
 
 ### 2. Email (Resend custom SMTP)
 
-- Create a Resend account, add `hamishburke.dev`, and add the SPF/DKIM DNS
+- Create a Resend account, add `youinc.net`, and add the SPF/DKIM DNS
   records Resend lists (additive; does not affect existing mail).
 - Create a Resend API key.
 - Supabase → **Authentication → SMTP Settings → Enable Custom SMTP:** host
   `smtp.resend.com`, port `465`, username `resend`, password = the API key,
-  sender `no-reply@youinc.hamishburke.dev`.
+  sender `no-reply@youinc.net`.
 
 ### 3. Fly build-args + app
 
@@ -76,7 +78,8 @@ fly secrets set SUPABASE_SERVICE_ROLE_KEY='<service_role_key>'    # required —
 fly secrets set \
   AKAHU_APP_TOKEN='<app_token>' \
   AKAHU_SECRET='<app_secret>' \
-  AKAHU_OAUTH_REDIRECT_URI='https://youinc.hamishburke.dev/api/akahu/callback'
+  AKAHU_OAUTH_REDIRECT_URI='https://youinc.net/api/akahu/callback' \
+  EMAIL_FROM='YouInc <no-reply@youinc.net>'
 # optional: fly secrets set YOUINC_LEADS_WEBHOOK_URL='...' YOUINC_FEEDBACK_WEBHOOK_URL='...'
 ```
 
@@ -96,11 +99,19 @@ Then confirm the deployed bundle points at the **cloud** Supabase (not
 ### Custom domain
 
 ```sh
-fly certs add youinc.hamishburke.dev
+fly certs add youinc.net
+fly certs add www.youinc.net
 ```
 
-Add the CNAME (and/or A/AAAA) target Fly prints to `hamishburke.dev` DNS, then
-`fly certs check youinc.hamishburke.dev` until the certificate is issued.
+At the `youinc.net` DNS provider, add the apex A and AAAA records Fly prints
+(or the provider's supported ALIAS/ANAME equivalent), then run
+`fly certs check youinc.net` until the certificate is issued. Do not use a
+standard CNAME at the apex unless the DNS provider explicitly supports CNAME
+flattening.
+
+For `www`, point a CNAME at `8xy5yje.youinc.fly.dev`. The app's canonical URLs
+use the apex `https://youinc.net`; alternatively, configure a permanent `www`
+→ apex redirect at the DNS/registrar edge instead of routing `www` to Fly.
 
 ## Continuous deployment (GitHub Actions)
 

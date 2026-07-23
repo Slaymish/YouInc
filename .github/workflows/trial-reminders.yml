@@ -4,7 +4,7 @@
 # which tenants are inside the day-12 window (idempotent — safe to run daily and
 # to re-run). Requires two repo secrets:
 #   CRON_SECRET      — must equal the app's CRON_SECRET env var
-#   CRON_TARGET_URL  — the app origin, e.g. https://youinc.hamishburke.dev
+#   CRON_TARGET_URL  — the app origin, e.g. https://youinc.net
 name: trial-reminders
 
 on:

@@ -63,7 +63,7 @@ Done:
     Akahu to verify app is upgraded to Full App with OAuth enabled, (2) supply
     `AKAHU_APP_SECRET` and `AKAHU_OAUTH_REDIRECT_URI` env vars, and (3) register both
     redirect URIs (`http://localhost:3000/api/akahu/callback` for local,
-    `https://youinc.hamishburke.dev/api/akahu/callback` for prod) on the Akahu
+    `https://youinc.net/api/akahu/callback` for prod) on the Akahu
     dashboard. Flow fails gracefully until prerequisites met.
 - [x] Self-service follow-ups (rest of Phase 2), part (b): per-tenant rules/classification
   editing UI (`components/workspace/RulesEditor.tsx` + `server/tenantRules.ts` CRUD, wired into
@@ -99,8 +99,11 @@ Done:
   - Design/plan: `docs/superpowers/specs/2026-07-05-production-hosting-design.md` +
     `docs/superpowers/plans/2026-07-05-production-hosting.md`; README + `docs/deploy_fly.md` rewritten.
   - Follow-ups (minor): delete the `smtp-probe@hamishburke.dev` test user; destroy the orphaned
-    `youinc_data` Fly volume; optionally verify `youinc.hamishburke.dev` in Resend if the sender
-    address should be `no-reply@youinc.hamishburke.dev` rather than `@hamishburke.dev`.
+    `youinc_data` Fly volume; verify `youinc.net` in Resend and use `no-reply@youinc.net`.
+- [ ] Move production to **https://youinc.net**: Fly certificates for the apex and `www` are
+  created; add the DNS records, update Supabase Auth URLs, Akahu's OAuth callback, Fly secrets,
+  Resend sender domain, and the GitHub `CRON_TARGET_URL`, then deploy and verify signup, OAuth,
+  reminders, sitemap, and TLS.
 - [x] Optional polish (from review): calmer `/demo` first impression — sample suspense backlog
   50 → 3 items (`components/marketing/sampleDashboard.ts`), plus a shared
   `SUSPENSE_MINOR_THRESHOLD` (`components/widgets/derive.ts`) so small backlogs render as a neutral

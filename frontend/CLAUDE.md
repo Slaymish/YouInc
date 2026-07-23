@@ -64,7 +64,7 @@ All paths default relative to the `frontend/` cwd and assume the standard parent
 
 The 14-day no-card trial + day-12 email reminder need one-time owner setup:
 1. Apply migration `supabase/migrations/20260713120000_tenant_trial.sql` to Supabase.
-2. Create a Resend account, verify the sending domain (`youinc.hamishburke.dev`),
+2. Create a Resend account, verify the sending domain (`youinc.net`),
    and set `RESEND_API_KEY` + `EMAIL_FROM` on the Fly app.
 3. Set `CRON_SECRET` on the Fly app; add `CRON_SECRET` (same value) and
    `CRON_TARGET_URL` (the app origin) as GitHub Actions repo secrets.

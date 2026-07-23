@@ -39,6 +39,8 @@ describe("trialReminderMessage", () => {
     expect(msg.subject).toContain("2 days");
     expect(msg.text).toContain("Acme");
     expect(msg.text).toContain("$15/mo");
+    expect(msg.text).toContain("https://youinc.net/workspace/settings");
+    expect(msg.html).toContain('href="https://youinc.net/workspace/settings"');
     expect(msg.text.toLowerCase()).toContain("cancel anytime");
   });
 

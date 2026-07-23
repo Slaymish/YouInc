@@ -5,4 +5,4 @@ Disallow: /onboarding
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://youinc.hamishburke.dev/sitemap.xml
+Sitemap: https://youinc.net/sitemap.xml

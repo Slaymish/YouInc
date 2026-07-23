@@ -4,7 +4,7 @@
 // (`src/routes/sitemap[.]xml.ts`) just calls `buildSitemapXml(PUBLIC_ROUTES,
 // SITE_URL)` and returns the string as an XML response.
 
-export const SITE_URL = "https://youinc.hamishburke.dev";
+export const SITE_URL = "https://youinc.net";
 
 export interface SitemapRoute {
   /** Site-relative path, e.g. "/" or "/pricing". */

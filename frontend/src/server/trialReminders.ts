@@ -9,6 +9,7 @@
 // the who-gets-reminded logic is unit-tested without touching Supabase.
 import { needsReminder, REMINDER_LEAD_DAYS, trialDaysLeft } from "./trial";
 import { sendEmail, type EmailMessage } from "./email";
+import { SITE_URL } from "../lib/sitemap";
 
 export interface ReminderTenant {
   id: string;
@@ -31,12 +32,13 @@ export function selectTenantsNeedingReminder(
 export function trialReminderMessage(to: string, workspaceName: string, daysLeft: number): EmailMessage {
   const dayWord = daysLeft === 1 ? "day" : "days";
   const subject = `Your live bank sync trial ends in ${daysLeft} ${dayWord}`;
+  const settingsUrl = `${SITE_URL}/workspace/settings`;
   const text =
     `Hi,\n\n${workspaceName}'s free trial of live bank sync ends in ${daysLeft} ${dayWord}. ` +
     `To keep your accounts updating themselves, add a card — it's NZD $15/mo, and you ` +
     `can cancel anytime. If you do nothing, your workspace simply stays on the free plan ` +
     `with manual accounts; none of your data goes anywhere.\n\n` +
-    `Keep live sync on: https://youinc.hamishburke.dev/workspace/settings\n\n— YouInc`;
+    `Keep live sync on: ${settingsUrl}\n\n— YouInc`;
   const html =
     `<p>Hi,</p>` +
     `<p><strong>${workspaceName}</strong>'s free trial of live bank sync ends in ` +
@@ -44,7 +46,7 @@ export function trialReminderMessage(to: string, workspaceName: string, daysLeft
     `add a card — it's <strong>NZD $15/mo</strong>, and you can cancel anytime.</p>` +
     `<p>If you do nothing, your workspace simply stays on the free plan with manual ` +
     `accounts; none of your data goes anywhere.</p>` +
-    `<p><a href="https://youinc.hamishburke.dev/workspace/settings">Keep live sync on →</a></p>` +
+    `<p><a href="${settingsUrl}">Keep live sync on →</a></p>` +
     `<p>— YouInc</p>`;
   return { to, subject, html, text };
 }

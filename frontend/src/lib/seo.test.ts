@@ -74,7 +74,7 @@ describe("jsonLdScript", () => {
 
 describe("breadcrumbList", () => {
   it("builds an ordered ListItem trail with fully-qualified URLs", () => {
-    const node = breadcrumbList("https://youinc.hamishburke.dev", [
+    const node = breadcrumbList("https://youinc.net", [
       { name: "Home", path: "/" },
       { name: "Trust", path: "/security" },
     ]);
@@ -84,12 +84,12 @@ describe("breadcrumbList", () => {
     expect(items[0]).toMatchObject({
       position: 1,
       name: "Home",
-      item: "https://youinc.hamishburke.dev/",
+      item: "https://youinc.net/",
     });
     expect(items[1]).toMatchObject({
       position: 2,
       name: "Trust",
-      item: "https://youinc.hamishburke.dev/security",
+      item: "https://youinc.net/security",
     });
   });
 });

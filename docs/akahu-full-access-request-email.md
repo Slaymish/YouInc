@@ -27,7 +27,7 @@ upgrade my dev app to full API access so I can onboard multiple users via OAuth
 - **App name:** YouInc
 - **App logo:** attached (square, 512×512 PNG)
 - **Redirect URI(s):**
-  - `https://youinc.hamishburke.dev/api/akahu/callback` (production)
+  - `https://youinc.net/api/akahu/callback` (production)
   - `http://localhost:3000/api/akahu/callback` (local development)
 - **Webhook URL:** not required at this stage — I'm currently using on-demand
   sync with scheduled polling as the fallback you recommend. Happy to register an

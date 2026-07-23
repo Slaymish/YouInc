@@ -100,7 +100,7 @@ verify your app tier and enable OAuth if needed.
 - `AKAHU_OAUTH_SCOPES` (default: `ENDURING_CONSENT`, matching the URL registered by Akahu)
 
 **Registering redirect URIs:** On the Akahu app dashboard, register both:
-- Production: `https://youinc.hamishburke.dev/api/akahu/callback`
+- Production: `https://youinc.net/api/akahu/callback`
 - Local dev: `http://localhost:3000/api/akahu/callback`
 
 Without valid app credentials the workspace shows a "live sync not configured" note;
