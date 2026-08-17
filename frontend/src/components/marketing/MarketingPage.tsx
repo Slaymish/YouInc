@@ -14,8 +14,7 @@ import { Act02Engine } from "./film/Act02Engine";
 import { Act03Command } from "./film/Act03Command";
 import { Act04Pipeline } from "./film/Act04Pipeline";
 import { Act04Security } from "./film/Act04Security";
-import { Act05Concierge } from "./film/Act05Concierge";
-import { Act06Pricing } from "./film/Act06Pricing";
+import { Act05SelfHost } from "./film/Act05SelfHost";
 import { Act07Close } from "./film/Act07Close";
 import { Faq } from "./film/Faq";
 import { useFilmMotion } from "./film/useFilmMotion";
@@ -46,8 +45,7 @@ export function MarketingPage() {
         <Act03Command />
         <Act04Pipeline />
         <Act04Security />
-        <Act05Concierge />
-        <Act06Pricing />
+        <Act05SelfHost />
         <Act07Close />
         <Faq />
       </main>

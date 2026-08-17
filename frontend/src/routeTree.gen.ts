@@ -14,21 +14,18 @@ import { Route as WidgetsRouteImport } from './routes/widgets'
 import { Route as UseCasesRouteImport } from './routes/use-cases'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StatusRouteImport } from './routes/status'
-import { Route as StartRouteImport } from './routes/start'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DataDeletionRouteImport } from './routes/data-deletion'
-import { Route as CustomBuildsRouteImport } from './routes/custom-builds'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ChangelogRouteImport } from './routes/changelog'
@@ -46,7 +43,6 @@ import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
 import { Route as ApiAnalyticsRouteImport } from './routes/api.analytics'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as ApiCronTrialRemindersRouteImport } from './routes/api.cron.trial-reminders'
 import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
 import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
 
@@ -73,11 +69,6 @@ const TermsRoute = TermsRouteImport.update({
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StartRoute = StartRouteImport.update({
-  id: '/start',
-  path: '/start',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -110,11 +101,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -143,11 +129,6 @@ const DemoRoute = DemoRouteImport.update({
 const DataDeletionRoute = DataDeletionRouteImport.update({
   id: '/data-deletion',
   path: '/data-deletion',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomBuildsRoute = CustomBuildsRouteImport.update({
-  id: '/custom-builds',
-  path: '/custom-builds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -235,11 +216,6 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiCronTrialRemindersRoute = ApiCronTrialRemindersRouteImport.update({
-  id: '/api/cron/trial-reminders',
-  path: '/api/cron/trial-reminders',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAkahuCallbackRoute = ApiAkahuCallbackRouteImport.update({
   id: '/api/akahu/callback',
   path: '/api/akahu/callback',
@@ -257,21 +233,18 @@ export interface FileRoutesByFullPath {
   '/changelog': typeof ChangelogRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
-  '/custom-builds': typeof CustomBuildsRoute
   '/data-deletion': typeof DataDeletionRoute
   '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
   '/help': typeof HelpRoute
   '/integrations': typeof IntegrationsRoute
   '/onboarding': typeof OnboardingRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
   '/signin': typeof SigninRouteWithChildren
   '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/start': typeof StartRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -290,7 +263,6 @@ export interface FileRoutesByFullPath {
   '/signup/': typeof SignupIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
-  '/api/cron/trial-reminders': typeof ApiCronTrialRemindersRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesByTo {
@@ -299,19 +271,16 @@ export interface FileRoutesByTo {
   '/changelog': typeof ChangelogRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
-  '/custom-builds': typeof CustomBuildsRoute
   '/data-deletion': typeof DataDeletionRoute
   '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
   '/help': typeof HelpRoute
   '/integrations': typeof IntegrationsRoute
   '/onboarding': typeof OnboardingRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/start': typeof StartRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -329,7 +298,6 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupIndexRoute
   '/workspace': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
-  '/api/cron/trial-reminders': typeof ApiCronTrialRemindersRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesById {
@@ -339,21 +307,18 @@ export interface FileRoutesById {
   '/changelog': typeof ChangelogRoute
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
-  '/custom-builds': typeof CustomBuildsRoute
   '/data-deletion': typeof DataDeletionRoute
   '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
   '/help': typeof HelpRoute
   '/integrations': typeof IntegrationsRoute
   '/onboarding': typeof OnboardingRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/security': typeof SecurityRoute
   '/signin': typeof SigninRouteWithChildren
   '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/start': typeof StartRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/use-cases': typeof UseCasesRoute
@@ -372,7 +337,6 @@ export interface FileRoutesById {
   '/signup/': typeof SignupIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
-  '/api/cron/trial-reminders': typeof ApiCronTrialRemindersRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRouteTypes {
@@ -383,21 +347,18 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/compare'
     | '/contact'
-    | '/custom-builds'
     | '/data-deletion'
     | '/demo'
     | '/docs'
     | '/help'
     | '/integrations'
     | '/onboarding'
-    | '/pricing'
     | '/privacy'
     | '/roadmap'
     | '/security'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
-    | '/start'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -416,7 +377,6 @@ export interface FileRouteTypes {
     | '/signup/'
     | '/workspace/'
     | '/api/akahu/callback'
-    | '/api/cron/trial-reminders'
     | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -425,19 +385,16 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/compare'
     | '/contact'
-    | '/custom-builds'
     | '/data-deletion'
     | '/demo'
     | '/docs'
     | '/help'
     | '/integrations'
     | '/onboarding'
-    | '/pricing'
     | '/privacy'
     | '/roadmap'
     | '/security'
     | '/sitemap.xml'
-    | '/start'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -455,7 +412,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/workspace'
     | '/api/akahu/callback'
-    | '/api/cron/trial-reminders'
     | '/api/akahu/oauth/start'
   id:
     | '__root__'
@@ -464,21 +420,18 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/compare'
     | '/contact'
-    | '/custom-builds'
     | '/data-deletion'
     | '/demo'
     | '/docs'
     | '/help'
     | '/integrations'
     | '/onboarding'
-    | '/pricing'
     | '/privacy'
     | '/roadmap'
     | '/security'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
-    | '/start'
     | '/status'
     | '/terms'
     | '/use-cases'
@@ -497,7 +450,6 @@ export interface FileRouteTypes {
     | '/signup/'
     | '/workspace/'
     | '/api/akahu/callback'
-    | '/api/cron/trial-reminders'
     | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
 }
@@ -507,21 +459,18 @@ export interface RootRouteChildren {
   ChangelogRoute: typeof ChangelogRoute
   CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
-  CustomBuildsRoute: typeof CustomBuildsRoute
   DataDeletionRoute: typeof DataDeletionRoute
   DemoRoute: typeof DemoRoute
   DocsRoute: typeof DocsRoute
   HelpRoute: typeof HelpRoute
   IntegrationsRoute: typeof IntegrationsRoute
   OnboardingRoute: typeof OnboardingRoute
-  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RoadmapRoute: typeof RoadmapRoute
   SecurityRoute: typeof SecurityRoute
   SigninRoute: typeof SigninRouteWithChildren
   SignupRoute: typeof SignupRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  StartRoute: typeof StartRoute
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
   UseCasesRoute: typeof UseCasesRoute
@@ -532,7 +481,6 @@ export interface RootRouteChildren {
   ApiAnalyticsRoute: typeof ApiAnalyticsRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
-  ApiCronTrialRemindersRoute: typeof ApiCronTrialRemindersRoute
   ApiAkahuOauthStartRoute: typeof ApiAkahuOauthStartRoute
 }
 
@@ -571,13 +519,6 @@ declare module '@tanstack/react-router' {
       path: '/status'
       fullPath: '/status'
       preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/start': {
-      id: '/start'
-      path: '/start'
-      fullPath: '/start'
-      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -622,13 +563,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -669,13 +603,6 @@ declare module '@tanstack/react-router' {
       path: '/data-deletion'
       fullPath: '/data-deletion'
       preLoaderRoute: typeof DataDeletionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/custom-builds': {
-      id: '/custom-builds'
-      path: '/custom-builds'
-      fullPath: '/custom-builds'
-      preLoaderRoute: typeof CustomBuildsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -797,13 +724,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/cron/trial-reminders': {
-      id: '/api/cron/trial-reminders'
-      path: '/api/cron/trial-reminders'
-      fullPath: '/api/cron/trial-reminders'
-      preLoaderRoute: typeof ApiCronTrialRemindersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/akahu/callback': {
       id: '/api/akahu/callback'
       path: '/api/akahu/callback'
@@ -871,21 +791,18 @@ const rootRouteChildren: RootRouteChildren = {
   ChangelogRoute: ChangelogRoute,
   CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
-  CustomBuildsRoute: CustomBuildsRoute,
   DataDeletionRoute: DataDeletionRoute,
   DemoRoute: DemoRoute,
   DocsRoute: DocsRoute,
   HelpRoute: HelpRoute,
   IntegrationsRoute: IntegrationsRoute,
   OnboardingRoute: OnboardingRoute,
-  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RoadmapRoute: RoadmapRoute,
   SecurityRoute: SecurityRoute,
   SigninRoute: SigninRouteWithChildren,
   SignupRoute: SignupRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  StartRoute: StartRoute,
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
   UseCasesRoute: UseCasesRoute,
@@ -896,7 +813,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAnalyticsRoute: ApiAnalyticsRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,
-  ApiCronTrialRemindersRoute: ApiCronTrialRemindersRoute,
   ApiAkahuOauthStartRoute: ApiAkahuOauthStartRoute,
 }
 export const routeTree = rootRouteImport

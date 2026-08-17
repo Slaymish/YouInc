@@ -13,6 +13,7 @@ import { formatMoney } from "~/components/widgets/format";
 import { workspaceStage } from "~/server/workspaceStage";
 import type { WorkspaceLedgerSummary } from "~/server/workspaceLedger";
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
+import { SOURCE_URL } from "~/components/marketing/config";
 import { trackProductEvent } from "~/lib/productAnalytics";
 
 const loadSampleDataFn = createServerFn({ method: "POST" }).handler(
@@ -96,9 +97,7 @@ function WorkspaceOverview() {
   return (
     <main className="ws-main">
       <section className="ws-hero">
-        <p className="ws-eyebrow">
-          {tenant.tier === "concierge" ? "Concierge" : "Self-serve"} workspace
-        </p>
+        <p className="ws-eyebrow">Workspace</p>
         <h1>{tenant.name}</h1>
         <p className="ws-lede">
           {isEmpty
@@ -269,8 +268,10 @@ function WorkspaceOverview() {
       ) : null}
 
       <p className="ws-help">
-        Want a bespoke setup, integration, or AI automation?{" "}
-        <Link to="/custom-builds">Book a concierge build →</Link>
+        Running your own instance?{" "}
+        <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer">
+          Read the docs on GitHub →
+        </a>
       </p>
     </main>
   );

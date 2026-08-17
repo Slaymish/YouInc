@@ -12,7 +12,7 @@ const getServerUserMock = vi.fn();
 const rpcMock = vi.fn();
 
 /** The one row `requireTenant()` reads; null means "no tenant yet". */
-let tenantRow: { id: string; tier: string; trial_ends_at?: string | null } | null = null;
+let tenantRow: { id: string } | null = null;
 /** The one row the akahu_connections status lookup reads. */
 let akahuConnectionRow: { status: string; connected_at: string | null; last_synced_at: string | null } | null =
   null;
@@ -47,7 +47,10 @@ vi.mock("./supabaseServer", () => ({
 
 import { connectAkahu, getAkahuConnectionStatus } from "./akahuConnection";
 
-describe("Akahu tier gating", () => {
+// YouInc is self-hosted: whoever runs the instance brings their own Akahu
+// credentials, so there is no tier, trial, or entitlement check on this path.
+// The only gates left are authentication and input validation.
+describe("Akahu connection", () => {
   beforeEach(() => {
     getServerUserMock.mockReset().mockResolvedValue({ id: "user-1" });
     rpcMock.mockReset().mockResolvedValue({ data: null, error: null });
@@ -56,143 +59,77 @@ describe("Akahu tier gating", () => {
   });
 
   describe("connectAkahu", () => {
-    it("rejects a free-tier tenant with a clear, tagged error and never calls connect_akahu", async () => {
-      // Arrange
-      tenantRow = { id: "tenant-free", tier: "free" };
+    it("stores the token for any signed-in tenant", async () => {
+      tenantRow = { id: "tenant-1" };
 
-      // Act & Assert
-      await expect(connectAkahu("user_token_abc")).rejects.toMatchObject({
-        name: "ServerFnError",
-        status: 403,
-      });
-      await expect(connectAkahu("user_token_abc")).rejects.toThrow(/TIER_RESTRICTED/);
-      expect(rpcMock).not.toHaveBeenCalled();
-    });
+      await connectAkahu("akahu-user-token");
 
-    it("allows a free-tier tenant with an ACTIVE trial to connect", async () => {
-      // Arrange — trial ends far in the future.
-      tenantRow = { id: "tenant-trial", tier: "free", trial_ends_at: "2999-01-01T00:00:00.000Z" };
-
-      // Act
-      await connectAkahu("user_token_abc");
-
-      // Assert
       expect(rpcMock).toHaveBeenCalledWith("connect_akahu", {
-        target_tenant: "tenant-trial",
-        user_token: "user_token_abc",
+        target_tenant: "tenant-1",
+        user_token: "akahu-user-token",
       });
     });
 
-    it("rejects a free-tier tenant whose trial has EXPIRED", async () => {
-      // Arrange — trial ended in the past.
-      tenantRow = { id: "tenant-expired", tier: "free", trial_ends_at: "2000-01-01T00:00:00.000Z" };
-
-      // Act & Assert
-      await expect(connectAkahu("user_token_abc")).rejects.toMatchObject({ status: 403 });
-      expect(rpcMock).not.toHaveBeenCalled();
-    });
-
-    it.each(["self-serve", "concierge"] as const)(
-      "allows a %s-tier tenant to connect and calls connect_akahu with their token",
-      async (tier) => {
-        // Arrange
-        tenantRow = { id: "tenant-1", tier };
-
-        // Act
-        await connectAkahu("  user_token_abc  ");
-
-        // Assert
-        expect(rpcMock).toHaveBeenCalledWith("connect_akahu", {
-          target_tenant: "tenant-1",
-          user_token: "user_token_abc",
-        });
-      },
-    );
-
-    it("rejects when the caller is not signed in, before any tier check", async () => {
-      // Arrange
+    it("rejects when the caller is not signed in, before touching the tenant", async () => {
       getServerUserMock.mockResolvedValue(null);
-      tenantRow = { id: "tenant-1", tier: "self-serve" };
+      tenantRow = { id: "tenant-1" };
 
-      // Act & Assert
-      await expect(connectAkahu("user_token_abc")).rejects.toMatchObject({
-        name: "ServerFnError",
-        status: 401,
-      });
+      await expect(connectAkahu("akahu-user-token")).rejects.toThrow();
       expect(rpcMock).not.toHaveBeenCalled();
     });
 
-    it("still validates a blank token for a plan that is allowed to connect", async () => {
-      // Arrange
-      tenantRow = { id: "tenant-1", tier: "self-serve" };
+    it("rejects a blank token without calling connect_akahu", async () => {
+      tenantRow = { id: "tenant-1" };
 
-      // Act & Assert
-      await expect(connectAkahu("   ")).rejects.toMatchObject({
-        name: "ServerFnError",
-        status: 400,
-      });
+      await expect(connectAkahu("   ")).rejects.toThrow();
+      expect(rpcMock).not.toHaveBeenCalled();
+    });
+
+    it("fails when the signed-in user has no workspace yet", async () => {
+      tenantRow = null;
+
+      await expect(connectAkahu("akahu-user-token")).rejects.toThrow();
       expect(rpcMock).not.toHaveBeenCalled();
     });
   });
 
   describe("getAkahuConnectionStatus", () => {
-    it("reports tier 'free' and canConnectLive: false for a free-tier tenant", async () => {
-      // Arrange
-      tenantRow = { id: "tenant-free", tier: "free" };
+    it("reports a disconnected tenant", async () => {
+      tenantRow = { id: "tenant-1" };
+      akahuConnectionRow = null;
 
-      // Act
       const status = await getAkahuConnectionStatus();
 
-      // Assert
-      expect(status.tier).toBe("free");
-      expect(status.canConnectLive).toBe(false);
-      expect(status.trialEndsAt).toBeNull();
-      expect(status.trialDaysLeft).toBeNull();
+      expect(status.connected).toBe(false);
+      expect(status.status).toBeNull();
+      expect(status.lastSyncedAt).toBeNull();
     });
 
-    it("reports canConnectLive: true and days remaining for a free tenant mid-trial", async () => {
-      // Arrange
-      tenantRow = { id: "tenant-trial", tier: "free", trial_ends_at: "2999-01-01T00:00:00.000Z" };
-
-      // Act
-      const status = await getAkahuConnectionStatus();
-
-      // Assert
-      expect(status.canConnectLive).toBe(true);
-      expect(status.trialEndsAt).toBe("2999-01-01T00:00:00.000Z");
-      expect(status.trialDaysLeft !== null && status.trialDaysLeft > 0).toBe(true);
-    });
-
-    it.each(["self-serve", "concierge"] as const)(
-      "reports canConnectLive: true for a %s-tier tenant",
-      async (tier) => {
-        // Arrange
-        tenantRow = { id: "tenant-1", tier };
-
-        // Act
-        const status = await getAkahuConnectionStatus();
-
-        // Assert
-        expect(status.tier).toBe(tier);
-        expect(status.canConnectLive).toBe(true);
-      },
-    );
-
-    it("still reports the underlying connection state alongside the tier signal", async () => {
-      // Arrange
-      tenantRow = { id: "tenant-1", tier: "self-serve" };
+    it("reports the underlying connection state when active", async () => {
+      tenantRow = { id: "tenant-1" };
       akahuConnectionRow = {
         status: "active",
-        connected_at: "2026-01-01T00:00:00.000Z",
-        last_synced_at: "2026-01-02T00:00:00.000Z",
+        connected_at: "2026-07-01T00:00:00.000Z",
+        last_synced_at: "2026-07-08T00:00:00.000Z",
       };
 
-      // Act
       const status = await getAkahuConnectionStatus();
 
-      // Assert
       expect(status.connected).toBe(true);
-      expect(status.canConnectLive).toBe(true);
+      expect(status.status).toBe("active");
+      expect(status.connectedAt).toBe("2026-07-01T00:00:00.000Z");
+      expect(status.lastSyncedAt).toBe("2026-07-08T00:00:00.000Z");
+    });
+
+    it("exposes no tier, trial, or entitlement fields", async () => {
+      tenantRow = { id: "tenant-1" };
+
+      const status = await getAkahuConnectionStatus();
+
+      expect(status).not.toHaveProperty("tier");
+      expect(status).not.toHaveProperty("canConnectLive");
+      expect(status).not.toHaveProperty("trialEndsAt");
+      expect(status).not.toHaveProperty("trialDaysLeft");
     });
   });
 });

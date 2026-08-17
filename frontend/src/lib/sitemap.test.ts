@@ -35,13 +35,13 @@ describe("buildSitemapXml", () => {
   });
 
   it("resolves <loc> against the provided base URL", () => {
-    const xml = buildSitemapXml([{ path: "/pricing" }], "https://example.test");
-    expect(xml).toContain("<loc>https://example.test/pricing</loc>");
+    const xml = buildSitemapXml([{ path: "/demo" }], "https://example.test");
+    expect(xml).toContain("<loc>https://example.test/demo</loc>");
   });
 
   it("defaults to the production SITE_URL when no base URL is given", () => {
-    const xml = buildSitemapXml([{ path: "/pricing" }]);
-    expect(xml).toContain(`<loc>${SITE_URL}/pricing</loc>`);
+    const xml = buildSitemapXml([{ path: "/demo" }]);
+    expect(xml).toContain(`<loc>${SITE_URL}/demo</loc>`);
   });
 
   it("includes <lastmod> only when a parseable `updated` date is present", () => {

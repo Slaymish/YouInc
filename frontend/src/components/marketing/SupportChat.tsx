@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BOOKING_URL, DEFAULT_EMAIL } from "./config";
+import { SOURCE_URL, DEFAULT_EMAIL } from "./config";
 
 // No live-chat backend exists — this is an honest affordance (spec E5) that
 // routes to a real human via booking link or email, never a fake chat UI.
@@ -45,17 +45,17 @@ export function SupportChat() {
         >
           <p className="sc-popover__title">Questions about YouInc?</p>
           <p className="sc-popover__body">
-            No live chat here — just a real inbox. Book time or drop a line and
-            I'll reply myself.
+            No live chat here. Open an issue on GitHub, or drop a line and I'll
+            reply myself.
           </p>
           <a
             ref={firstLinkRef}
             className="mk-btn mk-btn--primary sc-popover__cta"
-            href={BOOKING_URL}
+            href={`${SOURCE_URL}/issues`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Book a call →
+            Open an issue →
           </a>
           <a className="sc-popover__email" href={`mailto:${DEFAULT_EMAIL}`}>
             {DEFAULT_EMAIL}

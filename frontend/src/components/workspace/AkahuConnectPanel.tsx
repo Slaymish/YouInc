@@ -45,13 +45,6 @@ const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
-const startTrialFn = createServerFn({ method: "POST" }).handler(
-  async (): Promise<AkahuConnectionStatus> => {
-    const { startTrial } = await import("~/server/akahuConnection");
-    return startTrial();
-  },
-);
-
 const AKAHU_OAUTH_ERROR_COPY: Record<string, string> = {
   auth: "You need to be signed in to connect Akahu. Please sign in and try again.",
   not_configured: "Akahu OAuth isn't configured on this server yet.",
@@ -162,20 +155,6 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
     });
   }
 
-  function startTrial() {
-    setError(null);
-    setMessage(null);
-    startTransition(async () => {
-      try {
-        const next = await startTrialFn();
-        setStatus(next);
-        setMessage("Your 14-day free trial of live sync has started — connect your bank below.");
-      } catch (err) {
-        setError(errorMessage(err));
-      }
-    });
-  }
-
   function loadAccounts() {
     setError(null);
     setMessage(null);
@@ -225,12 +204,6 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
 
   return (
     <div className="akahu-panel">
-      {status.tier === "free" && status.canConnectLive && status.trialDaysLeft !== null ? (
-        <p className="akahu-panel__trial" role="status">
-          {status.trialDaysLeft} {status.trialDaysLeft === 1 ? "day" : "days"} of live
-          sync left — <Link to="/pricing">add a card</Link> to keep it after your trial.
-        </p>
-      ) : null}
       {status.connected ? (
         <>
           <p className="akahu-panel__status">
@@ -302,39 +275,6 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
             )
           ) : null}
         </>
-      ) : !status.canConnectLive ? (
-        status.trialEndsAt === null ? (
-          <>
-            <p className="akahu-panel__note">
-              Live bank sync keeps your accounts updating themselves. Try it free
-              for 14 days — no card. After that it's NZD $15/mo and you can cancel
-              anytime. Your manual accounts and every widget stay free either way.
-            </p>
-            <div className="akahu-panel__connect">
-              <button
-                className="auth-primary akahu-panel__connect-link"
-                type="button"
-                onClick={startTrial}
-                disabled={pending}
-              >
-                {pending ? "Starting…" : "Try live sync free for 14 days"}
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="akahu-panel__note">
-              Your free trial of live sync has ended. Add a card to keep your bank
-              syncing automatically — NZD $15/mo, cancel anytime. Your data stays
-              put, and manual accounts remain free.
-            </p>
-            <div className="akahu-panel__connect">
-              <Link className="auth-primary akahu-panel__connect-link" to="/pricing">
-                Keep live sync — add a card
-              </Link>
-            </div>
-          </>
-        )
       ) : status.oauthConfigured ? (
         <>
           <p className="akahu-panel__note">

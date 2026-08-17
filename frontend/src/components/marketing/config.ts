@@ -1,165 +1,50 @@
 // Central marketing copy + config. No magic strings in components.
-
-const DEFAULT_BOOKING_URL = "https://cal.com/youinc/intro";
+//
+// YouInc is not sold. There are no tiers, no billing, and no booking link —
+// the public surface is the sample-data demo plus instructions for running
+// your own instance. Anything reintroducing a price belongs nowhere in here.
 
 export const DEFAULT_EMAIL = "hamishapps@gmail.com";
 
-export function resolveBookingUrl(env: {
-  VITE_YOUINC_BOOKING_URL?: string;
-}): string {
-  const value = env.VITE_YOUINC_BOOKING_URL?.trim();
-  return value && value.length > 0 ? value : DEFAULT_BOOKING_URL;
-}
+/** Canonical source repository — the self-host path and the licence live here. */
+export const SOURCE_URL = "https://github.com/Slaymish/YouInc";
 
-// import.meta.env is Vite's client-exposed env; only VITE_* keys are inlined.
-export const BOOKING_URL: string = resolveBookingUrl(
-  import.meta.env as { VITE_YOUINC_BOOKING_URL?: string },
-);
+/** Self-hosting instructions, served from the repo README. */
+export const SELF_HOST_URL = `${SOURCE_URL}#run-it-yourself`;
 
 export const PRODUCT = {
   name: "YouInc",
-  heroEyebrow: "Personal ERP · Live bank sync via Akahu",
+  heroEyebrow: "Personal ERP · Open source · Self-hosted",
   heroHeadline: "Run yourself like a company.",
   heroSub:
-    "Connect your bank and YouInc keeps a live double-entry ledger of your whole financial life — then shows you the CFO view: net worth, runway, cashflow, and the one thing to do next.",
-  heroReassurance: "No card to start · Read-only bank access · Live in 2 minutes",
+    "A double-entry ledger for your whole financial life, and the CFO view on top of it: net worth, runway, cashflow, and the one thing to do next. You run it, on your own machine, against your own data.",
+  heroReassurance: "Open source · Your data stays yours · No account required",
 } as const;
 
-// Four tiers, two of them free in different senses — keep them distinct:
-//   * `demo`   — no account at all. Unauthenticated, read-only sample data at
-//     /demo. Exists purely so a visitor can look around before signing up.
-//   * `free`   — a REAL signed-up account (tenants.tier = 'free', the default
-//     for self-registered tenants as of migration 20260705150001). Full
-//     widget access on the user's own data, manual accounts only — no live
-//     Akahu bank connection. This is what funds nothing; `selfServe` below is
-//     what funds the Akahu API costs, which is why live sync is gated to it.
-//   * `selfServe` — paid ($15/mo). Everything in `free`, plus live bank sync.
-//   * `concierge` — bespoke, operator-provisioned, unchanged.
-export const PRICING = {
+/**
+ * The two ways to use YouInc. Neither involves an account on youinc.net —
+ * `demo` is anonymous sample data, `selfHost` is your own instance.
+ */
+export const USE_PATHS = {
   demo: {
     name: "Demo",
-    price: "Free",
+    summary: "Sample data, read-only, no sign-up.",
     cta: "Open the demo",
     features: [
-      "Sample data, read-only",
+      "The real dashboard on a seeded ledger",
       "Full widget gallery",
-      "No sign-up to look around",
+      "Nothing to install, nothing to create",
     ],
   },
-  free: {
-    name: "Free",
-    price: "$0",
-    cadence: "/mo",
-    cta: "Start — no card needed",
+  selfHost: {
+    name: "Self-host",
+    summary: "Your machine, your database, your bank connection.",
+    cta: "Read the setup guide",
     features: [
-      "Start in two minutes — no card, no commitment",
-      "Manual accounts (no live bank sync)",
-      "Full widget gallery on your real data",
-      "Export your full ledger anytime — plain-text journals, no lock-in",
-    ],
-  },
-  selfServe: {
-    name: "Self-serve",
-    price: "NZD $15",
-    cadence: "/mo",
-    cta: "Add live sync",
-    features: [
-      "14-day free trial — no card up front",
-      "Everything in Free",
-      "Live bank sync via Akahu",
-      "Customize widget order and layout",
-      "Email support",
-    ],
-  },
-  concierge: {
-    name: "Concierge",
-    price: "From NZD $149",
-    cadence: "/mo",
-    cta: "Book a call",
-    features: [
-      "Everything in Self-serve",
-      "Bespoke widgets, integrations, and AI agents",
-      "Scoped one-off builds from NZD $1,500",
-      "Direct line for questions and tweaks",
+      "Docker Compose or a local Supabase stack",
+      "Connect your own Akahu account for live NZ bank sync",
+      "Plain-text ledger exports — no lock-in, nothing to cancel",
+      "MIT licensed; fork it and change whatever you want",
     ],
   },
 } as const;
-
-// Structured feature-comparison matrix for the `/pricing` route's comparison
-// table (design-direction spec E4). Derived from the `PRICING.*.features`
-// copy above but reshaped as rows (capability) x columns (tier) so the table
-// can render ticks/dashes instead of four separate bullet lists. Does NOT
-// duplicate or restate any test-pinned price string — see config.test.ts.
-//
-// The ONLY functional difference between `free` and `selfServe` is live Akahu
-// sync (+ support tier) — everything else (widgets, layout customization,
-// export) is available to any signed-up tenant regardless of billing tier,
-// because there is no widget-level tier gating in the app. Keep this table
-// honest about that: don't invent a gated feature here that the product
-// doesn't actually gate.
-export interface PricingComparisonRow {
-  feature: string;
-  demo: boolean | string;
-  free: boolean | string;
-  selfServe: boolean | string;
-  concierge: boolean | string;
-}
-
-export const PRICING_COMPARISON: readonly PricingComparisonRow[] = [
-  {
-    feature: "Look around",
-    demo: "Sample data, read-only",
-    free: true,
-    selfServe: true,
-    concierge: true,
-  },
-  {
-    feature: "Live bank sync via Akahu",
-    demo: false,
-    free: false,
-    selfServe: true,
-    concierge: true,
-  },
-  {
-    feature: "Full widget gallery",
-    demo: true,
-    free: true,
-    selfServe: true,
-    concierge: true,
-  },
-  {
-    feature: "Customize widget order and layout",
-    demo: false,
-    free: true,
-    selfServe: true,
-    concierge: true,
-  },
-  {
-    feature: "Export full ledger — plain-text journals, no lock-in",
-    demo: false,
-    free: true,
-    selfServe: true,
-    concierge: true,
-  },
-  {
-    feature: "Support",
-    demo: false,
-    free: false,
-    selfServe: "Email support",
-    concierge: "Direct line — book anytime",
-  },
-  {
-    feature: "Bespoke widgets, integrations, and AI agents",
-    demo: false,
-    free: false,
-    selfServe: false,
-    concierge: true,
-  },
-  {
-    feature: "Scoped one-off builds",
-    demo: false,
-    free: false,
-    selfServe: false,
-    concierge: "From NZD $1,500",
-  },
-] as const;

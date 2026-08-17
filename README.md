@@ -1,25 +1,26 @@
 # YouInc
 
-A multi-tenant personal ERP: a self-service executive dashboard over a per-user
-double-entry ledger, with live bank sync via Akahu (NZ Open Finance).
+A self-hosted personal ERP: an executive dashboard over a double-entry ledger,
+with live bank sync via Akahu (NZ Open Finance).
+
+**YouInc is not a service.** There is no hosted product, no account to create on
+youinc.net, and nothing to buy. The public site publishes a sample-data demo and
+the documentation; to use it on your own money, you run your own instance
+against your own database and your own Akahu credentials.
 
 ## What it does
 
-- Self-service signup + onboarding — anyone can create an account and their own
-  isolated workspace (tenant).
-- Per-tenant double-entry ledger in Postgres, with tenant isolation enforced by
-  Supabase Row-Level Security.
-- Live bank sync via Akahu: each user connects their own Akahu account with an
-  enduring user token, stored encrypted in Supabase Vault and never returned to
-  the browser.
-- Transactions run through the ported ledger engine (rules routing, NZFCC
-  fallback, suspense safety) and post idempotently as `raw_transactions` +
-  balanced `journal_transactions` / `journal_entries`.
+- Double-entry ledger in Postgres, with isolation enforced by Supabase
+  Row-Level Security.
+- Live bank sync via Akahu: you supply your own enduring user token, stored
+  encrypted in Supabase Vault and never returned to the browser.
+- Transactions run through the ledger engine (rules routing, NZFCC fallback,
+  suspense safety) and post idempotently as `raw_transactions` + balanced
+  `journal_transactions` / `journal_entries`.
 - A configurable dashboard of widgets (net worth, runway, cashflow, balance
   sheet, ledger controls, and more).
-- Public marketing surface: landing (`/`), live demo on sample data (`/demo`),
-  bespoke-service page (`/custom-builds`), and a live widget catalogue
-  (`/widgets`).
+- Public surface on youinc.net: landing (`/`), live demo on sample data
+  (`/demo`), and a live widget catalogue (`/widgets`).
 
 See `docs/architecture_design.md`, `docs/persona_frontend_information_design.md`,
 and `docs/research_competitors.md` for background, and
@@ -35,9 +36,10 @@ hosting design.
 - **Stateless:** the app holds no local disk state. All persistence is Supabase
   over the network; there is no SQLite and no attached volume in production.
 
-## Run locally
+## Run it yourself
 
-You need [Supabase CLI](https://supabase.com/docs/guides/cli) and Docker.
+This is the supported way to use YouInc. You need
+[Supabase CLI](https://supabase.com/docs/guides/cli) and Docker.
 
 ```sh
 supabase start          # from the repo root: local Postgres/Auth/Studio stack
@@ -49,9 +51,10 @@ pnpm dev                # http://localhost:3000
 ```
 
 The frontend defaults (in `src/lib/supabaseConfig.ts`) point at the local
-`supabase start` stack, so dev works with no extra config. Create an account at
-`/signup`; local Supabase has email confirmation off, so signup goes straight to
-onboarding.
+`supabase start` stack, so this works with no extra config. Create your account
+at `/signup`; local Supabase has email confirmation off, so signup goes straight
+to onboarding. On your own instance you are the only user — sign-up is open
+because there is nobody else pointed at your database.
 
 If `pnpm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, a local
 proxy is configured but not running — re-run with proxy vars unset:
@@ -79,10 +82,11 @@ docker exec -i supabase_db_YouInc psql -U postgres -d postgres \
 
 ## Live Akahu sync
 
-Self-service tenants connect their bank via **OAuth2**: a "Connect with Akahu" button
-on the workspace launches the Akahu consent flow, returns an enduring user token to
-the callback, and the app stores it encrypted in Supabase Vault (never in the
-client bundle). The Akahu **app** is a server-wide secret.
+You connect your bank via **OAuth2**: a "Connect with Akahu" button on the
+workspace launches the Akahu consent flow, returns an enduring user token to the
+callback, and the app stores it encrypted in Supabase Vault (never in the client
+bundle). The Akahu **app** credentials are server-side secrets on your instance.
+There is no tier or trial gate on live sync — they are your credentials.
 
 **Prerequisites:** Your Akahu app must be upgraded to a **Full App** with OAuth2
 enabled. Personal Apps do not support OAuth token exchange. Contact Akahu support to
@@ -165,8 +169,15 @@ RPC returns aggregates only. Apply migration
 
 ## Deployment
 
-Hosted on Fly.io (stateless, scale-to-zero) backed by a Supabase Cloud project.
-See `docs/deploy_fly.md` for the full walkthrough.
+youinc.net runs the demo and docs on Fly.io (stateless, scale-to-zero) backed by
+a Supabase project. The same setup works for your own instance —
+see `docs/deploy_fly.md` for the full walkthrough.
+
+## Licence
+
+MIT — see [`LICENSE`](LICENSE). Fork it, run it, change it, ship it. The point of
+publishing this is that you can own your own copy; a licence that made you ask
+permission first would defeat that.
 
 ## Safety notes
 

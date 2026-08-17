@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { PRODUCT, BOOKING_URL, DEFAULT_EMAIL } from "../config";
+import { PRODUCT, SOURCE_URL, SELF_HOST_URL, DEFAULT_EMAIL } from "../config";
 import { Logo } from "../../Logo";
 import "./marketing-footer.css";
 
@@ -18,8 +18,7 @@ const FOOTER_COLS: readonly FooterCol[] = [
     links: [
       { to: "/demo", label: "Live demo" },
       { to: "/widgets", label: "Widget library" },
-      { to: "/pricing", label: "Pricing" },
-      { to: "/custom-builds", label: "Custom builds" },
+      { href: SELF_HOST_URL, label: "Self-host guide" },
       { to: "/integrations", label: "Integrations" },
     ],
   },
@@ -49,7 +48,7 @@ const FOOTER_COLS: readonly FooterCol[] = [
       { to: "/about", label: "About" },
       { to: "/use-cases", label: "Use cases" },
       { to: "/contact", label: "Contact" },
-      { href: BOOKING_URL, label: "Book a call" },
+      { href: SOURCE_URL, label: "Source on GitHub" },
       { href: `mailto:${DEFAULT_EMAIL}`, label: DEFAULT_EMAIL },
     ],
   },
@@ -122,7 +121,7 @@ export function MarketingFooter() {
             © {YEAR} {PRODUCT.name}
           </span>
           <span className="mk-footer__credit">
-            Founder-led. Built and operated in New Zealand.
+            Open source. Built in New Zealand.
           </span>
         </div>
       </div>

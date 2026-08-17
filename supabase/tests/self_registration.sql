@@ -43,10 +43,9 @@ declare t public.tenants;
 begin
   t := public.create_tenant('Dana Holdings');
   assert t.name = 'Dana Holdings', 'create_tenant: name should be stored verbatim';
-  assert t.tier = 'free', 'create_tenant: self-service signups now default to the free tier (20260705150001)';
   assert t.slug like 'dana-holdings-%', 'create_tenant: slug should derive from the name';
   assert t.default_currency = 'NZD', 'create_tenant: default currency should be NZD';
-  raise notice 'PASS: create_tenant created Dana''s free-tier tenant (slug=%)', t.slug;
+  raise notice 'PASS: create_tenant created Dana''s tenant (slug=%)', t.slug;
 end $$;
 
 -- D is now the owner and sees exactly their own tenant + membership.
@@ -69,7 +68,6 @@ do $$
 declare t public.tenants;
 begin
   t := public.create_tenant('Dana Holdings');   -- deliberately identical name
-  assert t.tier = 'free', 'E create_tenant: tier defaults to free';
   raise notice 'PASS: second identical-name signup succeeded (slug=%)', t.slug;
 end $$;
 

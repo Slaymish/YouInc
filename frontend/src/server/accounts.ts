@@ -10,24 +10,11 @@
 import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
 import { throwServerError } from "./serverError";
 
-// Tenant-level product tier (billing/plan). 'free' = manual accounts only,
-// full widget access, no live Akahu sync — the default for brand-new
-// self-registered tenants since migration 20260705150001 (create_tenant used
-// to default to 'self-serve'; that's now an explicit, non-schema upgrade).
-// 'self-serve' = paid, adds live bank sync via Akahu. 'concierge' = bespoke,
-// operator-provisioned. Exported so other server modules (akahuConnection.ts)
-// can type their own tenant lookups against the same set of values instead of
-// re-declaring the union.
-export type TenantTier = "free" | "self-serve" | "concierge";
-
 export interface TenantSummary {
   id: string;
   name: string;
   slug: string;
-  tier: TenantTier;
   defaultCurrency: string;
-  /** ISO end of the Free-tier live-sync trial, or null if never started. */
-  trialEndsAt: string | null;
 }
 
 export interface AccountState {
@@ -42,9 +29,7 @@ interface TenantRow {
   id: string;
   name: string;
   slug: string;
-  tier: TenantTier;
   default_currency: string;
-  trial_ends_at: string | null;
 }
 
 /**
@@ -60,7 +45,7 @@ export async function getAccountState(): Promise<AccountState | null> {
 
   const { data: tenantRows } = await supabase
     .from("tenants")
-    .select("id, name, slug, tier, default_currency, trial_ends_at")
+    .select("id, name, slug, default_currency")
     .order("created_at", { ascending: true })
     .limit(1);
 
@@ -70,9 +55,7 @@ export async function getAccountState(): Promise<AccountState | null> {
         id: row.id,
         name: row.name,
         slug: row.slug,
-        tier: row.tier,
         defaultCurrency: row.default_currency,
-        trialEndsAt: row.trial_ends_at,
       }
     : null;
 
@@ -133,9 +116,7 @@ export async function createTenant(name: string): Promise<TenantSummary> {
     id: row.id,
     name: row.name,
     slug: row.slug,
-    tier: row.tier,
     defaultCurrency: row.default_currency,
-    trialEndsAt: row.trial_ends_at,
   };
 }
 

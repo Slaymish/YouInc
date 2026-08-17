@@ -11,6 +11,7 @@ import {
   renderWidgetContent,
   METRIC_IDS,
 } from "~/components/dashboard/renderWidget";
+import { SOURCE_URL } from "~/components/marketing/config";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
 import { noop } from "~/components/marketing/noop";
 import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
@@ -159,9 +160,14 @@ function WidgetLibraryPage() {
             <Link className="mk-btn mk-btn--primary" to="/demo">
               Try the live demo →
             </Link>
-            <Link className="mk-btn mk-btn--ghost" to="/custom-builds">
-              Missing one? I build it →
-            </Link>
+            <a
+              className="mk-btn mk-btn--ghost"
+              href={SOURCE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Missing one? Build it →
+            </a>
           </div>
         </section>
       </main>

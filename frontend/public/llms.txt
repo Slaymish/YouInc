@@ -1,40 +1,39 @@
 # YouInc
 
-> YouInc turns your connected accounts into a live double-entry ledger, then renders it as an executive dashboard — net worth, cashflow, runway, income, expenses, and exceptions.
+> YouInc turns your accounts into a live double-entry ledger, then renders it as an executive dashboard — net worth, cashflow, runway, income, expenses, and exceptions.
 
-YouInc is a founder-led, New Zealand-built personal finance ledger. Bank sync runs read-only through Akahu, manual accounts cover anything a bank feed can't see, and the full ledger exports as portable, hledger-compatible plain-text journals — no lock-in.
+YouInc is an open-source, self-hosted personal finance ledger built in New Zealand. You run your own instance: bank sync goes read-only through your own Akahu connection, manual accounts cover anything a bank feed can't see, and the full ledger exports as portable, hledger-compatible plain-text journals. There is no hosted service, no account to create, and nothing to buy — youinc.net publishes a sample-data demo and the documentation, and the software itself lives on GitHub.
 
 ## Product
 
 - [Home](https://youinc.net/): Run yourself like a company — the YouInc landing page.
 - [Live demo](https://youinc.net/demo): The real dashboard shell and widgets running on sample data, no sign-up required.
 - [Widget library](https://youinc.net/widgets): Every YouInc dashboard widget, rendered live on sample data.
-- [Custom builds](https://youinc.net/custom-builds): Bespoke widgets, integrations, and AI agents built on your live YouInc ledger.
-- [Integrations](https://youinc.net/integrations): How YouInc connects to Akahu, supported banks, manual accounts, exports, and custom integrations.
-- [Use cases](https://youinc.net/use-cases): Example ways people can use YouInc for net worth, runway, cashflow, manual accounts, and custom finance views.
+- [Integrations](https://youinc.net/integrations): How YouInc connects to Akahu, supported banks, manual accounts, and exports.
+- [Use cases](https://youinc.net/use-cases): Example ways people can use YouInc for net worth, runway, cashflow, and manual accounts.
 - [Compare](https://youinc.net/compare): How YouInc compares with budgeting apps, spreadsheets, personal finance apps, and accounting tools.
 
-## Pricing
+## Running it yourself
 
-- [Pricing](https://youinc.net/pricing): Compare YouInc's Demo, Self-serve, and Concierge plans feature by feature, including live sync, exports, support, and bespoke work.
-- [Create an account](https://youinc.net/signup): Start a free self-serve workspace — no card required.
+- [Source code](https://github.com/Slaymish/YouInc): The full repository — engine, dashboard, and database migrations.
+- [Setup guide](https://github.com/Slaymish/YouInc#run-it-yourself): How to stand up your own instance and connect your own Akahu account.
 
 ## Docs
 
-- [Documentation](https://youinc.net/docs): V1 YouInc documentation for setup, bank sync, ledgers, widgets, exports, and support.
-- [Help center](https://youinc.net/help): V1 help center for common YouInc questions around access, bank sync, widgets, exports, and support.
-- [Changelog](https://youinc.net/changelog): A v1 changelog showing how YouInc is changing over time.
-- [Roadmap](https://youinc.net/roadmap): The v1 public roadmap for YouInc product, integrations, documentation, and trust work.
-- [Status](https://youinc.net/status): Current v1 service status for YouInc app availability, bank sync, demo, and support.
+- [Documentation](https://youinc.net/docs): YouInc documentation for setup, bank sync, ledgers, widgets, and exports.
+- [Help center](https://youinc.net/help): Common YouInc questions around setup, bank sync, widgets, and exports.
+- [Changelog](https://youinc.net/changelog): A changelog showing how YouInc is changing over time.
+- [Roadmap](https://youinc.net/roadmap): The public roadmap for YouInc product, integrations, and documentation.
+- [Status](https://youinc.net/status): Current status for the youinc.net demo and documentation.
 
 ## Company
 
-- [About](https://youinc.net/about): The story and operating principles behind YouInc, a founder-led personal finance ledger product.
-- [Contact](https://youinc.net/contact): Contact YouInc for support, security reports, privacy requests, billing questions, and custom build discussions.
-- [Security](https://youinc.net/security): How YouInc protects bank data, account access, ledger data, exports, and support requests.
+- [About](https://youinc.net/about): The story and operating principles behind YouInc.
+- [Contact](https://youinc.net/contact): Contact for bugs, security reports, and self-hosting questions.
+- [Security](https://youinc.net/security): How YouInc handles bank tokens, ledger data, and exports.
 
 ## Legal
 
-- [Privacy](https://youinc.net/privacy): How YouInc collects, uses, stores, and deletes personal and financial data.
-- [Terms](https://youinc.net/terms): The v1 terms for using YouInc, including subscriptions, custom builds, data exports, and important disclaimers.
-- [Data deletion](https://youinc.net/data-deletion): How to export, disconnect, and delete YouInc financial data and account records.
+- [Privacy](https://youinc.net/privacy): What youinc.net collects, and what a self-hosted instance keeps on your own infrastructure.
+- [Terms](https://youinc.net/terms): The terms covering the demo, the documentation, and the source licence.
+- [Data deletion](https://youinc.net/data-deletion): How to export and delete YouInc financial data from your own instance.

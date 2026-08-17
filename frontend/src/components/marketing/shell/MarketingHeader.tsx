@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "../../Logo";
+import { SOURCE_URL } from "../config";
 import "./marketing-header.css";
 
 interface NavItem {
@@ -11,9 +12,8 @@ interface NavItem {
 // Mono index numbers per item drive the mobile overlay's staggered reveal.
 const NAV_ITEMS: readonly NavItem[] = [
   { to: "/widgets", label: "Product" },
-  { to: "/pricing", label: "Pricing" },
   { to: "/demo", label: "Demo" },
-  { to: "/custom-builds", label: "Custom builds" },
+  { to: "/docs", label: "Docs" },
 ];
 
 const SCROLL_THRESHOLD = 24;
@@ -86,11 +86,16 @@ export function MarketingHeader() {
         </nav>
 
         <div className="mk-header__actions">
-          <Link className="mk-header__signin" to="/signin">
-            Sign in
-          </Link>
-          <Link className="mk-btn mk-btn--primary mk-header__cta" to="/signup">
-            <span className="mk-btn__label">Start free</span>
+          <a
+            className="mk-header__signin"
+            href={SOURCE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+          <Link className="mk-btn mk-btn--primary mk-header__cta" to="/demo">
+            <span className="mk-btn__label">Open the demo</span>
           </Link>
         </div>
 
@@ -136,19 +141,21 @@ export function MarketingHeader() {
               ))}
             </nav>
             <div className="mk-mobile__actions">
-              <Link
+              <a
                 className="mk-btn mk-btn--ghost"
-                to="/signin"
+                href={SOURCE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
               >
-                <span className="mk-btn__label">Sign in</span>
-              </Link>
+                <span className="mk-btn__label">GitHub</span>
+              </a>
               <Link
                 className="mk-btn mk-btn--primary"
-                to="/signup"
+                to="/demo"
                 onClick={() => setMenuOpen(false)}
               >
-                <span className="mk-btn__label">Start free</span>
+                <span className="mk-btn__label">Open the demo</span>
               </Link>
             </div>
           </div>

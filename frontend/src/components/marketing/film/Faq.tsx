@@ -13,7 +13,7 @@ const FAQS: readonly FaqItem[] = [
   },
   {
     q: "Where is my data stored?",
-    a: "Your ledger lives in an isolated per-account store — nothing is pooled between users, sold, or used for advertising. You can export the complete ledger anytime as plain-text accounting journals, so your history stays readable without YouInc.",
+    a: "In your own database, on infrastructure you control. There is no hosted YouInc account and nothing is pooled, sold, or used for advertising. You can export the complete ledger anytime as plain-text accounting journals, so your history stays readable without YouInc.",
   },
   {
     q: "What is Akahu?",
@@ -33,7 +33,7 @@ const FAQS: readonly FaqItem[] = [
   },
   {
     q: "Is this only for New Zealand accounts?",
-    a: "Live bank sync currently depends on Akahu, so YouInc is built around New Zealand-connected accounts. Anything Akahu cannot see can still be added manually or through a custom integration.",
+    a: "Live bank sync currently depends on Akahu, so YouInc is built around New Zealand-connected accounts. Anything Akahu cannot see can still be added manually, or through an integration you write yourself.",
   },
   {
     q: "What if my account isn't with a bank Akahu supports?",
@@ -45,11 +45,11 @@ const FAQS: readonly FaqItem[] = [
   },
   {
     q: "Can I get a widget that doesn't exist yet?",
-    a: "Yes — that's Concierge. Book a call and tell me what you need: a custom widget, an integration, or an AI agent built around your ledger.",
+    a: "Build it. The widget registry is a plain TypeScript module in the repository, and every existing widget is a worked example. Pull requests welcome; open an issue first if you want a second opinion on the shape.",
   },
   {
-    q: "What happens if I cancel?",
-    a: "You keep your data. Export the full double-entry journal as plain text before you go — it works with open tools like hledger, so nothing about your history is locked in.",
+    q: "What happens if I stop using it?",
+    a: "Nothing to cancel — it is your instance. Export the full double-entry journal as plain text whenever you like; it works with open tools like hledger, so nothing about your history is locked in.",
   },
 ];
 

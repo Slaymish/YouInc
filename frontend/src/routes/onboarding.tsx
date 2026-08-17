@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import { AuthShell } from "~/components/auth/AuthShell";
 import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import type { AccountState, TenantSummary } from "~/server/accounts";
-import { clearQuizState, loadQuizState } from "~/components/onboarding/quizStorage";
-import { quizToLedger } from "~/components/onboarding/quizToLedger";
+import { SOURCE_URL } from "~/components/marketing/config";
 import { trackProductEvent } from "~/lib/productAnalytics";
 
 // --- Server functions --------------------------------------------------------
@@ -26,18 +25,6 @@ const createTenantFn = createServerFn({ method: "POST" })
   .handler(async ({ data: name }): Promise<TenantSummary> => {
     const { createTenant } = await import("~/server/accounts");
     return createTenant(name);
-  });
-
-// Replays the anonymous quiz answers (held in the browser) as manual balances
-// on the freshly-created tenant. Tenant is derived from the RLS session inside
-// upsertWorkspaceBalance — never passed by the caller.
-const persistQuizBalancesFn = createServerFn({ method: "POST" })
-  .validator((entries: { account: string; balanceCents: number }[]) => entries)
-  .handler(async ({ data: entries }): Promise<void> => {
-    const { upsertWorkspaceBalance } = await import("~/server/workspaceLedger");
-    for (const entry of entries) {
-      await upsertWorkspaceBalance(entry);
-    }
   });
 
 export const Route = createFileRoute("/onboarding")({
@@ -99,20 +86,6 @@ function OnboardingPage() {
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Quiz answers from an anonymous /start session (client-only; read after mount
-  // to avoid an SSR/hydration mismatch). If present, skip the generic welcome.
-  const [quizEntries, setQuizEntries] = useState<
-    { account: string; balanceCents: number }[]
-  >([]);
-
-  useEffect(() => {
-    const entries = quizToLedger(loadQuizState());
-    if (entries.length > 0) {
-      setQuizEntries(entries);
-      setStep((s) => (s === "welcome" ? "workspace" : s));
-    }
-  }, []);
-
   const firstName = account.displayName?.split(" ")[0] ?? null;
 
   async function createWorkspace(event: React.FormEvent<HTMLFormElement>) {
@@ -126,10 +99,6 @@ function OnboardingPage() {
     setError(null);
     try {
       const created = await createTenantFn({ data: name });
-      if (quizEntries.length > 0) {
-        await persistQuizBalancesFn({ data: quizEntries });
-        clearQuizState();
-      }
       setTenant(created);
       setStep("connect");
     } catch (err) {
@@ -243,10 +212,6 @@ function OnboardingPage() {
               <dl className="onb-summary">
                 <dt>Workspace</dt>
                 <dd>{tenant.name}</dd>
-                <dt>Plan</dt>
-                <dd>
-                  {tenant.tier === "concierge" ? "Concierge" : "Self-serve"}
-                </dd>
               </dl>
             ) : null}
 
@@ -278,8 +243,10 @@ function OnboardingPage() {
               </button>
             </div>
             <p className="auth-note">
-              Want a hand setting it up?{" "}
-              <Link to="/custom-builds">Book a concierge build →</Link>
+              Stuck?{" "}
+              <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer">
+                Setup docs on GitHub →
+              </a>
             </p>
           </>
         )}

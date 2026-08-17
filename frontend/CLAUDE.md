@@ -4,14 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-The TanStack Start (React 19 + Nitro) frontend for **YouInc Ledger**, a local-first
-personal ERP. It is a read-mostly executive dashboard over a local double-entry SQLite
-ledger that is produced by a separate Python CLI (`youinc_ledger`) living in the parent
-repository (`../`). This frontend does not own the schema; it reads the same SQLite file
-the Python pipeline writes, and shells out to the Python CLI for live ingestion.
+The TanStack Start (React 19 + Nitro) frontend for **YouInc**, a self-hosted
+personal ERP: an executive dashboard over a double-entry ledger held in Postgres
+(Supabase), with live bank sync via the operator's own Akahu credentials.
 
-The same app also serves the **public marketing site** (landing page, live demo,
-custom-builds and widget-library pages) — see "Marketing surface" below.
+**YouInc is not sold.** There are no tiers, no trials, no billing, and no hosted
+accounts. youinc.net serves the sample-data demo and the docs; anyone who wants
+to use it on real money runs their own instance. Do not reintroduce a price, a
+plan, a booking link, or an entitlement check — `marketing/config.test.ts`
+asserts against exactly that.
+
+The same app also serves the **public site** (landing page, live demo, and the
+widget-library page) — see "Marketing surface" below.
+
+> **Doc debt (2026-08-18):** sections below still describe a local-first SQLite
+> ledger fed by a Python CLI, a passkey/WebAuthn gate, `/dashboard`, `/login`,
+> `server/ledger.ts` and `server/auth.ts`. All of that was removed earlier (see
+> commits `6065eee` and `f17e25e`) and none of those files exist. Treat the
+> Supabase/`/workspace` sections as current and the SQLite/passkey ones as
+> history until this file gets a proper pass.
 
 ## Commands
 
@@ -44,32 +55,10 @@ env -u HTTPS_PROXY -u HTTP_PROXY -u ALL_PROXY -u https_proxy -u http_proxy -u al
 
 All paths default relative to the `frontend/` cwd and assume the standard parent-repo layout:
 
-- `YOUINC_DB_PATH` — SQLite ledger (default `../data/youinc-ledger.sqlite3`)
-- `YOUINC_RULES_PATH` — classification rules YAML (default `../config/rules.yaml`)
-- `YOUINC_PROJECT_ROOT` — Python project root; auto-detected by walking up to a dir with `pyproject.toml`
-- `YOUINC_PYTHON` — python executable; defaults to `<root>/.venv/bin/python`, else `python3`
 - `AKAHU_CA_BUNDLE` — PEM CA bundle for TLS-inspecting networks (Akahu sync only)
 - `YOUINC_ALLOW_PROXY=1` — opt back into proxy env vars during CLI shell-outs
-- `YOUINC_ENROLLMENT_TOKEN` — set temporarily to enrol a passkey via the `/login` "Enrol a new passkey" form, then unset to disable registration. Unset by default (registration disabled).
 - `YOUINC_RP_ID` / `YOUINC_RP_ORIGIN` — WebAuthn relying-party id/origin. Derived from the request by default (works for localhost and a deployed domain); override only behind a proxy that rewrites Host/Origin.
-- `YOUINC_AUTH_DB_PATH` — passkey credential + session store (default `../data/youinc-auth.sqlite3`, separate from the ledger).
-- `RESEND_API_KEY` / `EMAIL_FROM` — transactional email (Resend) for the live-sync
-  trial reminder. If either is unset, `server/email.ts` no-ops with a log (nothing
-  is sent); the app otherwise works. `EMAIL_FROM` must be a verified Resend sender.
-- `CRON_SECRET` — bearer token guarding `POST /api/cron/trial-reminders`. If unset,
-  the endpoint fails closed (refuses all requests). Must match the `CRON_SECRET`
-  GitHub Actions secret used by `.github/workflows/trial-reminders.yml`.
 
-### Live-sync trial (Phase B) — deploy runbook
-
-The 14-day no-card trial + day-12 email reminder need one-time owner setup:
-1. Apply migration `supabase/migrations/20260713120000_tenant_trial.sql` to Supabase.
-2. Create a Resend account, verify the sending domain (`youinc.net`),
-   and set `RESEND_API_KEY` + `EMAIL_FROM` on the Fly app.
-3. Set `CRON_SECRET` on the Fly app; add `CRON_SECRET` (same value) and
-   `CRON_TARGET_URL` (the app origin) as GitHub Actions repo secrets.
-4. The `trial-reminders` workflow then runs daily; it's idempotent (a tenant is
-   reminded at most once, tracked by `tenants.trial_reminded_at`).
 
 ## Architecture
 
@@ -184,11 +173,13 @@ Use `NoData` for empty states.
 `useLightTheme` and live inside the `.mk` CSS scope (`marketing.css`, light-first palette
 variables, deliberately not coupled to the app's `data-theme` tokens).
 
-- Routes: `/` (`MarketingPage`), `/demo` (real dashboard on sample data), `/custom-builds`
-  (bespoke-service pitch), `/widgets` (live widget catalogue). All four must be listed in
-  `PUBLIC_PATHS` in `start.ts`. `MarketingHeader`/`MarketingFooter` are shared across them.
-- `config.ts` is the single source of marketing copy + pricing. **Unit tests pin the price
-  strings** (`"NZD $15"`, `"From NZD $149"`) — change tests and copy together, deliberately.
+- Routes: `/` (`MarketingPage`), `/demo` (real dashboard on sample data),
+  `/widgets` (live widget catalogue), plus the static trust/docs pages.
+  `MarketingHeader`/`MarketingFooter` are shared across them.
+- `config.ts` is the single source of marketing copy. It exports `PRODUCT`,
+  `USE_PATHS` (demo and self-host — the only two ways to use YouInc),
+  `SOURCE_URL` and `SELF_HOST_URL`. **`config.test.ts` asserts that no currency
+  amount, plan, trial, or billing word appears anywhere in that copy.**
 - `sampleDashboard.ts` is the demo dataset (a full `LedgerDashboardData`). Watch the two
   `accountType` domains: **balances** use the path-derived `"Assets"`/`"Liabilities"` (see
   `accountType()` in `server/ledger.ts`), while **source accounts** use lowercase
@@ -199,14 +190,10 @@ variables, deliberately not coupled to the app's `data-theme` tokens).
 - CSS trap: `.mk section` applies section padding to *every* `<section>` inside `.mk`. Widgets
   and dashboard panels emit `<section>`s, so any real widget rendered inside `.mk` needs a
   scoped padding reset (see the `.wl-cat` override in `marketing.css` and commit `7bb90d6`).
-- The landing showcase (`DashboardFrame`) and Concierge artifacts (`ConciergeShowcase`) are
-  designed marketing objects; the Concierge artifacts are explicitly mock-ups of bespoke work,
-  not shipped features — keep that framing honest when editing copy.
-- The self-serve CTA is now **live signup**: `StartFreeCta.tsx` links to `/signup` (it
-  replaced the old `WaitlistForm` in the hero, pricing, pricing table, and final CTA).
-  `WaitlistForm.tsx` + `server/leads.ts` remain for concierge lead capture but are no longer
-  rendered on the self-serve path. `VITE_YOUINC_BOOKING_URL` overrides the concierge booking
-  link (`resolveBookingUrl` in `config.ts`).
+- Public CTAs go to `/demo` or to `SELF_HOST_URL` on GitHub. `StartFreeCta.tsx`,
+  `WaitlistForm.tsx`, `PricingTable.tsx`, `PricingLedger.tsx`, `ConciergeShowcase.tsx`
+  and the `/pricing`, `/custom-builds`, `/start` routes were all removed with the
+  commercial surface. `server/leads.ts` remains but nothing renders it.
 
 ## Conventions specific to this codebase
 

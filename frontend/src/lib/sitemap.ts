@@ -7,7 +7,7 @@
 export const SITE_URL = "https://youinc.net";
 
 export interface SitemapRoute {
-  /** Site-relative path, e.g. "/" or "/pricing". */
+  /** Site-relative path, e.g. "/" or "/demo". */
   path: string;
   /** Human-readable last-modified date as it appears in on-page copy, e.g.
    * "5 July 2026". Optional — omitted for pages with no maintained date. */
@@ -26,14 +26,13 @@ export interface SitemapRoute {
 // The full public marketing/content surface. Deliberately excludes anything
 // gated or non-canonical: /workspace, /onboarding, /admin/*, /api/*, and
 // /auth/confirm (a redirect-only callback route with no content of its own).
+// It also excludes /signin and /signup: those routes exist for self-hosted
+// instances, and youinc.net offers no accounts, so advertising them to
+// crawlers would misrepresent what the public deployment does.
 export const PUBLIC_ROUTES: readonly SitemapRoute[] = [
   { path: "/", changefreq: "weekly", priority: 1.0 },
   { path: "/demo", changefreq: "monthly", priority: 0.9 },
-  { path: "/pricing", changefreq: "monthly", priority: 0.9 },
-  { path: "/signup", changefreq: "monthly", priority: 0.8 },
-  { path: "/signin", changefreq: "yearly", priority: 0.3 },
   { path: "/widgets", changefreq: "monthly", priority: 0.7 },
-  { path: "/custom-builds", changefreq: "monthly", priority: 0.7 },
   { path: "/docs", changefreq: "monthly", priority: 0.7 },
   { path: "/help", changefreq: "monthly", priority: 0.6 },
   { path: "/integrations", changefreq: "monthly", priority: 0.6 },

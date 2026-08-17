@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { BOOKING_URL, DEFAULT_EMAIL } from "./config";
+import { SOURCE_URL, SELF_HOST_URL, DEFAULT_EMAIL } from "./config";
 
 export type StaticPageId =
   | "privacy"
@@ -58,28 +58,28 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
   privacy: {
     title: "Privacy - YouInc",
     description:
-      "How YouInc collects, uses, stores, and deletes personal and financial data.",
+      "What youinc.net collects, and what a self-hosted YouInc instance keeps on your own infrastructure.",
     eyebrow: "Trust",
     heading: "Privacy Policy",
     updated: "4 July 2026",
     subheading:
-      "YouInc is a founder-led finance product built and operated in New Zealand. This plain-English policy explains what data the service uses, how bank access works, and how to export or delete your data. It is a v1 policy and is not yet a substitute for legally reviewed terms.",
+      "There are two different things to be clear about: what this website collects, and what your own YouInc instance holds. This site runs a sample-data demo and nothing else — it has no account for you and never sees your bank. Everything below about financial data describes software running on your infrastructure, under your control.",
     sections: [
       {
-        title: "Who runs YouInc",
-        body: "YouInc is operated by its founder from New Zealand. Because it is still early and founder-led, the person you email is the person who runs the service. A registered legal entity name and address will be added here once finalised.",
+        title: "Who runs what",
+        body: "youinc.net is published from New Zealand by the author of YouInc, and serves only the demo and documentation. If you self-host YouInc, you operate that instance — the author has no access to it, receives no data from it, and cannot see that it exists.",
       },
       {
-        title: "What YouInc collects",
+        title: "What this website collects",
         items: [
-          "Account basics: your email address and sign-in details when you join the waitlist, enrol a passkey, book a call, or contact support.",
-          "Financial data you choose to connect or enter, including account names, balances, transactions, categories, manual accounts, and ledger entries.",
-          "Messages you send, including support requests, feedback, booking details, and the page or source that generated the message.",
-          "Technical records needed to run and protect the service, such as browser/user-agent details, session records, and security and error logs.",
+          "Anonymous demo interactions: the demo runs on fixed sample data and stores your dashboard layout in your own browser, not on a server.",
+          "Messages you choose to send, such as an email or a GitHub issue, and whatever you put in them.",
+          "Coarse technical records needed to keep the site up, such as error logs.",
+          "No bank data. No account. This site cannot connect to your bank because it does not offer accounts.",
         ],
       },
       {
-        title: "Bank connections",
+        title: "Bank connections on your own instance",
         body: (
           <>
             Live bank sync is provided through{" "}
@@ -90,48 +90,48 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
             >
               Akahu
             </a>
-            , New Zealand's open-finance provider. Connections are read-only:
-            YouInc receives account and transaction data you approve, and never
-            asks for or stores your online-banking password. You choose which
-            accounts to share, and you can revoke access at any time through
-            Akahu or by asking YouInc.
+            , New Zealand's open-finance provider. You register your own Akahu
+            application and hold your own credentials. Connections are
+            read-only: your instance receives account and transaction data you
+            approve, and never asks for or stores your online-banking password.
+            You choose which accounts to share, and you can revoke access at any
+            time through Akahu. None of this data reaches youinc.net.
           </>
         ),
       },
       {
-        title: "How the data is used",
+        title: "How your instance uses that data",
         items: [
-          "To build and maintain your double-entry ledger, dashboard widgets, exports, and any custom views.",
-          "To provide support, answer your questions, and improve onboarding and product quality.",
-          "To detect errors, failed syncs, abuse, suspicious activity, and other operational problems.",
-          "To contact you about access, billing, product updates, and service changes.",
+          "To build and maintain your double-entry ledger, dashboard widgets, and exports.",
+          "To surface failed syncs, unclassified transactions, and other operational problems.",
+          "Nothing else. The software has no analytics callback to the author and no outbound reporting.",
         ],
       },
       {
-        title: "Service providers YouInc relies on",
-        body: "To operate, YouInc uses a small number of third-party providers, including Akahu for bank connections and cloud infrastructure for hosting, storage, and backups. These providers process data only to deliver their part of the service. A named subprocessor list will be published on this page as the provider set is finalised.",
+        title: "Third parties",
+        body: "youinc.net is hosted on cloud infrastructure and that is the extent of its provider set. Your own instance talks to whatever you point it at — typically Akahu for bank connections and a Postgres host of your choosing. Those relationships are yours, not the author's.",
       },
       {
         title: "What YouInc does not do",
         items: [
-          "YouInc does not sell your personal or financial data.",
-          "YouInc does not use your bank data for advertising or ad targeting.",
-          "YouInc does not store your online-banking login details.",
+          "YouInc has no hosted service that could collect, pool, or sell your financial data.",
+          "YouInc does not use bank data for advertising or ad targeting.",
+          "YouInc never stores online-banking login details — Akahu access is token-based and read-only.",
           "YouInc does not provide financial, tax, investment, or legal advice.",
         ],
       },
       {
-        title: "Your choices and rights",
+        title: "Your control",
         items: [
-          "Access and export: request a copy of your ledger as plain-text accounting journals at any time.",
-          "Correction: fix or re-classify data inside the product, or ask for help correcting it.",
+          "Export: dump your ledger as plain-text accounting journals whenever you like.",
+          "Correction: fix or re-classify anything directly in your own database.",
           "Disconnect: revoke bank access through Akahu so new transactions stop syncing.",
-          "Deletion: ask YouInc to delete your account and connected data. See the data controls page for the full process.",
+          "Deletion: drop your database. There is nobody to ask. See the data controls page.",
         ],
       },
       {
         title: "Storage, retention, and deletion",
-        body: "Data is kept only as long as needed to provide the service, meet legal or accounting obligations, resolve disputes, prevent abuse, and maintain backups. You can request export or deletion at any time. After deletion, some records may remain briefly in encrypted backups or in billing and security logs until they age out or are no longer required.",
+        body: "Your financial data is kept exactly as long as you keep it, on infrastructure you chose, under a retention policy you set. There is no operator-side copy to age out and no backup you did not configure yourself.",
       },
       {
         title: "Jurisdiction",
@@ -141,9 +141,9 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         title: "Contact",
         body: (
           <>
-            Privacy questions and deletion requests can be sent to{" "}
-            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>. A dedicated
-            privacy address will be published as YouInc opens up to more users.
+            Questions about this policy can be sent to{" "}
+            <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>. Deletion
+            requests are not applicable — there is no account here to delete.
           </>
         ),
       },
@@ -153,19 +153,19 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
   terms: {
     title: "Terms - YouInc",
     description:
-      "The v1 terms for using YouInc, including subscriptions, custom builds, data exports, and important disclaimers.",
+      "The terms covering the youinc.net demo, the documentation, and the YouInc source code.",
     eyebrow: "Legal",
     heading: "Terms of Service",
     updated: "4 July 2026",
     subheading:
-      "These plain-English v1 terms describe how YouInc is offered while the product is founder-led and access is still controlled. They are written to be honest and readable, not to serve as final legal terms, and will be reviewed by a lawyer before broad public launch.",
+      "YouInc is not a service. These plain-English terms cover the two things youinc.net actually offers — a sample-data demo and documentation — plus what you take on when you run your own instance. They are written to be honest and readable rather than to serve as final legal terms.",
     sections: [
       {
-        title: "Using YouInc",
+        title: "What youinc.net offers",
         items: [
-          "YouInc helps individuals understand their finances through bank sync, a double-entry ledger, dashboards, exports, and optional custom work.",
-          "You need a compatible account and, for live access, a passkey to sign in. You are responsible for keeping access to your device and passkey secure.",
-          "You are responsible for the accuracy of any information you connect, import, edit, or enter by hand.",
+          "A public demo running on sample data. It holds no real financial data, requires no account, and is reset from a fixed seed.",
+          "Documentation for the YouInc software, which you are free to read and follow.",
+          "Nothing else. There is no hosted YouInc account, no bank connection, and nothing for sale on this site.",
         ],
       },
       {
@@ -181,25 +181,20 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         body: "YouInc provides software, reports, widgets, and operational views. It does not provide financial, tax, legal, investment, lending, or accounting advice, and it is not a registered financial adviser. You should verify important decisions with a qualified professional.",
       },
       {
-        title: "Plans and billing",
+        title: "Running your own instance",
         items: [
-          "Demo access uses sample data, is free, and does not require a bank connection.",
-          "Self-serve access is offered as a monthly NZD subscription while access is being rolled out.",
-          "Concierge work may be a monthly plan, a scoped one-off build, or both. Paid custom work is confirmed in writing, including scope and price, before work begins.",
-          "Prices may change over time. Existing subscribers will get reasonable notice before a material change applies to them.",
+          "If you self-host YouInc, you are the operator. Your database, your infrastructure, and your Akahu credentials are yours to secure.",
+          "You are responsible for the accuracy of anything you connect, import, edit, or enter by hand.",
+          "Your ledger stays portable through hledger-compatible plain-text journals, so your financial history can outlive the software.",
         ],
       },
       {
-        title: "Custom builds",
-        body: "Custom widgets, integrations, and ledger-aware automation are scoped around a specific outcome agreed in writing. Unless agreed otherwise, custom work is delivered inside YouInc. General product improvements learned from custom work do not expose your private financial data.",
-      },
-      {
-        title: "Cancellation and export",
-        body: "You can stop using YouInc at any time and request an export of your ledger. YouInc keeps your data portable through hledger-compatible plain-text accounting journals so your financial history can outlive the product. See the data controls page for the export, disconnect, and deletion steps.",
+        title: "Licence",
+        body: "The source is MIT licensed. You may use, copy, modify, merge, publish, distribute, sublicense, and sell copies, provided the copyright notice travels with it. The software is provided as-is and without warranty. MIT was chosen deliberately: the point of publishing this is that your copy is genuinely yours, and a licence that made you ask permission first would defeat that.",
       },
       {
         title: "Availability and liability",
-        body: "YouInc is a founder-led product still in early access. The service may change, pause, or experience outages, and it is provided on an as-is basis without guarantees of uninterrupted availability. Material incidents and changes will be communicated as clearly as possible. Specific liability limits will be set during legal review.",
+        body: "The demo and documentation are provided as-is, may change or go offline without notice, and carry no guarantee of availability. The software is likewise provided as-is: it handles your financial data on your own infrastructure, and the risk of running it is yours.",
       },
       {
         title: "Governing law",
@@ -306,7 +301,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         title: "Step 1 — Export your ledger",
         items: [
           "Export your full double-entry ledger as hledger-compatible plain-text accounting journals.",
-          "Do this before you cancel or delete, so you keep your own permanent copy.",
+          "Do this before you tear the instance down, so you keep your own permanent copy.",
           "The journal is a readable text file you can archive, hand to an accountant, or load into hledger and other plain-text accounting tools.",
           "If you need help producing a specific format for review or analysis, ask and YouInc will help.",
         ],
@@ -324,7 +319,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
             the subject.
           </>,
           "YouInc may verify the request first, so that nobody else can delete your account.",
-          "Settle or cancel any active subscription or in-progress custom work before final deletion.",
+          "Revoke your Akahu connection so no further transactions are pulled while you wind down.",
           "Export first (step 1) if you want a copy — deletion cannot be undone.",
         ],
       },
@@ -342,25 +337,28 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
   contact: {
     title: "Contact - YouInc",
     description:
-      "Contact YouInc for support, security reports, privacy requests, billing questions, and custom build discussions.",
+      "Contact for bugs, security reports, and self-hosting questions.",
     eyebrow: "Support",
     heading: "Talk to a real person",
     subheading:
-      "YouInc is founder-led. That means support, onboarding, and custom-build conversations are handled directly while the product is still early.",
+      "YouInc is one person\u2019s open-source project, not a company with a support desk. Bugs and questions are best raised in public so the answer helps the next person.",
     sections: [
       {
         title: "Best ways to reach YouInc",
         items: [
           <>
-            Book an intro call for Concierge, onboarding, or custom-build
-            questions:{" "}
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
-              cal.com/youinc/intro
+            Bugs, feature requests, and self-hosting questions:{" "}
+            <a
+              href={`${SOURCE_URL}/issues`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              open an issue on GitHub
             </a>
             .
           </>,
           <>
-            Email support, privacy, billing, and security questions to{" "}
+            Email privacy and security questions to{" "}
             <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a>.
           </>,
           "Include the page, account email, and a short description of what happened if you are reporting a bug or sync issue.",
@@ -368,7 +366,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
       {
         title: "What to expect",
-        body: 'Support is human and founder-led, not a 24/7 call centre. During early access you are emailing the person who builds and runs YouInc. Urgent security or data-access concerns should say "security" or "urgent" in the subject line so they can be triaged first.',
+        body: 'There is no support contract and no 24/7 call centre \u2014 you are emailing the person who writes the software, in their own time. Security concerns should say "security" in the subject line so they get triaged first.',
       },
       {
         title: "Which topics go where",
@@ -376,11 +374,11 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
           "Support, bugs, and sync issues: email with the page, your account email, and what happened.",
           "Privacy, export, or deletion requests: email from your account address — see the data controls page for the steps.",
           'Security reports: email with "security" in the subject — see the security page for what to include.',
-          "Billing, Concierge, and custom builds: email or book an intro call.",
+          "Anything else: open a GitHub issue.",
         ],
       },
     ],
-    cta: { label: "Book a call", href: BOOKING_URL, external: true },
+    cta: { label: "Open an issue", href: `${SOURCE_URL}/issues`, external: true },
   },
 
   docs: {
@@ -494,7 +492,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         {
           question: "How do I get access?",
           answer:
-            "The demo is public, uses sample data, and needs no sign-up. Self-serve accounts are open: create an account, name your workspace, and connect your accounts when you're ready. Concierge users can book a call to scope custom dashboards, integrations, or ledger-aware automation.",
+            "The demo is public, uses sample data, and needs no sign-up. To use YouInc on your own money, clone the repository and run your own instance against your own database and Akahu credentials.",
         },
         {
           question: "How do I sign in?",
@@ -514,16 +512,16 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         {
           question: "Can I get my data out?",
           answer:
-            "Yes. Export your full ledger as plain-text accounting journals at any time — there is no lock-in. Do this before you cancel or delete.",
+            "Yes. Export your full ledger as plain-text accounting journals at any time — there is no lock-in.",
         },
         {
-          question: "How do I cancel or delete my account?",
+          question: "How do I delete my data?",
           answer:
-            "Cancelling stops billing; deletion removes your data. They are separate — you can cancel and keep your data, or ask for full deletion. Export first if you want a copy.",
+            "It is your database, so you delete it. Revoke the Akahu connection first, export if you want a copy, then drop the data. Nothing needs to be requested from anyone.",
         },
         {
           question: "Still stuck?",
-          answer: `Email ${DEFAULT_EMAIL} or book a call. Include the page and your account email if it is a bug or sync issue.`,
+          answer: `Open an issue at ${SOURCE_URL}/issues, or email ${DEFAULT_EMAIL}. Include the page and what you were doing when it broke.`,
         },
       ],
     },
@@ -533,7 +531,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         items: [
           "The demo is public, uses sample data, and needs no sign-up.",
           "Self-serve accounts are open: create an account, name your workspace, and connect your accounts when you're ready.",
-          "Concierge users can book a call to scope custom dashboards, integrations, or ledger-aware automation.",
+          "Widgets are plain TypeScript modules in the repository — add your own, or open an issue to discuss one.",
         ],
       },
       {
@@ -564,18 +562,18 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         body: (
           <>
             Yes. Export your full ledger as plain-text accounting journals at
-            any time — there is no lock-in. Do this before you cancel or delete.
+            any time — there is no lock-in.
             The <Link to="/data-deletion">data controls</Link> page has the
             steps.
           </>
         ),
       },
       {
-        title: "How do I cancel or delete my account?",
+        title: "How do I delete my data?",
         body: (
           <>
-            Cancelling stops billing; deletion removes your data. They are
-            separate — you can cancel and keep your data, or ask for full
+            It is your database, so you delete it. Export first if you want a
+            copy, then drop the data. Nothing needs to be requested from
             deletion. Export first if you want a copy. See{" "}
             <Link to="/data-deletion">data controls</Link>.
           </>
@@ -586,11 +584,14 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         body: (
           <>
             Email <a href={`mailto:${DEFAULT_EMAIL}`}>{DEFAULT_EMAIL}</a> or{" "}
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
-              book a call
+            <a
+              href={`${SOURCE_URL}/issues`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              open an issue
             </a>
-            . Include the page and your account email if it is a bug or sync
-            issue.
+            . Include the page and what you were doing when it broke.
           </>
         ),
       },
@@ -644,7 +645,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
       {
         title: "Custom integrations",
-        body: "When there is an export, API, or dependable spreadsheet behind an account, a scoped custom integration can map it into balanced journal entries so it lives in the ledger like everything else. Custom integrations are Concierge work, agreed in writing before they begin.",
+        body: "When there is an export, API, or dependable spreadsheet behind an account, an integration can map it into balanced journal entries so it lives in the ledger like everything else. The ingestion path is documented and the existing Akahu adapter is a worked example — write your own, or propose one.",
       },
       {
         title: "Integration principles",
@@ -657,8 +658,8 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
     ],
     cta: {
-      label: "Discuss a custom integration",
-      href: BOOKING_URL,
+      label: "Propose an integration",
+      href: `${SOURCE_URL}/issues`,
       external: true,
     },
   },
@@ -678,7 +679,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
           "Marketing site: no known issue.",
           "Live demo: no known issue.",
           "Bank sync: early-access only. No public incident currently posted.",
-          "Support: founder-led email and booking support.",
+          "Support: public GitHub issues, plus email for anything security-sensitive.",
         ],
       },
       {
@@ -731,14 +732,14 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       {
         title: "Earlier foundation",
         items: [
-          "Published the marketing landing page, pricing comparison, widget library, custom-builds page, and live sample-data demo.",
-          "Added feedback and founder-led support affordances for early users.",
+          "Published the landing page, widget library, and live sample-data demo.",
+          "Added feedback affordances for early users.",
           "Connected marketing copy to the same sample dashboard data used by the demo where practical.",
         ],
       },
       {
         title: "How to maintain this page",
-        body: "Add a short entry whenever a user-visible feature, security posture, pricing detail, onboarding step, integration, or support process changes. Do not use it for internal chores that do not matter to users.",
+        body: "Add a short entry whenever a user-visible feature, security posture, setup step, integration, or support process changes. Do not use it for internal chores that do not matter to users.",
       },
     ],
   },
@@ -750,14 +751,14 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
     eyebrow: "Product direction",
     heading: "Roadmap",
     subheading:
-      "A practical roadmap for a founder-led finance product. Dates should stay conservative and this page should not promise features before they are scoped.",
+      "A practical roadmap for an open-source finance project. Dates should stay conservative and this page should not promise features before they are scoped.",
     sections: [
       {
         title: "Now",
         items: [
           "Self-service signup and onboarding: create your own workspace and start tracking net worth today.",
           "Live bank sync via Akahu for self-serve workspaces: connect your account and pull transactions into a synced ledger.",
-          "Public demo, pricing comparison, widget library, and custom-build explanation.",
+          "Public demo, widget library, and self-hosting documentation.",
           "V1 privacy, terms, security, data controls, docs, and support pages.",
         ],
       },
@@ -776,7 +777,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
           "Customer-approved use cases and testimonials.",
           "Expanded integrations beyond the first Akahu-led workflows where technically and commercially justified.",
           "Third-party security review before broader public launch.",
-          "More self-serve controls for account deletion, data export, billing, and onboarding.",
+          "Smoother first-run setup, seed data, and one-command local bring-up.",
         ],
       },
     ],
@@ -785,9 +786,9 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
   about: {
     title: "About - YouInc",
     description:
-      "The story and operating principles behind YouInc, a founder-led personal finance ledger product.",
+      "The story and operating principles behind YouInc, an open-source personal finance ledger.",
     eyebrow: "Company",
-    heading: "Founder-led finance software, built for ownership.",
+    heading: "Finance software you actually own.",
     subheading:
       "YouInc exists for people who want the clarity of a company finance stack applied to their own life, without losing control of their data.",
     sections: [
@@ -796,8 +797,8 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
         body: "YouInc turns connected accounts into a live double-entry ledger, then renders the numbers through dashboard widgets for net worth, cashflow, runway, income, expenses, and exceptions worth attention.",
       },
       {
-        title: "Why founder-led",
-        body: "The product is still early, and finance workflows are personal. Founder-led support means onboarding and custom work can stay close to real user problems while the core product matures.",
+        title: "Why self-hosted",
+        body: "Finance workflows are personal, and the data behind them is about as sensitive as it gets. Handing that to someone else\u2019s server is a real cost, and one most personal-finance products ask you to pay without mentioning it. Running your own instance removes the question entirely.",
       },
       {
         title: "Operating principles",
@@ -814,8 +815,8 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
     ],
     cta: {
-      label: "Book a founder-led intro",
-      href: BOOKING_URL,
+      label: "Read the source",
+      href: SOURCE_URL,
       external: true,
     },
   },
@@ -847,7 +848,7 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
           "You want a fully self-serve global bank-sync product today.",
           "You need regulated financial advice rather than software and reporting.",
           "You mainly want envelope budgeting and daily habit nudges.",
-          "You do not want a founder-led early-access product.",
+          "You do not want to run and maintain your own infrastructure.",
         ],
       },
     ],
@@ -873,14 +874,14 @@ export const STATIC_PAGES: Record<StaticPageId, StaticPageData> = {
       },
       {
         title: "Custom decision views",
-        body: "Concierge work can create a view around a specific decision, such as taking time off, paying down debt, tracking a savings target, or understanding project-level income.",
+        body: "Because the widget layer is yours to extend, you can build a view around a specific decision — taking time off, paying down debt, tracking a savings target, or understanding project-level income.",
       },
       {
         title: "Ledger export and review",
         body: "Export the underlying journal so you can inspect, archive, or process your financial history outside YouInc.",
       },
     ],
-    cta: { label: "Explore custom builds", href: "/custom-builds" },
+    cta: { label: "Run it yourself", href: SELF_HOST_URL, external: true },
   },
 };
 

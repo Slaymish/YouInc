@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { PRODUCT } from "../config";
+import { PRODUCT, SELF_HOST_URL } from "../config";
 import { HERO } from "./filmCopy";
 import "./act01-hero.css";
 
@@ -53,13 +53,18 @@ export function Act01Hero() {
 
         <p className="act-hero__sub">{PRODUCT.heroSub}</p>
 
-        <div className="act-hero__ctas start-free">
-          <Link className="mk-btn mk-btn--primary" to="/start">
-            <span className="mk-btn__label">See your picture</span>
+        <div className="act-hero__ctas">
+          <Link className="mk-btn mk-btn--primary" to="/demo">
+            <span className="mk-btn__label">Open the demo</span>
           </Link>
-          <Link className="mk-btn mk-btn--ghost" to="/demo">
-            <span className="mk-btn__label">Watch the demo</span>
-          </Link>
+          <a
+            className="mk-btn mk-btn--ghost"
+            href={SELF_HOST_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="mk-btn__label">Run it yourself</span>
+          </a>
         </div>
 
         <p className="act-hero__reassurance">{HERO.reassurance}</p>

@@ -4,9 +4,9 @@
 // the real engine (rules routing, NZFCC fallback, suspense safety, RLS, Vault).
 
 export const HERO = {
-  eyebrow: { index: "00", label: "Personal ERP — Live bank sync (NZ)" },
+  eyebrow: { index: "00", label: "Personal ERP — Open source, self-hosted" },
   headline: "Run yourself like a company.",
-  reassurance: "No card · Read-only bank access · Live in 2 minutes",
+  reassurance: "Open source · Read-only bank access · Runs on your machine",
 } as const;
 
 export const ENGINE = {
@@ -71,25 +71,19 @@ export const SECURITY = {
   ],
 } as const;
 
-export const CONCIERGE = {
-  eyebrow: { index: "05", label: "Concierge" },
-  headline: "Your own engineering department.",
-  body: "When the view you want doesn't exist yet, I build it — on your live ledger, by the person who built the product. The work below is illustrative of the kind of commissions I take.",
-  // Illustrative mock-ups of bespoke work — kept honest, not shipped features.
-  artifacts: [
-    { spec: "Brief", brief: "Mortgage payoff, on target?", built: "A payoff-curve widget against a chosen date", shipped: "Live on the client's board in 6 days" },
-    { spec: "Brief", brief: "One number for three side projects", built: "Per-project P&L, posted as journal tags", shipped: "Shipped as a pinned control-brief tile" },
-    { spec: "Brief", brief: "Tell me before I overspend", built: "A weekly anomaly agent reading the ledger", shipped: "Monday brief, plain English, no chatbot" },
+export const SELF_HOST = {
+  eyebrow: { index: "05", label: "Run it yourself" },
+  headline: "Your ledger, on your machine.",
+  body: "There is no account to create and nothing to subscribe to. Clone the repository, bring your own Postgres, and point it at your own Akahu connection. The instance is yours — including the parts you want to change.",
+  steps: [
+    { title: "Clone", body: "One repository holds the engine, the dashboard, and the database migrations." },
+    { title: "Run", body: "Docker Compose brings up Postgres and the app locally. No hosted dependency, no telemetry." },
+    { title: "Own", body: "Your transactions never leave your infrastructure. Export the whole ledger as plain text whenever you like." },
   ],
 } as const;
 
-export const PRICING_COPY = {
-  eyebrow: { index: "06", label: "Pricing" },
-  headline: "Four ways to keep the books.",
-} as const;
-
 export const CLOSE = {
-  eyebrow: { index: "07", label: "Incorporate" },
+  eyebrow: { index: "06", label: "Incorporate" },
   headline: "Incorporate yourself.",
-  reassurance: "Free tier · No card · 2 minutes",
+  reassurance: "Open source · Self-hosted · Yours to fork",
 } as const;

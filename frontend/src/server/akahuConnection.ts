@@ -14,8 +14,6 @@ import { AkahuClient, AkahuApiError } from "./akahuClient";
 import { ingestTenantPayloads, type IngestResult } from "./tenantIngestion";
 import { throwServerError } from "./serverError";
 import { appToken, akahuBaseUrl, oauthConfigured } from "./akahuOAuth";
-import type { TenantTier } from "./accounts";
-import { canConnectLive, trialDaysLeft } from "./trial";
 
 // The OAuth authorize-URL / code-exchange logic lives in the pure,
 // path-alias-free akahuOAuth.ts (see its header comment for why) and is
@@ -32,44 +30,29 @@ export type { AkahuCallbackOutcome, AkahuCallbackQuery } from "./akahuOAuth";
 
 interface TenantContext {
   id: string;
-  tier: TenantTier;
-  trialEndsAt: string | null;
 }
 
-// Single tenant lookup shared by every Akahu operation below — same table +
-// column shape accounts.ts's getAccountState() reads (tenants.id, tenants.tier,
-// tenants.trial_ends_at), so tier/trial gating here never drifts from the tenant
-// summary the rest of the app already trusts. Most callers only need the id
-// (requireTenantId()); the connect + sync paths also need the tier + trial to
-// decide whether live sync is allowed right now.
+// Single tenant lookup shared by every Akahu operation below. There is no tier
+// or trial gating: YouInc is self-hosted, so whoever runs the instance supplies
+// their own Akahu credentials and is entitled to use them.
 async function requireTenant(): Promise<TenantContext> {
   const user = await getServerUser();
   if (!user) throwServerError("You must be signed in.", 401);
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase
     .from("tenants")
-    .select("id, tier, trial_ends_at")
+    .select("id")
     .order("created_at", { ascending: true })
     .limit(1);
   if (error) throwServerError(error.message, 400);
-  const row = data?.[0] as
-    | { id: string; tier: TenantTier; trial_ends_at: string | null }
-    | undefined;
+  const row = data?.[0] as { id: string } | undefined;
   if (!row) throwServerError("No workspace found. Finish onboarding first.", 409);
-  return { id: row.id, tier: row.tier, trialEndsAt: row.trial_ends_at ?? null };
+  return { id: row.id };
 }
 
 async function requireTenantId(): Promise<string> {
   return (await requireTenant()).id;
 }
-
-const TIER_RESTRICTED_MESSAGE =
-  "TIER_RESTRICTED: Live bank sync isn't active on the Free plan. Start your " +
-  "14-day free trial to connect your bank, or upgrade to Self-serve.";
-
-const TRIAL_ENDED_MESSAGE =
-  "TRIAL_ENDED: Your free trial of live sync has ended. Add a card to keep " +
-  "syncing, or keep using manual accounts — your data stays put.";
 
 export interface AkahuConnectionStatus {
   connected: boolean;
@@ -80,16 +63,6 @@ export interface AkahuConnectionStatus {
   appConfigured: boolean;
   /** Whether the server has OAuth client creds configured (client id, secret, redirect uri). */
   oauthConfigured: boolean;
-  /** The caller's tenant tier ('free' | 'self-serve' | 'concierge'). */
-  tier: TenantTier;
-  /** Whether the tenant may connect a live bank feed RIGHT NOW — true for paid
-   *  tiers, and for a Free tenant while a 14-day trial is active. This is the
-   *  UI's "can connect" signal — the actual enforcement lives in connectAkahu. */
-  canConnectLive: boolean;
-  /** ISO end of the Free-tier live-sync trial, or null if never started. */
-  trialEndsAt: string | null;
-  /** Whole days left in the trial (0 if expired, null if no trial started). */
-  trialDaysLeft: number | null;
 }
 
 export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus> {
@@ -104,7 +77,6 @@ export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus>
   const row = data?.[0] as
     | { status: string; connected_at: string | null; last_synced_at: string | null }
     | undefined;
-  const now = new Date();
   return {
     connected: row?.status === "active",
     status: row?.status ?? null,
@@ -112,26 +84,16 @@ export async function getAkahuConnectionStatus(): Promise<AkahuConnectionStatus>
     lastSyncedAt: row?.last_synced_at ?? null,
     appConfigured: appToken() !== null,
     oauthConfigured: oauthConfigured(),
-    tier: tenant.tier,
-    canConnectLive: canConnectLive(tenant, now),
-    trialEndsAt: tenant.trialEndsAt,
-    trialDaysLeft: trialDaysLeft(tenant.trialEndsAt, now),
   };
 }
 
 /**
  * Store the caller's Akahu user token (Vault) and mark the connection active.
- * This is the actual security boundary for the Free-tier restriction: it is
- * called from every connect path (paste-a-token form today; also the OAuth
- * callback once that flow lands), so gating here — not just in the UI — is
- * what stops a Free tenant from wiring up live sync no matter how the request
- * reaches the server.
+ * Called from every connect path (the paste-a-token form and the OAuth
+ * callback).
  */
 export async function connectAkahu(userToken: string): Promise<AkahuConnectionStatus> {
   const tenant = await requireTenant();
-  if (!canConnectLive(tenant, new Date())) {
-    throwServerError(TIER_RESTRICTED_MESSAGE, 403);
-  }
 
   const clean = userToken.trim();
   if (!clean) throwServerError("Enter your Akahu user token.", 400);
@@ -142,20 +104,6 @@ export async function connectAkahu(userToken: string): Promise<AkahuConnectionSt
     user_token: clean,
   });
   if (error) throwServerError(error.message || "Could not save your Akahu connection.", 400);
-  return getAkahuConnectionStatus();
-}
-
-/**
- * Start the Free tenant's 14-day live-sync trial (no card). Idempotent-safe: the
- * start_trial RPC only sets trial_ends_at when the tenant is 'free' and hasn't
- * trialed before, so repeat calls can't extend or re-arm it. Returns the fresh
- * status so the UI immediately reflects that live connect is now available.
- */
-export async function startTrial(): Promise<AkahuConnectionStatus> {
-  const tenant = await requireTenant();
-  const supabase = getSupabaseServerClient();
-  const { error } = await supabase.rpc("start_trial", { target_tenant: tenant.id });
-  if (error) throwServerError(error.message || "Could not start your trial.", 400);
   return getAkahuConnectionStatus();
 }
 
@@ -309,12 +257,6 @@ export async function syncAkahuAccount(
   endDate?: string,
 ): Promise<AkahuSyncResult> {
   const tenant = await requireTenant();
-  // Trial expiry (or a lapsed plan) closes the live feed: existing data stays,
-  // but no new pulls run until they add a card. This is the graceful fallback —
-  // syncAkahuAccount is a second enforcement point beyond connectAkahu.
-  if (!canConnectLive(tenant, new Date())) {
-    throwServerError(TRIAL_ENDED_MESSAGE, 403);
-  }
   const tenantId = tenant.id;
   const cleanAccount = accountId.trim();
   if (!cleanAccount) throwServerError("Choose an account to sync.", 400);

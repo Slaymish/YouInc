@@ -6,7 +6,7 @@ import { throwServerError } from "./serverError";
 const WaitlistSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   name: z.string().max(120).optional(),
-  interest: z.enum(["self-serve", "concierge"]).optional(),
+  interest: z.string().max(60).optional(),
   source: z.string().max(60).optional(),
   userAgent: z.string().max(400).optional(),
   // Honeypot: real users never fill this. Bots do.

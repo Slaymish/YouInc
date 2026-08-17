@@ -1,32 +1,32 @@
-/* Act V — Concierge. Dark editorial commission cards. Tokens only. */
+/* Act V — Self-host. Dark editorial step cards. Tokens only. */
 
-.mk .act-concierge {
+.mk .act-selfhost {
   position: relative;
   padding-block: var(--space-section);
   border-top: 1px solid var(--mk-line);
 }
 
-.act-concierge__inner {
+.act-selfhost__inner {
   max-width: var(--mk-maxw);
   margin-inline: auto;
   padding-inline: var(--mk-gutter);
 }
 
-.act-concierge__head {
+.act-selfhost__head {
   max-width: 48rem;
   margin-bottom: var(--space-8);
 }
 
-.act-concierge__headline {
+.act-selfhost__headline {
   font-size: var(--mk-text-act);
   margin: var(--space-5) 0 var(--space-4);
 }
 
-.act-concierge__body {
+.act-selfhost__body {
   max-width: 56ch;
 }
 
-.act-concierge__grid {
+.act-selfhost__grid {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -35,7 +35,7 @@
   gap: var(--space-5);
 }
 
-.act-concierge__card {
+.act-selfhost__card {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -48,19 +48,19 @@
     transform var(--mk-dur-base) var(--mk-ease-out);
 }
 
-.act-concierge__card:hover {
+.act-selfhost__card:hover {
   border-color: var(--mk-accent-line);
   transform: translateY(-3px);
 }
 
-.act-concierge__index {
+.act-selfhost__index {
   font-family: var(--mk-mono);
   font-size: var(--mk-text-mono-sm);
   letter-spacing: var(--mk-tracking-mono);
   color: var(--mk-accent);
 }
 
-.act-concierge__brief {
+.act-selfhost__brief {
   margin: 0;
   font-family: var(--mk-serif);
   font-weight: 300;
@@ -70,7 +70,7 @@
   color: var(--mk-ink);
 }
 
-.act-concierge__spec {
+.act-selfhost__spec {
   margin: auto 0 0;
   display: flex;
   flex-direction: column;
@@ -79,13 +79,13 @@
   padding-top: var(--space-4);
 }
 
-.act-concierge__spec > div {
+.act-selfhost__spec > div {
   display: grid;
   grid-template-columns: 5rem minmax(0, 1fr);
   gap: var(--space-3);
 }
 
-.act-concierge__spec dt {
+.act-selfhost__spec dt {
   font-family: var(--mk-mono);
   font-size: var(--mk-text-mono-sm);
   letter-spacing: var(--mk-tracking-mono);
@@ -93,14 +93,14 @@
   color: var(--mk-faint);
 }
 
-.act-concierge__spec dd {
+.act-selfhost__spec dd {
   margin: 0;
   font-size: var(--mk-text-small);
   color: var(--mk-soft);
   line-height: 1.4;
 }
 
-.act-concierge__cta {
+.act-selfhost__cta {
   margin-top: var(--space-8);
   display: flex;
   align-items: center;
@@ -108,23 +108,23 @@
   flex-wrap: wrap;
 }
 
-.act-concierge__note {
+.act-selfhost__note {
   font-family: var(--mk-mono);
   font-size: var(--mk-text-mono-sm);
   color: var(--mk-faint);
 }
 
 @media (max-width: 860px) {
-  .act-concierge__grid {
+  .act-selfhost__grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .act-concierge__card {
+  .act-selfhost__card {
     transition: none;
   }
-  .act-concierge__card:hover {
+  .act-selfhost__card:hover {
     transform: none;
   }
 }

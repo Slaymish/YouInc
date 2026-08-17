@@ -1,42 +1,38 @@
 import { describe, expect, it } from "vitest";
-import { resolveBookingUrl, PRICING, PRODUCT } from "./config";
+import { PRODUCT, USE_PATHS, SOURCE_URL, SELF_HOST_URL } from "./config";
 
-describe("resolveBookingUrl", () => {
-  it("returns the env override when present", () => {
-    expect(resolveBookingUrl({ VITE_YOUINC_BOOKING_URL: "https://cal.com/me/x" })).toBe(
-      "https://cal.com/me/x",
-    );
-  });
-
-  it("falls back to the default placeholder when unset", () => {
-    expect(resolveBookingUrl({})).toBe("https://cal.com/youinc/intro");
-  });
-});
-
-describe("pricing + product copy", () => {
-  it("prices self-serve concretely and concierge as 'from'", () => {
-    expect(PRICING.selfServe.price).toBe("NZD $15");
-    expect(PRICING.concierge.price).toBe("From NZD $149");
-  });
-
-  it("prices the signed-up free tier at $0", () => {
-    expect(PRICING.free.price).toBe("$0");
-  });
-
+describe("product copy", () => {
   it("names the product", () => {
     expect(PRODUCT.name).toBe("YouInc");
   });
 
-  it("keeps the unauthenticated demo distinct from the signed-up free tier", () => {
-    // Demo = no account, sample data. Free = a real account, manual data.
-    // They must not collapse into the same tier name or CTA.
-    expect(PRICING.demo.name).not.toBe(PRICING.free.name);
-    expect(PRICING.free.name).toBe("Free");
-    expect(PRICING.demo.name).toBe("Demo");
+  it("points self-host links at the canonical repository", () => {
+    expect(SOURCE_URL).toBe("https://github.com/Slaymish/YouInc");
+    expect(SELF_HOST_URL.startsWith(SOURCE_URL)).toBe(true);
+  });
+});
+
+describe("no commercial surface", () => {
+  // YouInc is not sold. These assertions exist so that reintroducing a price,
+  // a tier, or a booking link fails loudly rather than quietly shipping.
+  const copy = JSON.stringify({ PRODUCT, USE_PATHS });
+
+  it("mentions no currency amounts anywhere in marketing copy", () => {
+    expect(copy).not.toMatch(/NZD|\$\d|USD/);
   });
 
-  it("gates live Akahu sync to self-serve and above, not the free tier", () => {
-    expect(PRICING.free.features).not.toContain("Live bank sync via Akahu");
-    expect(PRICING.selfServe.features).toContain("Live bank sync via Akahu");
+  it("mentions no billing, trial, or subscription language", () => {
+    expect(copy).not.toMatch(/\b(pricing|per month|\/mo|subscribe|trial|billing|invoice|card)\b/i);
+  });
+
+  it("offers exactly two paths, neither of which is an account", () => {
+    expect(Object.keys(USE_PATHS)).toEqual(["demo", "selfHost"]);
+    expect(USE_PATHS.demo.name).toBe("Demo");
+    expect(USE_PATHS.selfHost.name).toBe("Self-host");
+  });
+
+  it("keeps live bank sync on the self-hosted path, not a hosted tier", () => {
+    expect(USE_PATHS.selfHost.features.join(" ")).toMatch(/Akahu/);
+    expect(USE_PATHS.demo.features.join(" ")).not.toMatch(/Akahu/);
   });
 });

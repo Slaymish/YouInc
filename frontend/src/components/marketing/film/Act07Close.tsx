@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { SELF_HOST_URL } from "../config";
 import { CLOSE } from "./filmCopy";
 import "./act07-close.css";
 
@@ -17,10 +18,18 @@ export function Act07Close() {
         <h2 id="close-heading" className="act-close__headline mk-display">
           Incorporate <em>yourself.</em>
         </h2>
-        <div className="act-close__cta start-free">
-          <Link className="mk-btn mk-btn--primary" to="/start">
-            <span className="mk-btn__label">See your picture</span>
+        <div className="act-close__cta">
+          <Link className="mk-btn mk-btn--primary" to="/demo">
+            <span className="mk-btn__label">Open the demo</span>
           </Link>
+          <a
+            className="mk-btn mk-btn--ghost"
+            href={SELF_HOST_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="mk-btn__label">Run it yourself</span>
+          </a>
         </div>
         <p className="act-close__reassurance">{CLOSE.reassurance}</p>
       </div>

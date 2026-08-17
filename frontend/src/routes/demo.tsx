@@ -5,7 +5,7 @@ import { formatDateTime } from "~/components/widgets/format";
 import { useDarkTheme } from "~/components/marketing/system/useDarkTheme";
 import { SAMPLE_DASHBOARD } from "~/components/marketing/sampleDashboard";
 import { DEMO_WIDGET_IDS } from "~/components/marketing/demoWidgets";
-import { BOOKING_URL } from "~/components/marketing/config";
+import { SELF_HOST_URL } from "~/components/marketing/config";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 import "~/components/dashboard/dashboard.css";
@@ -100,11 +100,11 @@ function DemoPage() {
             </dl>
             <a
               className="theme-toggle demo-header-cta"
-              href={BOOKING_URL}
+              href={SELF_HOST_URL}
               target="_blank"
               rel="noopener noreferrer"
             >
-              Book a call
+              Run it yourself
             </a>
           </div>
         </header>

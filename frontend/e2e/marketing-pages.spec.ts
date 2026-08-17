@@ -1,19 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-test("custom-builds page loads publicly", async ({ page }) => {
-  await page.goto("/custom-builds");
-  await expect(page).toHaveURL(/\/custom-builds$/); // not redirected to /login
-  await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: /get your own finance engineer/i,
-    }),
-  ).toBeVisible();
-  // Pricing anchor is consistent with config.ts PRICING.
-  await expect(page.getByText("NZD $1,500")).toBeVisible();
-  await expect(page.getByText("From NZD $149")).toBeVisible();
-});
-
 test("widgets page loads publicly and renders live widgets", async ({
   page,
 }) => {
@@ -31,7 +17,7 @@ test("widgets page loads publicly and renders live widgets", async ({
   ).toBeVisible();
 });
 
-test("landing nav reaches both new pages", async ({ page }) => {
+test("landing nav reaches the product and demo pages", async ({ page }) => {
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Main navigation" });
   // "Product" is the terminal-redesign label for the widget library route.
@@ -40,23 +26,32 @@ test("landing nav reaches both new pages", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
   await page.goto("/");
-  await nav.getByRole("link", { name: "Custom builds", exact: true }).click();
-  await expect(page).toHaveURL(/\/custom-builds$/);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await nav.getByRole("link", { name: "Demo", exact: true }).click();
+  await expect(page).toHaveURL(/\/demo$/);
 });
 
-test("pricing nav link routes to the dedicated pricing comparison page from a subpage", async ({
-  page,
-}) => {
-  await page.goto("/custom-builds");
-  await page
-    .getByRole("navigation", { name: "Main navigation" })
-    .getByRole("link", { name: "Pricing", exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/pricing$/);
-  await expect(
-    page.getByRole("heading", { level: 1, name: /every plan, every detail/i }),
-  ).toBeVisible();
+// YouInc is not sold. No public surface may quote a price, a plan, or a
+// booking link. /demo and /widgets are excluded from the money-string check
+// only because they render a sample ledger, whose amounts are the point.
+test("no public page offers a price, plan, or booking link", async ({ page }) => {
+  for (const slug of ["/", "/contact", "/about", "/terms", "/help"]) {
+    await page.goto(slug);
+    await expect(page.locator("body")).not.toContainText(
+      /NZD \$|per month|\/mo\b|free trial|add a card/i,
+    );
+  }
+  for (const slug of ["/", "/demo", "/widgets", "/contact", "/about", "/terms"]) {
+    await page.goto(slug);
+    await expect(page.locator('a[href*="cal.com"]')).toHaveCount(0);
+    await expect(page.locator('a[href$="/pricing"]')).toHaveCount(0);
+  }
+});
+
+test("retired commercial routes are gone", async ({ page }) => {
+  for (const slug of ["/pricing", "/custom-builds", "/start"]) {
+    const response = await page.goto(slug);
+    expect(response?.status()).toBe(404);
+  }
 });
 
 // v1 trust/resource/company pages. Slugs are pinned to the routes in
@@ -73,7 +68,7 @@ const STATIC_PAGES: ReadonlyArray<{ slug: string; heading: RegExp }> = [
   { slug: "/status", heading: /system status/i },
   { slug: "/changelog", heading: /changelog/i },
   { slug: "/roadmap", heading: /roadmap/i },
-  { slug: "/about", heading: /founder-led finance software/i },
+  { slug: "/about", heading: /finance software/i },
   { slug: "/compare", heading: /how youinc is different/i },
   { slug: "/use-cases", heading: /what people use youinc for/i },
 ];
@@ -112,9 +107,8 @@ test("footer trust links are discoverable and route correctly", async ({
 });
 
 test("footer exposes docs and security to visitors", async ({ page }) => {
-  // In the terminal redesign the header nav is trimmed to Product/Pricing/
-  // Demo/Custom builds; Docs lives under the footer's Resources column and
-  // Security under Trust. Both must stay discoverable.
+  // The header nav is trimmed to Product/Demo/Docs; Security lives under the
+  // footer's Trust column. Both must stay discoverable.
   await page.goto("/");
   await page.waitForLoadState("networkidle");
   await page
