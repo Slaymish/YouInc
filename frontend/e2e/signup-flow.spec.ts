@@ -67,14 +67,17 @@ test.describe(
       ).toBeVisible();
       await page.getByRole("button", { name: /go to my workspace/i }).click();
 
-      await expect(page).toHaveURL(/\/workspace$/);
-      await expect(
-        page.getByRole("heading", { name: "E2E Holdings" }),
-      ).toBeVisible();
+      await expect(page).toHaveURL(/\/app$/);
+      await expect(page.getByRole("heading", { name: "Home" })).toBeVisible();
+      // The workspace name is shell furniture now, not the page title.
+      await expect(page.getByText("E2E Holdings")).toBeVisible();
 
       // Sign out returns to the landing page, and re-visiting a gated route bounces to sign-in.
       await page.getByRole("button", { name: /sign out/i }).click();
       await expect(page).toHaveURL(/\/$/);
+      await page.goto("/app");
+      await expect(page).toHaveURL(/\/signin$/);
+      // The pre-rename path still resolves, through /app, to the same gate.
       await page.goto("/workspace");
       await expect(page).toHaveURL(/\/signin$/);
     });
@@ -92,45 +95,69 @@ test.describe(
       await page.getByLabel("Workspace name").fill("Ledger Holdings");
       await page.getByRole("button", { name: /create workspace/i }).click();
       await page.getByRole("button", { name: /go to my workspace/i }).click();
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/app$/);
 
-      // Fresh tenant starts empty.
-      await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$0.00",
-      );
+      // Balances live on Accounts now — one list of every place money sits.
+      await page.getByRole("link", { name: "Accounts" }).click();
+      await expect(page).toHaveURL(/\/app\/accounts$/);
+      const accountsPanel = page.locator(".ws-panel:has(#ws-accounts-heading)");
+      await expect(accountsPanel.getByText(/No accounts yet/)).toBeVisible();
 
       // Add an asset and a (negative) liability.
       await page.getByLabel("New account path").fill("Assets:Bank:Everyday");
       await page.getByLabel("New account balance").fill("12500.00");
       await page.getByRole("button", { name: /add account/i }).click();
-      await expect(page.getByText("Assets:Bank:Everyday")).toBeVisible();
+      await expect(accountsPanel.getByText("Assets:Bank:Everyday")).toBeVisible();
 
       await page.getByLabel("New account path").fill("Liabilities:CreditCard");
       await page.getByLabel("New account balance").fill("-2500.00");
       await page.getByRole("button", { name: /add account/i }).click();
-      await expect(page.getByText("Liabilities:CreditCard")).toBeVisible();
+      await expect(accountsPanel.getByText("Liabilities:CreditCard")).toBeVisible();
 
-      // Net worth = 12,500 - 2,500 = 10,000.
-      await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$10,000.00",
+      // Net worth = 12,500 - 2,500 = 10,000, on Home's headline metric.
+      const netWorth = page.locator(
+        ".metric-inner:has(p:text-is('Net Worth')) strong",
       );
+      await page.getByRole("link", { name: "Home" }).click();
+      await expect(page).toHaveURL(/\/app$/);
+      await expect(netWorth).toHaveText("$10,000.00");
 
       // Persists across reload (data lives in Postgres, not client state).
       await page.reload();
       await page.waitForLoadState("networkidle");
-      await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$10,000.00",
-      );
+      await expect(netWorth).toHaveText("$10,000.00");
 
-      // Removing the liability updates the total.
+      // Removing the liability raises an undo toast that names the account — so
+      // "the row is gone" has to be scoped to the panel, not the page, or it
+      // matches the toast copy too.
+      await page.getByRole("link", { name: "Accounts" }).click();
       await page
         .getByRole("row", { name: /Liabilities:CreditCard/ })
         .getByRole("button", { name: "Remove" })
         .click();
-      await expect(page.getByText("Liabilities:CreditCard")).toBeHidden();
-      await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$12,500.00",
-      );
+      await expect(
+        accountsPanel.getByText("Liabilities:CreditCard"),
+      ).toHaveCount(0);
+      await expect(
+        page.getByText("Removed Liabilities:CreditCard."),
+      ).toBeVisible();
+
+      // Undo restores the row from the server, at its original balance.
+      await page.getByRole("button", { name: "Undo", exact: true }).click();
+      await expect(
+        accountsPanel.getByText("Liabilities:CreditCard"),
+      ).toBeVisible();
+
+      // Remove it again, then confirm the total followed on Home.
+      await page
+        .getByRole("row", { name: /Liabilities:CreditCard/ })
+        .getByRole("button", { name: "Remove" })
+        .click();
+      await expect(
+        accountsPanel.getByText("Liabilities:CreditCard"),
+      ).toHaveCount(0);
+      await page.getByRole("link", { name: "Home" }).click();
+      await expect(netWorth).toHaveText("$12,500.00");
     });
 
     test("sample ingestion posts a double-entry ledger to the tenant (idempotent)", async ({
@@ -145,36 +172,39 @@ test.describe(
       await page.getByLabel("Workspace name").fill("Ingest Co");
       await page.getByRole("button", { name: /create workspace/i }).click();
       await page.getByRole("button", { name: /go to my workspace/i }).click();
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/app$/);
 
       // Run the ported pipeline over the built-in sample Akahu batch.
+      const netWorth = page.locator(
+        ".metric-inner:has(p:text-is('Net Worth')) strong",
+      );
       await page
         .getByRole("button", { name: /load sample transactions/i })
         .click();
-      await expect(
-        page.getByRole("heading", { name: "Synced ledger" }),
-      ).toBeVisible();
 
       // Settlement-dated settled txns post; the PENDING one is skipped. The
       // ATM withdrawal deliberately matches no rule (see sampleIngestion.ts)
       // and posts to the tenant's suspense account instead of Assets:Bank:
       // Everyday, so it doesn't appear in this sum:
       //   +5000 (salary) -1800 (rent) -89.99 (spark) -152.40 (groceries) = 2917.61
-      const ledgerPanel = page.locator(".ws-panel:has(#ws-ledger-heading)");
-      await expect(
-        ledgerPanel.getByRole("row", { name: /Assets:Bank:Everyday/ }),
-      ).toContainText("$2,917.61");
-      await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$2,917.61",
-      );
+      await expect(netWorth).toHaveText("$2,917.61");
+
+      // Synced balances are read-only rows in the one accounts list, badged so
+      // it's clear they came from transactions rather than by hand.
+      await page.getByRole("link", { name: "Accounts" }).click();
+      // Name the badge in the matcher: the merged list can also hold a
+      // hand-entered row for the same account path.
+      const syncedRow = page
+        .locator(".mb-table")
+        .getByRole("row", { name: /Assets:Bank:Everyday.*Synced/i });
+      await expect(syncedRow).toContainText("$2,917.61");
 
       // Idempotent: re-running does not double-count.
+      await page.getByRole("link", { name: "Home" }).click();
       await page
         .getByRole("button", { name: /load sample transactions/i })
         .click();
-      await expect(page.locator(".ws-metric__value").first()).toHaveText(
-        "$2,917.61",
-      );
+      await expect(netWorth).toHaveText("$2,917.61");
     });
 
     test("connect Akahu (Vault), list accounts, sync, and disconnect", async ({
@@ -269,11 +299,11 @@ test.describe(
         await page.getByLabel("Workspace name").fill("Akahu Co");
         await page.getByRole("button", { name: /create workspace/i }).click();
         await page.getByRole("button", { name: /go to my workspace/i }).click();
-        await expect(page).toHaveURL(/\/workspace$/);
+        await expect(page).toHaveURL(/\/app$/);
 
-        // Bank connection lives on the Settings tab.
-        await page.getByRole("link", { name: "Settings" }).click();
-        await expect(page).toHaveURL(/\/workspace\/settings$/);
+        // Bank connection lives on Accounts, beside the balances it produces.
+        await page.getByRole("link", { name: "Accounts" }).click();
+        await expect(page).toHaveURL(/\/app\/accounts$/);
 
         // Connect via OAuth: the "Connect with Akahu" link does a full
         // navigation to GET /api/akahu/oauth/start, which 302s to the
@@ -282,9 +312,9 @@ test.describe(
         // end-to-end redirect chain, no network-layer interception. The
         // callback exchanges the code against the mock /token above;
         // connect_akahu then stores the resulting token in Vault, same as
-        // the old paste-a-token flow did. The callback lands on Settings.
+        // the old paste-a-token flow did. The callback lands on Accounts.
         await page.getByRole("link", { name: /connect with akahu/i }).click();
-        await expect(page).toHaveURL(/\/workspace\/settings\?akahu_connected=1$/);
+        await expect(page).toHaveURL(/\/app\/accounts\?akahu_connected=1$/);
         await expect(page.getByText(/connected to akahu/i)).toBeVisible();
 
         // List the authorized accounts (hits the mock /accounts).
@@ -326,21 +356,32 @@ test.describe(
           .click();
         await expect(page.getByText(/2 already seen/i)).toBeVisible();
 
-        // The synced balance surfaces on the Overview tab (Synced ledger panel
-        // + the net-worth metric): 4200 − 60 = 4140.
-        await page.getByRole("link", { name: "Overview" }).click();
-        await expect(page).toHaveURL(/\/workspace$/);
+        // The synced balance surfaces on Home's net-worth metric: 4200 − 60 = 4140.
+        await page.getByRole("link", { name: "Home" }).click();
+        await expect(page).toHaveURL(/\/app$/);
         await expect(
-          page.getByRole("heading", { name: "Synced ledger" }),
-        ).toBeVisible();
-        await expect(page.locator(".ws-metric__value").first()).toHaveText(
-          "$4,140.00",
-        );
+          page.locator(".metric-inner:has(p:text-is('Net Worth')) strong"),
+        ).toHaveText("$4,140.00");
 
-        // Disconnect removes the Vault secret and revokes the connection.
-        await page.getByRole("link", { name: "Settings" }).click();
-        await expect(page).toHaveURL(/\/workspace\/settings$/);
-        await page.getByRole("button", { name: /disconnect/i }).click();
+        // Disconnect removes the Vault secret and revokes the connection, and is
+        // deliberately two-step: destroying the token can't be undone, so the
+        // first click only reveals the confirm.
+        await page.getByRole("link", { name: "Accounts" }).click();
+        await expect(page).toHaveURL(/\/app\/accounts$/);
+
+        // Cancel path first: the connection must survive a change of mind.
+        await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+        await expect(page.getByText(/really disconnect\?/i)).toBeVisible();
+        await page.getByRole("button", { name: "Cancel", exact: true }).click();
+        await expect(page.getByText(/disconnect cancelled/i)).toBeVisible();
+        await expect(page.getByText(/akahu disconnected/i)).toHaveCount(0);
+
+        // Then confirm for real.
+        await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+        await expect(page.getByText(/really disconnect\?/i)).toBeVisible();
+        await page
+          .getByRole("button", { name: "Yes, disconnect", exact: true })
+          .click();
         await expect(page.getByText(/akahu disconnected/i)).toBeVisible();
       } finally {
         await new Promise<void>((resolve) => mock.close(() => resolve()));

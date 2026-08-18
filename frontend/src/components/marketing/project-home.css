@@ -1,0 +1,119 @@
+/* The public front page: a description of the project, not a pitch. Long-form
+ * measure, generous vertical rhythm, one accent. Shares the marketing tokens
+ * and primitives with the docs pages so the two read as one site. */
+
+.ph {
+  padding-top: clamp(6rem, 5rem + 4vw, 9rem);
+  padding-bottom: var(--space-section);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section);
+}
+
+.ph > section {
+  width: min(100% - 2.5rem, var(--mk-maxw));
+  margin-inline: auto;
+}
+
+.ph-hero__headline {
+  font-family: var(--mk-serif);
+  font-weight: 300;
+  font-size: var(--mk-text-act);
+  line-height: var(--mk-leading-head);
+  letter-spacing: var(--mk-tracking-head);
+  max-width: 22ch;
+  margin: var(--space-5) 0;
+}
+
+.ph-hero__sub {
+  max-width: var(--mk-maxw-narrow);
+  margin: 0 0 var(--space-5);
+  color: var(--mk-soft);
+  font-size: var(--text-lead);
+  line-height: var(--leading-body);
+}
+
+.ph-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: var(--space-5);
+}
+
+.ph-hero__note {
+  margin: var(--space-5) 0 0;
+  color: var(--mk-faint);
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+}
+
+.ph-block h2 {
+  font-family: var(--mk-serif);
+  font-weight: 300;
+  font-size: var(--mk-text-section);
+  line-height: var(--mk-leading-head);
+  letter-spacing: var(--mk-tracking-head);
+  margin: 0 0 var(--space-5);
+}
+
+.ph-block p {
+  max-width: var(--mk-maxw-narrow);
+  margin: 0 0 1rem;
+  color: var(--mk-soft);
+  line-height: var(--leading-body);
+}
+
+/* The honest caveat under the install section — quieter than body copy. */
+.ph-block__aside {
+  color: var(--mk-faint) !important;
+  font-size: 0.95rem;
+}
+
+.ph-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-family: var(--mk-mono);
+  font-size: var(--mk-text-mono-sm);
+  letter-spacing: var(--mk-tracking-mono);
+  text-transform: uppercase;
+}
+
+.ph-grid {
+  display: grid;
+  gap: 1px;
+  background: var(--mk-line);
+  border: 1px solid var(--mk-line);
+  border-radius: 14px;
+  overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.ph-card {
+  background: var(--mk-card);
+  padding: 1.5rem;
+}
+
+.ph-card h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mk-ink);
+}
+
+.ph-card p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+/* A screenshot of the running app, framed like a window rather than floated in
+   space. Full-bleed to the page measure. */
+.ph-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--mk-line);
+  border-radius: 14px;
+  background: var(--mk-card);
+}

@@ -6,6 +6,8 @@ import type {
 } from "~/server/accountMappings";
 import type { AkahuAccountSummary } from "~/server/akahuConnection";
 import { formatMoney } from "~/components/widgets/format";
+import { ToastViewport } from "~/components/ui/Toast";
+import { useUndoToasts } from "~/components/ui/useUndo";
 
 // --- Server functions --------------------------------------------------------
 
@@ -234,6 +236,7 @@ export function AccountMappingEditor({
   const [error, setError] = useState<string | null>(null);
   const [akahuAccounts, setAkahuAccounts] = useState<AkahuAccountSummary[] | null>(null);
   const [pending, startTransition] = useTransition();
+  const toasts = useUndoToasts();
 
   function run(action: () => Promise<AccountMapping[]>, after?: () => void) {
     setError(null);
@@ -245,6 +248,26 @@ export function AccountMappingEditor({
         setError(errorMessage(err));
       }
     });
+  }
+
+  // `account_mappings` has no soft delete; undo re-creates the row from the
+  // snapshot, which is safe because (tenant_id, akahu_account_id) is unique.
+  function deleteMapping(mapping: AccountMapping) {
+    run(
+      () => deleteAccountMappingFn({ data: mapping.id }),
+      () =>
+        toasts.notify({
+          message: `Deleted the mapping for ${mapping.akahuAccountId}.`,
+          onUndo: () =>
+            run(
+              () => createAccountMappingFn({ data: mappingToForm(mapping) }),
+              () =>
+                toasts.notify({
+                  message: `Restored the mapping for ${mapping.akahuAccountId}.`,
+                }),
+            ),
+        }),
+    );
   }
 
   function loadAkahuAccounts() {
@@ -331,7 +354,7 @@ export function AccountMappingEditor({
                       <button
                         type="button"
                         className="mb-remove"
-                        onClick={() => run(() => deleteAccountMappingFn({ data: m.id }))}
+                        onClick={() => deleteMapping(m)}
                         disabled={pending}
                       >
                         Delete
@@ -376,6 +399,8 @@ export function AccountMappingEditor({
           + Add mapping
         </button>
       )}
+
+      <ToastViewport {...toasts} />
     </div>
   );
 }

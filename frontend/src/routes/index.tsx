@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { MarketingPage } from "~/components/marketing/MarketingPage";
+import { ProjectHome } from "~/components/marketing/ProjectHome";
 import { PRODUCT } from "~/components/marketing/config";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
@@ -25,7 +25,7 @@ const HOME_JSON_LD = jsonLdScript(
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "YouInc — Run yourself like a company" },
+      { title: "YouInc — a ledger for your own money" },
       { name: "description", content: PRODUCT.heroSub },
     ],
     scripts: [HOME_JSON_LD],
@@ -33,8 +33,8 @@ export const Route = createFileRoute("/")({
   loader: async () => {
     const { authenticated } = await checkSession();
     if (authenticated) {
-      throw redirect({ to: "/workspace" });
+      throw redirect({ to: "/app" });
     }
   },
-  component: MarketingPage,
+  component: ProjectHome,
 });

@@ -10,38 +10,38 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkspaceRouteImport } from './routes/workspace'
-import { Route as WidgetsRouteImport } from './routes/widgets'
-import { Route as UseCasesRouteImport } from './routes/use-cases'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
-import { Route as SecurityRouteImport } from './routes/security'
-import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DemoRouteImport } from './routes/demo'
-import { Route as DataDeletionRouteImport } from './routes/data-deletion'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CompareRouteImport } from './routes/compare'
-import { Route as ChangelogRouteImport } from './routes/changelog'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorkspaceIndexRouteImport } from './routes/workspace.index'
 import { Route as SignupIndexRouteImport } from './routes/signup.index'
 import { Route as SigninIndexRouteImport } from './routes/signin.index'
-import { Route as WorkspaceSettingsRouteImport } from './routes/workspace.settings'
+import { Route as DemoIndexRouteImport } from './routes/demo.index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as WorkspaceSplatRouteImport } from './routes/workspace.$'
 import { Route as SignupPasswordRouteImport } from './routes/signup.password'
 import { Route as SignupNameRouteImport } from './routes/signup.name'
 import { Route as SignupCredentialRouteImport } from './routes/signup.credential'
 import { Route as SigninPasswordRouteImport } from './routes/signin.password'
+import { Route as DemoSpendingRouteImport } from './routes/demo.spending'
+import { Route as DemoNetWorthRouteImport } from './routes/demo.net-worth'
+import { Route as DemoActivityRouteImport } from './routes/demo.activity'
+import { Route as DemoAccountsRouteImport } from './routes/demo.accounts'
 import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
+import { Route as AppWorkshopRouteImport } from './routes/app.workshop'
+import { Route as AppSpendingRouteImport } from './routes/app.spending'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppPinboardRouteImport } from './routes/app.pinboard'
+import { Route as AppNetWorthRouteImport } from './routes/app.net-worth'
+import { Route as AppActivityRouteImport } from './routes/app.activity'
+import { Route as AppAccountsRouteImport } from './routes/app.accounts'
 import { Route as ApiAnalyticsRouteImport } from './routes/api.analytics'
-import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
 import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
@@ -49,26 +49,6 @@ import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth
 const WorkspaceRoute = WorkspaceRouteImport.update({
   id: '/workspace',
   path: '/workspace',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WidgetsRoute = WidgetsRouteImport.update({
-  id: '/widgets',
-  path: '/widgets',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UseCasesRoute = UseCasesRouteImport.update({
-  id: '/use-cases',
-  path: '/use-cases',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -86,16 +66,6 @@ const SigninRoute = SigninRouteImport.update({
   path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SecurityRoute = SecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RoadmapRoute = RoadmapRouteImport.update({
-  id: '/roadmap',
-  path: '/roadmap',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -104,11 +74,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IntegrationsRoute = IntegrationsRouteImport.update({
-  id: '/integrations',
-  path: '/integrations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpRoute = HelpRouteImport.update({
@@ -126,40 +91,15 @@ const DemoRoute = DemoRouteImport.update({
   path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DataDeletionRoute = DataDeletionRouteImport.update({
-  id: '/data-deletion',
-  path: '/data-deletion',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompareRoute = CompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChangelogRoute = ChangelogRouteImport.update({
-  id: '/changelog',
-  path: '/changelog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => WorkspaceRoute,
 } as any)
 const SignupIndexRoute = SignupIndexRouteImport.update({
   id: '/',
@@ -171,9 +111,19 @@ const SigninIndexRoute = SigninIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SigninRoute,
 } as any)
-const WorkspaceSettingsRoute = WorkspaceSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoRoute,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const WorkspaceSplatRoute = WorkspaceSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => WorkspaceRoute,
 } as any)
 const SignupPasswordRoute = SignupPasswordRouteImport.update({
@@ -196,19 +146,69 @@ const SigninPasswordRoute = SigninPasswordRouteImport.update({
   path: '/password',
   getParentRoute: () => SigninRoute,
 } as any)
+const DemoSpendingRoute = DemoSpendingRouteImport.update({
+  id: '/spending',
+  path: '/spending',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoNetWorthRoute = DemoNetWorthRouteImport.update({
+  id: '/net-worth',
+  path: '/net-worth',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoActivityRoute = DemoActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoAccountsRoute = DemoAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => DemoRoute,
+} as any)
 const AuthConfirmRoute = AuthConfirmRouteImport.update({
   id: '/auth/confirm',
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWorkshopRoute = AppWorkshopRouteImport.update({
+  id: '/workshop',
+  path: '/workshop',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSpendingRoute = AppSpendingRouteImport.update({
+  id: '/spending',
+  path: '/spending',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPinboardRoute = AppPinboardRouteImport.update({
+  id: '/pinboard',
+  path: '/pinboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNetWorthRoute = AppNetWorthRouteImport.update({
+  id: '/net-worth',
+  path: '/net-worth',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAccountsRoute = AppAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiAnalyticsRoute = ApiAnalyticsRouteImport.update({
   id: '/api/analytics',
   path: '/api/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
-  id: '/admin/feedback',
-  path: '/admin/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
@@ -229,113 +229,112 @@ const ApiAkahuOauthStartRoute = ApiAkahuOauthStartRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/changelog': typeof ChangelogRoute
-  '/compare': typeof CompareRoute
-  '/contact': typeof ContactRoute
-  '/data-deletion': typeof DataDeletionRoute
-  '/demo': typeof DemoRoute
+  '/app': typeof AppRouteWithChildren
+  '/demo': typeof DemoRouteWithChildren
   '/docs': typeof DocsRoute
   '/help': typeof HelpRoute
-  '/integrations': typeof IntegrationsRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
-  '/roadmap': typeof RoadmapRoute
-  '/security': typeof SecurityRoute
   '/signin': typeof SigninRouteWithChildren
   '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/status': typeof StatusRoute
-  '/terms': typeof TermsRoute
-  '/use-cases': typeof UseCasesRoute
-  '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/feedback': typeof AdminFeedbackRoute
   '/api/analytics': typeof ApiAnalyticsRoute
+  '/app/accounts': typeof AppAccountsRoute
+  '/app/activity': typeof AppActivityRoute
+  '/app/net-worth': typeof AppNetWorthRoute
+  '/app/pinboard': typeof AppPinboardRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/spending': typeof AppSpendingRoute
+  '/app/workshop': typeof AppWorkshopRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/demo/accounts': typeof DemoAccountsRoute
+  '/demo/activity': typeof DemoActivityRoute
+  '/demo/net-worth': typeof DemoNetWorthRoute
+  '/demo/spending': typeof DemoSpendingRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
   '/signup/name': typeof SignupNameRoute
   '/signup/password': typeof SignupPasswordRoute
-  '/workspace/settings': typeof WorkspaceSettingsRoute
+  '/workspace/$': typeof WorkspaceSplatRoute
+  '/app/': typeof AppIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/signup/': typeof SignupIndexRoute
-  '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/changelog': typeof ChangelogRoute
-  '/compare': typeof CompareRoute
-  '/contact': typeof ContactRoute
-  '/data-deletion': typeof DataDeletionRoute
-  '/demo': typeof DemoRoute
   '/docs': typeof DocsRoute
   '/help': typeof HelpRoute
-  '/integrations': typeof IntegrationsRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
-  '/roadmap': typeof RoadmapRoute
-  '/security': typeof SecurityRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/status': typeof StatusRoute
-  '/terms': typeof TermsRoute
-  '/use-cases': typeof UseCasesRoute
-  '/widgets': typeof WidgetsRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/feedback': typeof AdminFeedbackRoute
   '/api/analytics': typeof ApiAnalyticsRoute
+  '/app/accounts': typeof AppAccountsRoute
+  '/app/activity': typeof AppActivityRoute
+  '/app/net-worth': typeof AppNetWorthRoute
+  '/app/pinboard': typeof AppPinboardRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/spending': typeof AppSpendingRoute
+  '/app/workshop': typeof AppWorkshopRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/demo/accounts': typeof DemoAccountsRoute
+  '/demo/activity': typeof DemoActivityRoute
+  '/demo/net-worth': typeof DemoNetWorthRoute
+  '/demo/spending': typeof DemoSpendingRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
   '/signup/name': typeof SignupNameRoute
   '/signup/password': typeof SignupPasswordRoute
-  '/workspace/settings': typeof WorkspaceSettingsRoute
+  '/workspace/$': typeof WorkspaceSplatRoute
+  '/app': typeof AppIndexRoute
+  '/demo': typeof DemoIndexRoute
   '/signin': typeof SigninIndexRoute
   '/signup': typeof SignupIndexRoute
-  '/workspace': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/changelog': typeof ChangelogRoute
-  '/compare': typeof CompareRoute
-  '/contact': typeof ContactRoute
-  '/data-deletion': typeof DataDeletionRoute
-  '/demo': typeof DemoRoute
+  '/app': typeof AppRouteWithChildren
+  '/demo': typeof DemoRouteWithChildren
   '/docs': typeof DocsRoute
   '/help': typeof HelpRoute
-  '/integrations': typeof IntegrationsRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
-  '/roadmap': typeof RoadmapRoute
-  '/security': typeof SecurityRoute
   '/signin': typeof SigninRouteWithChildren
   '/signup': typeof SignupRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/status': typeof StatusRoute
-  '/terms': typeof TermsRoute
-  '/use-cases': typeof UseCasesRoute
-  '/widgets': typeof WidgetsRoute
   '/workspace': typeof WorkspaceRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
-  '/admin/feedback': typeof AdminFeedbackRoute
   '/api/analytics': typeof ApiAnalyticsRoute
+  '/app/accounts': typeof AppAccountsRoute
+  '/app/activity': typeof AppActivityRoute
+  '/app/net-worth': typeof AppNetWorthRoute
+  '/app/pinboard': typeof AppPinboardRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/spending': typeof AppSpendingRoute
+  '/app/workshop': typeof AppWorkshopRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/demo/accounts': typeof DemoAccountsRoute
+  '/demo/activity': typeof DemoActivityRoute
+  '/demo/net-worth': typeof DemoNetWorthRoute
+  '/demo/spending': typeof DemoSpendingRoute
   '/signin/password': typeof SigninPasswordRoute
   '/signup/credential': typeof SignupCredentialRoute
   '/signup/name': typeof SignupNameRoute
   '/signup/password': typeof SignupPasswordRoute
-  '/workspace/settings': typeof WorkspaceSettingsRoute
+  '/workspace/$': typeof WorkspaceSplatRoute
+  '/app/': typeof AppIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/signup/': typeof SignupIndexRoute
-  '/workspace/': typeof WorkspaceIndexRoute
   '/api/akahu/callback': typeof ApiAkahuCallbackRoute
   '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
@@ -343,141 +342,128 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
-    | '/changelog'
-    | '/compare'
-    | '/contact'
-    | '/data-deletion'
+    | '/app'
     | '/demo'
     | '/docs'
     | '/help'
-    | '/integrations'
     | '/onboarding'
     | '/privacy'
-    | '/roadmap'
-    | '/security'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
-    | '/status'
-    | '/terms'
-    | '/use-cases'
-    | '/widgets'
     | '/workspace'
     | '/admin/analytics'
-    | '/admin/feedback'
     | '/api/analytics'
+    | '/app/accounts'
+    | '/app/activity'
+    | '/app/net-worth'
+    | '/app/pinboard'
+    | '/app/settings'
+    | '/app/spending'
+    | '/app/workshop'
     | '/auth/confirm'
+    | '/demo/accounts'
+    | '/demo/activity'
+    | '/demo/net-worth'
+    | '/demo/spending'
     | '/signin/password'
     | '/signup/credential'
     | '/signup/name'
     | '/signup/password'
-    | '/workspace/settings'
+    | '/workspace/$'
+    | '/app/'
+    | '/demo/'
     | '/signin/'
     | '/signup/'
-    | '/workspace/'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
-    | '/changelog'
-    | '/compare'
-    | '/contact'
-    | '/data-deletion'
-    | '/demo'
     | '/docs'
     | '/help'
-    | '/integrations'
     | '/onboarding'
     | '/privacy'
-    | '/roadmap'
-    | '/security'
     | '/sitemap.xml'
-    | '/status'
-    | '/terms'
-    | '/use-cases'
-    | '/widgets'
+    | '/workspace'
     | '/admin/analytics'
-    | '/admin/feedback'
     | '/api/analytics'
+    | '/app/accounts'
+    | '/app/activity'
+    | '/app/net-worth'
+    | '/app/pinboard'
+    | '/app/settings'
+    | '/app/spending'
+    | '/app/workshop'
     | '/auth/confirm'
+    | '/demo/accounts'
+    | '/demo/activity'
+    | '/demo/net-worth'
+    | '/demo/spending'
     | '/signin/password'
     | '/signup/credential'
     | '/signup/name'
     | '/signup/password'
-    | '/workspace/settings'
+    | '/workspace/$'
+    | '/app'
+    | '/demo'
     | '/signin'
     | '/signup'
-    | '/workspace'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   id:
     | '__root__'
     | '/'
-    | '/about'
-    | '/changelog'
-    | '/compare'
-    | '/contact'
-    | '/data-deletion'
+    | '/app'
     | '/demo'
     | '/docs'
     | '/help'
-    | '/integrations'
     | '/onboarding'
     | '/privacy'
-    | '/roadmap'
-    | '/security'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
-    | '/status'
-    | '/terms'
-    | '/use-cases'
-    | '/widgets'
     | '/workspace'
     | '/admin/analytics'
-    | '/admin/feedback'
     | '/api/analytics'
+    | '/app/accounts'
+    | '/app/activity'
+    | '/app/net-worth'
+    | '/app/pinboard'
+    | '/app/settings'
+    | '/app/spending'
+    | '/app/workshop'
     | '/auth/confirm'
+    | '/demo/accounts'
+    | '/demo/activity'
+    | '/demo/net-worth'
+    | '/demo/spending'
     | '/signin/password'
     | '/signup/credential'
     | '/signup/name'
     | '/signup/password'
-    | '/workspace/settings'
+    | '/workspace/$'
+    | '/app/'
+    | '/demo/'
     | '/signin/'
     | '/signup/'
-    | '/workspace/'
     | '/api/akahu/callback'
     | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  ChangelogRoute: typeof ChangelogRoute
-  CompareRoute: typeof CompareRoute
-  ContactRoute: typeof ContactRoute
-  DataDeletionRoute: typeof DataDeletionRoute
-  DemoRoute: typeof DemoRoute
+  AppRoute: typeof AppRouteWithChildren
+  DemoRoute: typeof DemoRouteWithChildren
   DocsRoute: typeof DocsRoute
   HelpRoute: typeof HelpRoute
-  IntegrationsRoute: typeof IntegrationsRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
-  RoadmapRoute: typeof RoadmapRoute
-  SecurityRoute: typeof SecurityRoute
   SigninRoute: typeof SigninRouteWithChildren
   SignupRoute: typeof SignupRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  StatusRoute: typeof StatusRoute
-  TermsRoute: typeof TermsRoute
-  UseCasesRoute: typeof UseCasesRoute
-  WidgetsRoute: typeof WidgetsRoute
   WorkspaceRoute: typeof WorkspaceRouteWithChildren
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminFeedbackRoute: typeof AdminFeedbackRoute
   ApiAnalyticsRoute: typeof ApiAnalyticsRoute
   AuthConfirmRoute: typeof AuthConfirmRoute
   ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
@@ -491,34 +477,6 @@ declare module '@tanstack/react-router' {
       path: '/workspace'
       fullPath: '/workspace'
       preLoaderRoute: typeof WorkspaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/widgets': {
-      id: '/widgets'
-      path: '/widgets'
-      fullPath: '/widgets'
-      preLoaderRoute: typeof WidgetsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/use-cases': {
-      id: '/use-cases'
-      path: '/use-cases'
-      fullPath: '/use-cases'
-      preLoaderRoute: typeof UseCasesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -542,20 +500,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/security': {
-      id: '/security'
-      path: '/security'
-      fullPath: '/security'
-      preLoaderRoute: typeof SecurityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/roadmap': {
-      id: '/roadmap'
-      path: '/roadmap'
-      fullPath: '/roadmap'
-      preLoaderRoute: typeof RoadmapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -568,13 +512,6 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/integrations': {
-      id: '/integrations'
-      path: '/integrations'
-      fullPath: '/integrations'
-      preLoaderRoute: typeof IntegrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help': {
@@ -598,39 +535,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/data-deletion': {
-      id: '/data-deletion'
-      path: '/data-deletion'
-      fullPath: '/data-deletion'
-      preLoaderRoute: typeof DataDeletionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compare': {
-      id: '/compare'
-      path: '/compare'
-      fullPath: '/compare'
-      preLoaderRoute: typeof CompareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/changelog': {
-      id: '/changelog'
-      path: '/changelog'
-      fullPath: '/changelog'
-      preLoaderRoute: typeof ChangelogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -639,13 +548,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/workspace/': {
-      id: '/workspace/'
-      path: '/'
-      fullPath: '/workspace/'
-      preLoaderRoute: typeof WorkspaceIndexRouteImport
-      parentRoute: typeof WorkspaceRoute
     }
     '/signup/': {
       id: '/signup/'
@@ -661,11 +563,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninIndexRouteImport
       parentRoute: typeof SigninRoute
     }
-    '/workspace/settings': {
-      id: '/workspace/settings'
-      path: '/settings'
-      fullPath: '/workspace/settings'
-      preLoaderRoute: typeof WorkspaceSettingsRouteImport
+    '/demo/': {
+      id: '/demo/'
+      path: '/'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/workspace/$': {
+      id: '/workspace/$'
+      path: '/$'
+      fullPath: '/workspace/$'
+      preLoaderRoute: typeof WorkspaceSplatRouteImport
       parentRoute: typeof WorkspaceRoute
     }
     '/signup/password': {
@@ -696,6 +612,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninPasswordRouteImport
       parentRoute: typeof SigninRoute
     }
+    '/demo/spending': {
+      id: '/demo/spending'
+      path: '/spending'
+      fullPath: '/demo/spending'
+      preLoaderRoute: typeof DemoSpendingRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/net-worth': {
+      id: '/demo/net-worth'
+      path: '/net-worth'
+      fullPath: '/demo/net-worth'
+      preLoaderRoute: typeof DemoNetWorthRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/activity': {
+      id: '/demo/activity'
+      path: '/activity'
+      fullPath: '/demo/activity'
+      preLoaderRoute: typeof DemoActivityRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/accounts': {
+      id: '/demo/accounts'
+      path: '/accounts'
+      fullPath: '/demo/accounts'
+      preLoaderRoute: typeof DemoAccountsRouteImport
+      parentRoute: typeof DemoRoute
+    }
     '/auth/confirm': {
       id: '/auth/confirm'
       path: '/auth/confirm'
@@ -703,18 +647,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/workshop': {
+      id: '/app/workshop'
+      path: '/workshop'
+      fullPath: '/app/workshop'
+      preLoaderRoute: typeof AppWorkshopRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/spending': {
+      id: '/app/spending'
+      path: '/spending'
+      fullPath: '/app/spending'
+      preLoaderRoute: typeof AppSpendingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pinboard': {
+      id: '/app/pinboard'
+      path: '/pinboard'
+      fullPath: '/app/pinboard'
+      preLoaderRoute: typeof AppPinboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/net-worth': {
+      id: '/app/net-worth'
+      path: '/net-worth'
+      fullPath: '/app/net-worth'
+      preLoaderRoute: typeof AppNetWorthRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/accounts': {
+      id: '/app/accounts'
+      path: '/accounts'
+      fullPath: '/app/accounts'
+      preLoaderRoute: typeof AppAccountsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/analytics': {
       id: '/api/analytics'
       path: '/api/analytics'
       fullPath: '/api/analytics'
       preLoaderRoute: typeof ApiAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/feedback': {
-      id: '/admin/feedback'
-      path: '/admin/feedback'
-      fullPath: '/admin/feedback'
-      preLoaderRoute: typeof AdminFeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/analytics': {
@@ -740,6 +726,48 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AppRouteChildren {
+  AppAccountsRoute: typeof AppAccountsRoute
+  AppActivityRoute: typeof AppActivityRoute
+  AppNetWorthRoute: typeof AppNetWorthRoute
+  AppPinboardRoute: typeof AppPinboardRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppSpendingRoute: typeof AppSpendingRoute
+  AppWorkshopRoute: typeof AppWorkshopRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAccountsRoute: AppAccountsRoute,
+  AppActivityRoute: AppActivityRoute,
+  AppNetWorthRoute: AppNetWorthRoute,
+  AppPinboardRoute: AppPinboardRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppSpendingRoute: AppSpendingRoute,
+  AppWorkshopRoute: AppWorkshopRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface DemoRouteChildren {
+  DemoAccountsRoute: typeof DemoAccountsRoute
+  DemoActivityRoute: typeof DemoActivityRoute
+  DemoNetWorthRoute: typeof DemoNetWorthRoute
+  DemoSpendingRoute: typeof DemoSpendingRoute
+  DemoIndexRoute: typeof DemoIndexRoute
+}
+
+const DemoRouteChildren: DemoRouteChildren = {
+  DemoAccountsRoute: DemoAccountsRoute,
+  DemoActivityRoute: DemoActivityRoute,
+  DemoNetWorthRoute: DemoNetWorthRoute,
+  DemoSpendingRoute: DemoSpendingRoute,
+  DemoIndexRoute: DemoIndexRoute,
+}
+
+const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 
 interface SigninRouteChildren {
   SigninPasswordRoute: typeof SigninPasswordRoute
@@ -772,13 +800,11 @@ const SignupRouteWithChildren =
   SignupRoute._addFileChildren(SignupRouteChildren)
 
 interface WorkspaceRouteChildren {
-  WorkspaceSettingsRoute: typeof WorkspaceSettingsRoute
-  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
+  WorkspaceSplatRoute: typeof WorkspaceSplatRoute
 }
 
 const WorkspaceRouteChildren: WorkspaceRouteChildren = {
-  WorkspaceSettingsRoute: WorkspaceSettingsRoute,
-  WorkspaceIndexRoute: WorkspaceIndexRoute,
+  WorkspaceSplatRoute: WorkspaceSplatRoute,
 }
 
 const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
@@ -787,29 +813,17 @@ const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  ChangelogRoute: ChangelogRoute,
-  CompareRoute: CompareRoute,
-  ContactRoute: ContactRoute,
-  DataDeletionRoute: DataDeletionRoute,
-  DemoRoute: DemoRoute,
+  AppRoute: AppRouteWithChildren,
+  DemoRoute: DemoRouteWithChildren,
   DocsRoute: DocsRoute,
   HelpRoute: HelpRoute,
-  IntegrationsRoute: IntegrationsRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
-  RoadmapRoute: RoadmapRoute,
-  SecurityRoute: SecurityRoute,
   SigninRoute: SigninRouteWithChildren,
   SignupRoute: SignupRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  StatusRoute: StatusRoute,
-  TermsRoute: TermsRoute,
-  UseCasesRoute: UseCasesRoute,
-  WidgetsRoute: WidgetsRoute,
   WorkspaceRoute: WorkspaceRouteWithChildren,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminFeedbackRoute: AdminFeedbackRoute,
   ApiAnalyticsRoute: ApiAnalyticsRoute,
   AuthConfirmRoute: AuthConfirmRoute,
   ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,

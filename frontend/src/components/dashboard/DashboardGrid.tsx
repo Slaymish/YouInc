@@ -150,7 +150,7 @@ export function DashboardGrid({ dashboard, storageKey, allowedWidgetIds }: Dashb
               className="dashboard-edit-btn"
               onClick={enterEditMode}
             >
-              Customize
+              Customise
             </button>
           )}
         </div>
@@ -170,7 +170,7 @@ export function DashboardGrid({ dashboard, storageKey, allowedWidgetIds }: Dashb
             <p className="dashboard-empty">
               {isEditing
                 ? "Empty view — use “+ Add widget” to place widgets here."
-                : "Empty view — click Customize to add widgets."}
+                : "Nothing pinned yet — press Customise to add a card."}
             </p>
           ) : null}
           {layout.map((placement) => {

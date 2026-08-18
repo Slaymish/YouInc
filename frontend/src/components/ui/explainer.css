@@ -1,0 +1,59 @@
+/* "Why this number?" — small, quiet, and out of the way until asked. */
+
+.explainer {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.explainer__toggle {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-subtle);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.explainer__toggle:hover,
+.explainer__toggle[aria-expanded="true"] {
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.explainer__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 60;
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 2.5rem));
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line-subtle);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--soft-raised);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The last line says what the number means for you — the one that matters. */
+.explainer__line--point {
+  color: var(--text);
+  border-top: 1px solid var(--line-subtle);
+  padding-top: 0.45rem;
+}

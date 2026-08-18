@@ -1,5 +1,6 @@
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
-import { formatMoney, formatPercent } from "./format";
+import { formatMoney, formatPercent, leafAccount } from "./format";
+import { NoData } from "./NoData";
 
 export function LiquidityWidget({
   dashboard,
@@ -27,30 +28,30 @@ export function LiquidityWidget({
         <span className="liquidity-value">{formatMoney(cashCents)}</span>
       </div>
       <div className="liquidity-row">
-        <span className="liquidity-label">Semi-liquid</span>
+        <span className="liquidity-label">Takes a few days</span>
         <span className="liquidity-value">{formatMoney(semiLiquidCents)}</span>
       </div>
       <div className="liquidity-row">
-        <span className="liquidity-label">Illiquid</span>
+        <span className="liquidity-label">Tied up</span>
         <span className="liquidity-value">{formatMoney(illiquidCents)}</span>
       </div>
       {hasFacilities ? (
         <>
           <div className="liquidity-row">
-            <span className="liquidity-label">Credit headroom</span>
+            <span className="liquidity-label">Credit left</span>
             <span className="liquidity-value">
               {formatMoney(creditHeadroomCents)}
             </span>
           </div>
           <div className="liquidity-row liquidity-row--primary liquidity-row--float">
-            <span className="liquidity-label">Available liquidity</span>
+            <span className="liquidity-label">Could reach in a hurry</span>
             <span className="liquidity-value">
               {formatMoney(availableLiquidityCents)}
             </span>
           </div>
           <p className="liquidity-note">
-            Cash + undrawn facility headroom. Not net worth — drawn balances
-            remain liabilities serviced from income.
+            Cash plus the credit you haven't used. Borrowed money still has to be
+            paid back, so this isn't the same as what you're worth.
           </p>
         </>
       ) : null}
@@ -65,7 +66,12 @@ export function CreditFacilityWidget({
 }) {
   const facilities = dashboard.creditFacilities;
   if (!facilities.length) {
-    return <p className="no-data">NO CREDIT FACILITIES CONFIGURED</p>;
+    return (
+      <NoData
+        message="No credit cards or overdrafts set up."
+        hint="Add one as an account and its limit shows here."
+      />
+    );
   }
 
   return (
@@ -77,13 +83,13 @@ export function CreditFacilityWidget({
             <th className="numeric">Limit</th>
             <th className="numeric">Drawn</th>
             <th className="numeric">Headroom</th>
-            <th className="numeric">Utilization</th>
+            <th className="numeric">Used</th>
           </tr>
         </thead>
         <tbody>
           {facilities.map((facility) => (
             <tr key={facility.account}>
-              <td>{facility.account}</td>
+              <td title={facility.account}>{leafAccount(facility.account)}</td>
               <td className="numeric">
                 {facility.limitCents !== null
                   ? formatMoney(facility.limitCents)

@@ -15,7 +15,7 @@ const TARGET_LABEL: Record<AttentionTargetView, string> = {
   "this-week": "This Week",
   "cash-flow": "Cash Flow",
   wealth: "Wealth",
-  books: "Books",
+  books: "Transactions",
 };
 
 export function AttentionWidget({
@@ -30,8 +30,8 @@ export function AttentionWidget({
   if (!items.length) {
     return (
       <div className="attention attention--clear">
-        <strong>All clear</strong>
-        <p>Books are decision-grade. Nothing needs you this week.</p>
+        <strong>All caught up</strong>
+        <p>Everything's sorted and your accounts are up to date.</p>
       </div>
     );
   }

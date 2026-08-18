@@ -1,0 +1,37 @@
+/* The one place the demo asks for something: the accounts screen, where sample
+ * data runs out of usefulness. */
+
+.install {
+  padding: 1.5rem;
+  border: 1px dashed var(--accent-line);
+  border-radius: 14px;
+  background: var(--accent-tint);
+}
+
+.install h2 {
+  margin: 0 0 0.6rem;
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 1rem + 1vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.install p {
+  margin: 0 0 0.7rem;
+  max-width: 60ch;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.install__how {
+  color: var(--text-muted) !important;
+  font-size: 0.9rem;
+}
+
+.install__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}

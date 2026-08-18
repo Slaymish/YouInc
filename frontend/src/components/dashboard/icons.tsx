@@ -76,3 +76,104 @@ export function AddIcon({ size = 16, className }: IconProps) {
     </svg>
   );
 }
+
+// ── App-shell navigation icons ────────────────────────────────────────────
+// Same inline-SVG rationale as above. These sit beside a text label in the
+// side nav and the mobile tab bar, so they are decorative — the link's own
+// text is the accessible name.
+
+/** Home — "am I OK?" */
+export function HomeIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <path d="M4 10.5 12 4l8 6.5" />
+      <path d="M6 9.8V20h12V9.8" />
+    </svg>
+  );
+}
+
+/** Spending — "where is it going?" */
+export function SpendingIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <path d="M4 7l6 6 3-3 7 7" />
+      <path d="M20 12v5h-5" />
+    </svg>
+  );
+}
+
+/** Net worth — "am I getting richer?" */
+export function NetWorthIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <path d="M4 17l6-6 3 3 7-7" />
+      <path d="M20 12V7h-5" />
+    </svg>
+  );
+}
+
+/** Activity — "what happened?" */
+export function ActivityIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h10" />
+    </svg>
+  );
+}
+
+/** Accounts — where the money sits. */
+export function AccountsIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <path d="M3 10h18" />
+      <path d="M16 14h2" />
+    </svg>
+  );
+}
+
+/** Pinboard — whatever you want to watch. */
+export function PinboardIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="4" rx="1.5" />
+      <rect x="13" y="10" width="7" height="10" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+    </svg>
+  );
+}
+
+/** Settings — sliders rather than a gear; legible at 20px. */
+export function SettingsIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <path d="M4 7h5M13 7h7" />
+      <circle cx="11" cy="7" r="2" />
+      <path d="M4 17h11M19 17h1" />
+      <circle cx="17" cy="17" r="2" />
+    </svg>
+  );
+}
+
+/** Workshop — the ledger's machinery, opt-in and slightly technical. */
+export function WorkshopIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <circle cx="16.5" cy="7.5" r="3.5" />
+      <path d="M14 10 5 19l1.5 1.5L15.5 11.5" />
+    </svg>
+  );
+}
+
+/** Account / you — the menu that holds Settings, Workshop and sign out. */
+export function PersonIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, className)}>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 20c1.3-3.5 4-5.2 7-5.2s5.7 1.7 7 5.2" />
+    </svg>
+  );
+}

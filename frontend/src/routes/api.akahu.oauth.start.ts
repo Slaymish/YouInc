@@ -17,7 +17,7 @@ const STATE_COOKIE_MAX_AGE_SECONDS = 600;
 
 function redirectToWorkspace(query: string): Response {
   // Bank connection lives on the workspace Settings tab — surface errors there.
-  return new Response(null, { status: 302, headers: { Location: `/workspace/settings?${query}` } });
+  return new Response(null, { status: 302, headers: { Location: `/app/accounts?${query}` } });
 }
 
 export const Route = createFileRoute("/api/akahu/oauth/start")({

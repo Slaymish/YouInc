@@ -31,6 +31,9 @@ import type { WidgetId } from "../dashboard/widgets";
 // through the grid).
 export const WORKSPACE_WIDGET_IDS: WidgetId[] = [
   "attention",
+  // Reads dashboard.balances, which the loader populates from liquidity —
+  // added when the Net worth page started placing it (pageLayouts.ts).
+  "balance-sheet",
   "ledger-confidence",
   "suspense-queue",
   "metric-net-worth",

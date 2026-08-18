@@ -1,11 +1,8 @@
 import type { LiquidityTier, BalanceRow, LedgerDashboardData } from "~/components/dashboard/dashboardData";
+import { NoData } from "./NoData";
 
 function formatMoney(cents: number) {
   return new Intl.NumberFormat("en-NZ", { style: "currency", currency: "NZD" }).format(cents / 100);
-}
-
-function NoData({ message }: { message: string }) {
-  return <p className="no-data">{message}</p>;
 }
 
 const TIER_LABELS: Record<LiquidityTier, string> = {
@@ -40,7 +37,10 @@ function TierSection({ tier, rows }: { tier: LiquidityTier; rows: BalanceRow[] }
 }
 
 export function BalanceSheetWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
-  if (!dashboard.balances.length) return <NoData message="NO BALANCES" />;
+  if (!dashboard.balances.length) return <NoData
+        message="No balances yet."
+        hint="Connect a bank or add an account by hand and this fills in."
+      />;
 
   const assetsByTier = TIER_ORDER.map((tier) => ({
     tier,

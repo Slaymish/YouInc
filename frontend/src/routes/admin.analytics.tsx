@@ -214,10 +214,9 @@ function AdminAnalyticsPage() {
     <div className="ws-shell">
       <header className="ws-topbar">
         <span className="ws-topbar__logo">Product analytics</span>
-        <nav className="ws-topbar__account" aria-label="Admin pages">
-          <Link to="/admin/feedback">Feedback</Link>
+        <div className="ws-topbar__account">
           <span>{account.email}</span>
-        </nav>
+        </div>
       </header>
       <main className="ws-main">
         <section className="ws-hero">

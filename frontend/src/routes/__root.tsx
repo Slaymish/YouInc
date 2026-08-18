@@ -6,9 +6,18 @@ import {
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
 import appCss from '~/styles/app.css?url'
+import { readAuthCache, writeAuthCache } from '~/lib/authCache'
 import { jsonLdGraph, jsonLdScript } from '~/lib/seo'
 import { SITE_URL } from '~/lib/sitemap'
+
+// Exposed to every route via beforeLoad context; read it with
+// `useRouteContext({ from: "__root__" })`.
+const checkSession = createServerFn({ method: 'GET' }).handler(async () => {
+  const { getServerUser } = await import('~/server/supabaseServer')
+  return { authenticated: (await getServerUser()) !== null }
+})
 
 // Root-level knowledge-graph anchor: Organization + WebSite nodes that every
 // page inherits. Per-page `head()`s add their own WebPage/FAQPage/Product +
@@ -34,6 +43,16 @@ const ROOT_JSON_LD = jsonLdScript(
 )
 
 export const Route = createRootRoute({
+  // Resolved once per tab on the client and cached (see ~/lib/authCache for
+  // why): this `beforeLoad` re-runs on every navigation, and the session cookie
+  // almost never changes. Always fresh on the server.
+  beforeLoad: async () => {
+    const cached = readAuthCache()
+    if (cached !== undefined) return { authenticated: cached }
+    const { authenticated } = await checkSession()
+    writeAuthCache(authenticated)
+    return { authenticated }
+  },
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -43,24 +62,24 @@ export const Route = createRootRoute({
       },
       {
         name: 'description',
-        content: 'Local-first executive dashboard for the YouInc personal ERP ledger.',
+        content: 'A double-entry ledger for your own money, with a dashboard over it. Open source, runs on your machine.',
       },
       // Social share defaults (per-page head()s can override title/description).
       { property: 'og:site_name', content: 'YouInc' },
       { property: 'og:type', content: 'website' },
-      { property: 'og:title', content: 'YouInc — Run yourself like a company.' },
+      { property: 'og:title', content: 'YouInc — a ledger for your own money' },
       {
         property: 'og:description',
-        content: 'Local-first executive dashboard for the YouInc personal ERP ledger.',
+        content: 'A double-entry ledger for your own money, with a dashboard over it. Open source, runs on your machine.',
       },
       { property: 'og:image', content: `${SITE_URL}/marketing/og-cover.png` },
       { property: 'og:image:width', content: '1200' },
       { property: 'og:image:height', content: '630' },
       { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: 'YouInc — Run yourself like a company.' },
+      { name: 'twitter:title', content: 'YouInc — a ledger for your own money' },
       {
         name: 'twitter:description',
-        content: 'Local-first executive dashboard for the YouInc personal ERP ledger.',
+        content: 'A double-entry ledger for your own money, with a dashboard over it. Open source, runs on your machine.',
       },
       { name: 'twitter:image', content: `${SITE_URL}/marketing/og-cover.png` },
       { name: 'theme-color', content: '#111111' },

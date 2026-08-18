@@ -1,0 +1,170 @@
+/* The sorting task: the interaction someone does fifty times. The animation
+ * budget goes here — one tap, an immediate settle, and the row is gone. */
+
+.sort-task__count {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.sort-task__error {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: var(--surface-muted);
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.sort-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sort-card {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--soft-raised-sm);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sort-card {
+    animation: sort-card-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes sort-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sort-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sort-card__what {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sort-card__what strong {
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sort-card__what time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sort-card__amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sort-card__amount--in {
+  color: var(--ok);
+}
+
+.sort-card__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+
+.sort-choice {
+  border: 1px solid var(--line-subtle);
+  background: var(--surface-muted);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.sort-choice:hover {
+  border-color: var(--accent-line);
+  background: var(--accent-tint);
+}
+
+.sort-choice:active {
+  transform: scale(0.97);
+}
+
+.sort-choice--other {
+  border-style: dashed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sort-choice {
+    transition: none;
+  }
+
+  .sort-choice:active {
+    transform: none;
+  }
+}
+
+.sort-card__custom {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.sort-card__custom label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sort-card__custom input {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 14rem;
+}
+
+/* Nothing left to sort — an end state, not an error. */
+.sort-done__line {
+  margin: 0;
+  font-family: var(--mk-serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.sort-done__note {
+  margin: 0.4rem 0 0;
+  max-width: 46ch;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}

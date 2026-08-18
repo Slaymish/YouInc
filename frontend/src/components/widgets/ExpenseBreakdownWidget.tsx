@@ -53,7 +53,10 @@ export function BreakdownList({ rows, barClass }: BreakdownListProps) {
 
 export function ExpenseBreakdownWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   if (!dashboard.expenseBreakdown.length) {
-    return <NoData message="NO EXPENSE POSTINGS" />;
+    return <NoData
+        message="Nothing spent yet, as far as the ledger knows."
+        hint="Spending shows up here grouped by category once transactions arrive."
+      />;
   }
   return <BreakdownList rows={dashboard.expenseBreakdown} barClass="expense" />;
 }

@@ -4,6 +4,7 @@ import { AuthShell } from "~/components/auth/AuthShell";
 import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { EmailCodeConfirm } from "~/components/auth/EmailCodeConfirm";
+import { clearAuthCache } from "~/lib/authCache";
 import { checkAuthed, loadFlow, signupWithPassword } from "~/lib/authServerFns";
 
 export const Route = createFileRoute("/signup/password")({
@@ -62,6 +63,7 @@ function SignupPasswordPage() {
         data: { token: flow.token, password },
       });
       if (hasSession) {
+        clearAuthCache();
         await router.navigate({ to: "/onboarding" });
       } else {
         setPendingEmail(flow.email);
@@ -77,7 +79,10 @@ function SignupPasswordPage() {
     return (
       <EmailCodeConfirm
         email={pendingEmail}
-        onVerified={() => void router.navigate({ to: "/onboarding" })}
+        onVerified={() => {
+          clearAuthCache();
+          void router.navigate({ to: "/onboarding" });
+        }}
       />
     );
   }

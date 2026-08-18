@@ -1,15 +1,12 @@
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
-
-function formatMoney(cents: number) {
-  return new Intl.NumberFormat("en-NZ", { style: "currency", currency: "NZD" }).format(cents / 100);
-}
-
-function NoData({ message }: { message: string }) {
-  return <p className="no-data">{message}</p>;
-}
+import { NoData } from "./NoData";
+import { formatMoney } from "./format";
 
 export function JournalWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
-  if (!dashboard.recentTransactions.length) return <NoData message="NO JOURNAL ENTRIES" />;
+  if (!dashboard.recentTransactions.length) return <NoData
+        message="No transactions yet."
+        hint="Connect a bank or load the sample batch to see them here."
+      />;
 
   return (
     <div className="journal">

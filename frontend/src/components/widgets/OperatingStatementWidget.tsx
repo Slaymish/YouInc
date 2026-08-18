@@ -1,4 +1,5 @@
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
+import { NoData } from "./NoData";
 
 function shortMoney(cents: number): string {
   const d = cents / 100;
@@ -13,10 +14,6 @@ function formatMoney(cents: number) {
 function formatPercent(value: number | null) {
   if (value === null || Number.isNaN(value)) return "n/a";
   return new Intl.NumberFormat("en-NZ", { style: "percent", maximumFractionDigits: 1 }).format(value);
-}
-
-function NoData({ message }: { message: string }) {
-  return <p className="no-data">{message}</p>;
 }
 
 function PnlChart({ rows }: { rows: LedgerDashboardData["pnl"] }) {
@@ -95,6 +92,9 @@ export function OperatingStatementWidget({ dashboard }: { dashboard: LedgerDashb
   return dashboard.pnl.length ? (
     <PnlChart rows={dashboard.pnl} />
   ) : (
-    <NoData message="NO INCOME / EXPENSE POSTINGS" />
+    <NoData
+      message="No income or spending recorded yet."
+      hint="This is the month-by-month summary of both, once they exist."
+    />
   );
 }

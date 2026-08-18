@@ -14,7 +14,7 @@ const USER_COOKIE = "akahu_oauth_user";
 function redirectToWorkspace(query: string): Response {
   // Bank connection lives on the workspace Settings tab; land the user there
   // so AkahuConnectPanel (which reads window.location) can pick up the result.
-  return new Response(null, { status: 302, headers: { Location: `/workspace/settings?${query}` } });
+  return new Response(null, { status: 302, headers: { Location: `/app/accounts?${query}` } });
 }
 
 async function recordOAuthFailure(reason: string): Promise<void> {

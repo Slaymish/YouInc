@@ -1,0 +1,231 @@
+/* Home: one judgement, the numbers behind it, what needs you, what we noticed.
+ * Fixed layout on purpose — no drag handles, nothing to configure. */
+
+.home-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.home-headline__question {
+  margin: 0;
+  font-family: var(--mk-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.home-headline h1 {
+  margin: 0;
+  font-family: var(--mk-serif);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 1.2rem + 2.4vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.home-headline__line {
+  margin: 0.2rem 0 0;
+  max-width: 58ch;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+/* ── The four numbers ───────────────────────────────────────────────────── */
+.home-numbers {
+  display: grid;
+  gap: 1px;
+  /* Fixed tracks, not auto-fit: a long figure ($142,380.00) has a wide
+     min-content, which auto-fit reads as "this track needs more room" and drops
+     to three columns. Four numbers, one row, always. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--line-subtle);
+  border: 1px solid var(--line-subtle);
+  border-radius: 14px;
+  overflow: visible;
+}
+
+.home-metric {
+  background: var(--surface);
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.home-metric:first-child {
+  border-radius: 13px 0 0 13px;
+}
+
+.home-metric:last-child {
+  border-radius: 0 13px 13px 0;
+}
+
+.home-metric__label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.home-metric__value {
+  display: block;
+  font-size: clamp(1.15rem, 0.85rem + 0.9vw, 1.6rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 720px) {
+  .home-numbers {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Two-up on a phone, so the corner treatment for a single row doesn't apply. */
+@media (max-width: 719px) {
+  .home-metric:first-child,
+  .home-metric:last-child {
+    border-radius: 0;
+  }
+
+  .home-numbers {
+    border-radius: 14px;
+  }
+}
+
+/* ── Needs you / Noticed ────────────────────────────────────────────────── */
+.home-block__heading {
+  margin: 0 0 0.75rem;
+  font-family: var(--mk-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.home-block__empty {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.home-needs,
+.home-noticed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-need {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.home-need:last-child {
+  border-bottom: none;
+}
+
+.home-need__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--text-muted);
+}
+
+.home-need--critical .home-need__dot {
+  background: var(--danger);
+}
+
+.home-need--action .home-need__dot {
+  background: var(--warn);
+}
+
+.home-need__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.home-need__text strong {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.home-need__text span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.home-need .home-need__go {
+  flex: none;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.home-need .home-need__go:hover {
+  text-decoration: underline;
+}
+
+/* The delight surface. Warm when the news is good, plain when it isn't. */
+.home-noticed__row {
+  padding: 0.7rem 0 0.7rem 0.9rem;
+  border-left: 2px solid var(--line-subtle);
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.home-noticed__row--good {
+  border-left-color: var(--accent);
+  color: var(--text);
+}
+
+.home-noticed__row--watch {
+  border-left-color: var(--warn);
+}
+
+/* Sample data: a developer convenience, so it reads as a footnote. */
+.home-sample {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line-subtle);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.home-sample button {
+  border: 1px solid var(--line-subtle);
+  background: none;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.home-sample button:hover:not(:disabled) {
+  border-color: var(--accent-line);
+}

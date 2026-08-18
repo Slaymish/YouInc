@@ -4,6 +4,7 @@ import { AuthShell } from "~/components/auth/AuthShell";
 import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { EmailCodeConfirm } from "~/components/auth/EmailCodeConfirm";
+import { clearAuthCache } from "~/lib/authCache";
 import {
   checkAuthed,
   loadFlow,
@@ -62,6 +63,7 @@ function SignupCredentialPage() {
 
   function routeAfterSignup(hasSession: boolean) {
     if (hasSession) {
+      clearAuthCache();
       void router.navigate({ to: "/onboarding" });
     } else {
       setPendingEmail(flow.email);
@@ -120,7 +122,10 @@ function SignupCredentialPage() {
       <EmailCodeConfirm
         email={pendingEmail}
         note="your passkey is already saved"
-        onVerified={() => void router.navigate({ to: "/onboarding" })}
+        onVerified={() => {
+          clearAuthCache();
+          void router.navigate({ to: "/onboarding" });
+        }}
       />
     );
   }

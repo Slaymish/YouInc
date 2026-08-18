@@ -498,6 +498,11 @@
   border-color: var(--accent, #12a150);
 }
 
+/* Where a balance came from — quieter than the account-type tag beside it. */
+.mb-source {
+  border-style: dashed;
+}
+
 .mb-tag--liabilities {
   color: var(--danger, #c0492f);
   border-color: var(--danger, #c0492f);
@@ -513,6 +518,31 @@
   background: var(--surface);
   color: var(--text);
   font-variant-numeric: tabular-nums;
+}
+
+/* Phones: the accounts list is the point of the page, so trade padding and
+   type size for fitting three columns without a sideways scroll. */
+@media (max-width: 640px) {
+  .mb-table {
+    font-size: 0.85rem;
+  }
+
+  .mb-table th,
+  .mb-table td {
+    padding: 0.5rem 0.35rem;
+  }
+
+  .mb-account {
+    font-size: 0.78rem;
+  }
+
+  .mb-table input[type="number"] {
+    width: 5.5rem;
+  }
+
+  .mb-actions button {
+    padding: 0.35rem 0.5rem;
+  }
 }
 
 .mb-actions {

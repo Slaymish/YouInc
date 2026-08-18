@@ -16,10 +16,10 @@ export function AuthCardFooter({ prompt }: AuthCardFooterProps) {
   return (
     <div className="auth-card__foot">
       {prompt ? <p className="auth-note">{prompt}</p> : null}
-      <nav className="auth-card__legal" aria-label="Legal">
+      <nav className="auth-card__legal" aria-label="Reference">
+        <Link to="/docs">Docs</Link>
         <Link to="/help">Help</Link>
         <Link to="/privacy">Privacy</Link>
-        <Link to="/terms">Terms</Link>
       </nav>
     </div>
   );

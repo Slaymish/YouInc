@@ -5,6 +5,7 @@ import { AuthCardFooter } from "~/components/auth/AuthCardFooter";
 import { AuthStepper } from "~/components/auth/AuthStepper";
 import { useResendVerification } from "~/hooks/useResendVerification";
 import { classifyAuthError } from "~/lib/authResend";
+import { clearAuthCache } from "~/lib/authCache";
 import { getSupabaseBrowserClient } from "~/lib/supabaseBrowser";
 import {
   checkAuthed,
@@ -78,6 +79,7 @@ function SigninPasswordPage() {
       const { runAuthentication } = await import("~/lib/passkeyBrowser");
       const response = await runAuthentication(options);
       await finishAuthentication({ data: { token, response } });
+      clearAuthCache();
       await router.navigate({ to: "/onboarding" });
     } catch (err) {
       setError(messageFor(err));
@@ -112,6 +114,7 @@ function SigninPasswordPage() {
         }
         return;
       }
+      clearAuthCache();
       await router.navigate({ to: "/onboarding" });
     } catch (err) {
       setError(messageFor(err));

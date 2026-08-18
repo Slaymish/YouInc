@@ -49,7 +49,7 @@ export interface WidgetDefinition {
 export const WIDGET_REGISTRY: WidgetDefinition[] = [
   {
     id: "attention",
-    label: "Action Center",
+    label: "Needs attention",
     category: "overview",
     defaultW: 6,
     defaultH: 4,
@@ -85,7 +85,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "metric-burn",
-    label: "Burn / Mo",
+    label: "Monthly spend",
     category: "stats",
     defaultW: 3,
     defaultH: 2,
@@ -94,7 +94,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "metric-margin",
-    label: "Margin",
+    label: "Savings rate",
     category: "stats",
     defaultW: 3,
     defaultH: 2,
@@ -121,7 +121,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "liquidity",
-    label: "Cash Position",
+    label: "Cash",
     category: "stats",
     defaultW: 4,
     defaultH: 4,
@@ -130,7 +130,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "metric-available-liquidity",
-    label: "Available Liquidity",
+    label: "Cash + credit available",
     category: "stats",
     defaultW: 3,
     defaultH: 2,
@@ -148,7 +148,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "operating-statement",
-    label: "Operating Statement",
+    label: "Income & expenses",
     category: "finance",
     defaultW: 7,
     defaultH: 6,
@@ -175,7 +175,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "journal",
-    label: "Journal",
+    label: "Transactions",
     category: "data",
     defaultW: 7,
     defaultH: 8,
@@ -220,7 +220,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "rolling-burn",
-    label: "Rolling Average",
+    label: "Spending trend",
     category: "finance",
     defaultW: 6,
     defaultH: 5,
@@ -256,7 +256,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "net-worth-velocity",
-    label: "Net-Worth Velocity",
+    label: "Net worth pace",
     category: "overview",
     defaultW: 5,
     defaultH: 4,
@@ -274,7 +274,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "cashflow-waterfall",
-    label: "Cashflow Waterfall",
+    label: "Where the money went",
     category: "finance",
     defaultW: 6,
     defaultH: 6,
@@ -301,7 +301,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
   },
   {
     id: "suspense-queue",
-    label: "Suspense Queue",
+    label: "Needs a category",
     category: "actions",
     defaultW: 6,
     defaultH: 4,

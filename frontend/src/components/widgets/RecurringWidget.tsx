@@ -10,7 +10,10 @@ const CADENCE_LABEL: Record<RecurringCadence, string> = {
 
 export function RecurringWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   const payments = dashboard.recurringPayments;
-  if (!payments.length) return <NoData message="NO RECURRING PAYMENTS DETECTED" />;
+  if (!payments.length) return <NoData
+        message="No repeating payments spotted yet."
+        hint="Subscriptions and bills are found automatically once they have charged a few times."
+      />;
 
   const monthlyCommittedCents = payments.reduce(
     (sum, payment) => sum + payment.monthlyEquivalentCents,

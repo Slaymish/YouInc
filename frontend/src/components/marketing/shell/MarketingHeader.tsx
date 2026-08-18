@@ -11,14 +11,19 @@ interface NavItem {
 
 // Mono index numbers per item drive the mobile overlay's staggered reveal.
 const NAV_ITEMS: readonly NavItem[] = [
-  { to: "/widgets", label: "Product" },
   { to: "/demo", label: "Demo" },
   { to: "/docs", label: "Docs" },
+  { to: "/help", label: "Help" },
 ];
 
 const SCROLL_THRESHOLD = 24;
 
-export function MarketingHeader() {
+interface MarketingHeaderProps {
+  /** Signed-in state, resolved by the caller. Defaults to false — unchanged, signed-out chrome. */
+  readonly authenticated?: boolean;
+}
+
+export function MarketingHeader({ authenticated = false }: MarketingHeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -94,9 +99,15 @@ export function MarketingHeader() {
           >
             GitHub
           </a>
-          <Link className="mk-btn mk-btn--primary mk-header__cta" to="/demo">
-            <span className="mk-btn__label">Open the demo</span>
-          </Link>
+          {authenticated ? (
+            <Link className="mk-btn mk-btn--primary mk-header__cta" to="/app">
+              <span className="mk-btn__label">Open YouInc</span>
+            </Link>
+          ) : (
+            <Link className="mk-btn mk-btn--primary mk-header__cta" to="/demo">
+              <span className="mk-btn__label">Open the demo</span>
+            </Link>
+          )}
         </div>
 
         <button
@@ -150,13 +161,23 @@ export function MarketingHeader() {
               >
                 <span className="mk-btn__label">GitHub</span>
               </a>
-              <Link
-                className="mk-btn mk-btn--primary"
-                to="/demo"
-                onClick={() => setMenuOpen(false)}
-              >
-                <span className="mk-btn__label">Open the demo</span>
-              </Link>
+              {authenticated ? (
+                <Link
+                  className="mk-btn mk-btn--primary"
+                  to="/app"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="mk-btn__label">Open YouInc</span>
+                </Link>
+              ) : (
+                <Link
+                  className="mk-btn mk-btn--primary"
+                  to="/demo"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="mk-btn__label">Open the demo</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>
