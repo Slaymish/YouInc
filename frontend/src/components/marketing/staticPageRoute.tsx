@@ -3,21 +3,6 @@ import { SITE_URL, toIsoDate } from "~/lib/sitemap";
 import { StaticMarketingPage } from "./StaticMarketingPage";
 import { pageData, type StaticPageData, type StaticPageId } from "./staticPages";
 
-/** For the changelog page only: turn its date-titled sections ("5 July
- * 2026", "4 July 2026", ...) into `WebPageElement` nodes with a real
- * `dateModified`, so the per-entry update history is machine-readable too —
- * not just the page-level `dateModified`. Purely derived from existing
- * section titles; no copy is invented. */
-function changelogParts(page: StaticPageData): readonly JsonLdNode[] | undefined {
-  const parts = page.sections
-    .map((section): JsonLdNode | null => {
-      const iso = toIsoDate(section.title);
-      return iso ? { "@type": "WebPageElement", name: section.title, dateModified: iso } : null;
-    })
-    .filter((part): part is JsonLdNode => part !== null);
-  return parts.length > 0 ? parts : undefined;
-}
-
 function buildPageNode(id: StaticPageId, page: StaticPageData): JsonLdNode {
   const url = `${SITE_URL}/${id}`;
   const dateModified = toIsoDate(page.updated);
@@ -37,14 +22,12 @@ function buildPageNode(id: StaticPageId, page: StaticPageData): JsonLdNode {
     };
   }
 
-  const hasPart = id === "changelog" ? changelogParts(page) : undefined;
   return {
     "@type": "WebPage",
     name: page.heading,
     description: page.description,
     url,
     ...(dateModified ? { dateModified } : {}),
-    ...(hasPart ? { hasPart } : {}),
   };
 }
 

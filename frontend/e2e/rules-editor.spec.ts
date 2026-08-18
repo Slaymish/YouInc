@@ -37,7 +37,7 @@ test.describe(
       await page.getByLabel("Workspace name").fill(workspaceName);
       await page.getByRole("button", { name: /create workspace/i }).click();
       await page.getByRole("button", { name: /go to my workspace/i }).click();
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/app$/);
     }
 
     test("add, edit, toggle, and delete a classification rule", async ({
@@ -47,8 +47,8 @@ test.describe(
       await signUpIntoWorkspace(page, email, "Rules Co");
 
       // Classification rules live on the workspace Settings tab.
-      await page.getByRole("link", { name: "Settings" }).click();
-      await expect(page).toHaveURL(/\/workspace\/settings$/);
+      await page.getByRole("link", { name: "Workshop" }).click();
+      await expect(page).toHaveURL(/\/app\/workshop$/);
 
       const rulesPanel = page.locator(".ws-panel:has(#ws-rules-heading)");
       await expect(

@@ -19,8 +19,8 @@ against your own database and your own Akahu credentials.
   `journal_transactions` / `journal_entries`.
 - A configurable dashboard of widgets (net worth, runway, cashflow, balance
   sheet, ledger controls, and more).
-- Public surface on youinc.net: landing (`/`), live demo on sample data
-  (`/demo`), and a live widget catalogue (`/widgets`).
+- Public surface on youinc.net: the project page (`/`), the demo on sample
+  data (`/demo`), and the reference pages (`/docs`, `/help`, `/privacy`).
 
 See `docs/architecture_design.md`, `docs/persona_frontend_information_design.md`,
 and `docs/research_competitors.md` for background, and
@@ -115,36 +115,6 @@ Disconnecting revokes the user token at Akahu before removing its encrypted Vaul
 copy. This both removes Akahu's access and frees one of the development app's five
 user slots. If a user revokes access through Akahu first, the next API `401` removes
 the now-invalid local token automatically.
-
-## Feedback & variant voting
-
-`FeedbackWidget.tsx` on the marketing pages randomly assigns each visitor variant A/B
-(client-side, persisted in `localStorage`) and records 👍/👎 votes into `public.feedback`
-via the anon-callable `record_feedback` RPC — write-only from the client's perspective.
-
-Aggregated results are readable through `public.feedback_variant_stats(p_since)`, a
-second SECURITY DEFINER RPC that self-enforces admin-only access (an `is_app_admin()`
-allowlist check inside the function — there is no `service_role` key anywhere in this
-app, so authorization has to live in Postgres, not app code). The signed-in owner views
-results at **`/admin/feedback`** (not linked from any nav — go there directly), which
-shows vote counts/up-rate per variant × source × path, and flags a statistically
-significant leader (two-proportion z-test, requires ≥30 samples per variant and p < 0.05)
-without acting on it.
-
-**Promotion is intentionally not automated.** Variant assignment is still 100%
-client-side `Math.random()`; there is no mechanism today to shift new visitors toward a
-flagged winner. Doing so would mean either moving assignment server-side or having
-`FeedbackWidget` read a remote config/feature-flag value at render time — reasonable
-future work, but out of scope here. For now, a human reads the `/admin/feedback` flag and
-manually edits `FeedbackWidget.tsx`'s variant copy/split if/when a result is convincing.
-
-To grant the first admin in a fresh environment (the migration seeds `hamish@paychase.co.nz`
-as a best-effort no-op if that user doesn't exist yet):
-
-```sql
-insert into public.app_admins (user_id)
-select id from auth.users where email = 'you@example.com';
-```
 
 ## Product analytics
 

@@ -1,150 +1,82 @@
 import { test, expect } from "@playwright/test";
 
-test("widgets page loads publicly and renders live widgets", async ({
-  page,
-}) => {
-  await page.goto("/widgets");
-  await expect(page).toHaveURL(/\/widgets$/); // not redirected to /login
-  await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: /every widget, running live/i,
-    }),
-  ).toBeVisible();
-  // A live widget rendered from the registry on sample data.
-  await expect(
-    page.getByRole("heading", { name: "Net Worth Trend", exact: true }),
-  ).toBeVisible();
-});
+// The whole public surface: the project page, the demo, and three reference
+// pages. Slugs are pinned to routes in frontend/src/routes and the ids in
+// staticPages.tsx — keep them in step.
+const REFERENCE_PAGES: ReadonlyArray<{ slug: string; heading: RegExp }> = [
+  { slug: "/docs", heading: /documentation/i },
+  { slug: "/help", heading: /common questions/i },
+  { slug: "/privacy", heading: /privacy/i },
+];
 
-test("landing nav reaches the product and demo pages", async ({ page }) => {
+for (const page_ of REFERENCE_PAGES) {
+  test(`${page_.slug} renders publicly`, async ({ page }) => {
+    await page.goto(page_.slug);
+    await expect(page).toHaveURL(new RegExp(`${page_.slug}$`));
+    await expect(
+      page.getByRole("heading", { level: 1, name: page_.heading }),
+    ).toBeVisible();
+  });
+}
+
+test("header nav reaches the demo and the docs", async ({ page }) => {
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Main navigation" });
-  // "Product" is the terminal-redesign label for the widget library route.
-  await nav.getByRole("link", { name: "Product", exact: true }).click();
-  await expect(page).toHaveURL(/\/widgets$/);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await nav.getByRole("link", { name: "Docs", exact: true }).click();
+  await expect(page).toHaveURL(/\/docs$/);
 
   await page.goto("/");
   await nav.getByRole("link", { name: "Demo", exact: true }).click();
   await expect(page).toHaveURL(/\/demo$/);
 });
 
-// YouInc is not sold. No public surface may quote a price, a plan, or a
-// booking link. /demo and /widgets are excluded from the money-string check
-// only because they render a sample ledger, whose amounts are the point.
-test("no public page offers a price, plan, or booking link", async ({ page }) => {
-  for (const slug of ["/", "/contact", "/about", "/terms", "/help"]) {
+test("footer exposes the docs and the source", async ({ page }) => {
+  await page.goto("/");
+  const footer = page.locator("footer");
+  await expect(footer.getByRole("link", { name: "Docs" })).toBeVisible();
+  await expect(
+    footer.getByRole("link", { name: /source on github/i }),
+  ).toHaveAttribute("href", /github\.com/);
+});
+
+// Everything that made this look like a product for sale, or a hosted service
+// with a support desk, is gone. A 404 here is the point.
+test("retired product and trust routes are gone", async ({ page }) => {
+  const retired = [
+    "/pricing",
+    "/custom-builds",
+    "/start",
+    "/security",
+    "/terms",
+    "/status",
+    "/about",
+    "/contact",
+    "/compare",
+    "/use-cases",
+    "/integrations",
+    "/changelog",
+    "/roadmap",
+    "/data-deletion",
+    "/widgets",
+  ];
+  for (const slug of retired) {
+    const response = await page.goto(slug);
+    expect(response?.status(), `${slug} should not exist`).toBe(404);
+  }
+});
+
+test("no public page quotes a price or a booking link", async ({ page }) => {
+  // /demo is excluded from the money-string check: it renders a sample ledger,
+  // whose amounts are the whole point.
+  for (const slug of ["/", "/docs", "/help", "/privacy"]) {
     await page.goto(slug);
     await expect(page.locator("body")).not.toContainText(
       /NZD \$|per month|\/mo\b|free trial|add a card/i,
     );
   }
-  for (const slug of ["/", "/demo", "/widgets", "/contact", "/about", "/terms"]) {
+  for (const slug of ["/", "/demo", "/docs", "/help", "/privacy"]) {
     await page.goto(slug);
     await expect(page.locator('a[href*="cal.com"]')).toHaveCount(0);
     await expect(page.locator('a[href$="/pricing"]')).toHaveCount(0);
   }
-});
-
-test("retired commercial routes are gone", async ({ page }) => {
-  for (const slug of ["/pricing", "/custom-builds", "/start"]) {
-    const response = await page.goto(slug);
-    expect(response?.status()).toBe(404);
-  }
-});
-
-// v1 trust/resource/company pages. Slugs are pinned to the routes in
-// frontend/src/routes/*.tsx and the ids in staticPages.tsx — keep them stable.
-const STATIC_PAGES: ReadonlyArray<{ slug: string; heading: RegExp }> = [
-  { slug: "/privacy", heading: /privacy policy/i },
-  { slug: "/terms", heading: /terms of service/i },
-  { slug: "/security", heading: /security at youinc/i },
-  { slug: "/data-deletion", heading: /export, disconnect, and delete/i },
-  { slug: "/contact", heading: /talk to a real person/i },
-  { slug: "/docs", heading: /documentation/i },
-  { slug: "/help", heading: /help and support/i },
-  { slug: "/integrations", heading: /integrations/i },
-  { slug: "/status", heading: /system status/i },
-  { slug: "/changelog", heading: /changelog/i },
-  { slug: "/roadmap", heading: /roadmap/i },
-  { slug: "/about", heading: /finance software/i },
-  { slug: "/compare", heading: /how youinc is different/i },
-  { slug: "/use-cases", heading: /what people use youinc for/i },
-];
-
-for (const { slug, heading } of STATIC_PAGES) {
-  test(`static page ${slug} loads publicly`, async ({ page }) => {
-    await page.goto(slug);
-    // Public: not redirected to /login.
-    await expect(page).toHaveURL(new RegExp(`${slug}$`));
-    await expect(
-      page.getByRole("heading", { level: 1, name: heading }),
-    ).toBeVisible();
-  });
-}
-
-test("footer trust links are discoverable and route correctly", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const trustNav = page.getByRole("navigation", { name: "Trust" });
-  for (const [name, url] of [
-    ["Security", /\/security$/],
-    ["Privacy", /\/privacy$/],
-    ["Terms", /\/terms$/],
-    ["Data deletion", /\/data-deletion$/],
-    ["Status", /\/status$/],
-  ] as const) {
-    await page.goto("/");
-    // Wait for hydration so the click drives the client router rather than
-    // landing before handlers attach (which no-ops and leaves us on "/").
-    await page.waitForLoadState("networkidle");
-    await trustNav.getByRole("link", { name, exact: true }).click();
-    await expect(page).toHaveURL(url);
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  }
-});
-
-test("footer exposes docs and security to visitors", async ({ page }) => {
-  // The header nav is trimmed to Product/Demo/Docs; Security lives under the
-  // footer's Trust column. Both must stay discoverable.
-  await page.goto("/");
-  await page.waitForLoadState("networkidle");
-  await page
-    .getByRole("navigation", { name: "Resources" })
-    .getByRole("link", { name: "Docs", exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/docs$/);
-  await expect(
-    page.getByRole("heading", { level: 1, name: /documentation/i }),
-  ).toBeVisible();
-
-  await page.goto("/");
-  await page.waitForLoadState("networkidle");
-  await page
-    .getByRole("navigation", { name: "Trust" })
-    .getByRole("link", { name: "Security", exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/security$/);
-  await expect(
-    page.getByRole("heading", { level: 1, name: /security at youinc/i }),
-  ).toBeVisible();
-});
-
-test("public /widgets exposes no session-gated mutation controls", async ({
-  page,
-}) => {
-  await page.goto("/widgets");
-  // The read-only Suspense Queue is catalogued (rendered on sample data)...
-  await expect(
-    page.getByRole("heading", { name: "Suspense Queue", exact: true }),
-  ).toBeVisible();
-  // ...but none of the session-gated mutation controls are ever rendered on the
-  // public page (these would 401 without a session — see demoWidgets allowlist).
-  await expect(page.getByRole("button", { name: "Sync" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: /add account/i })).toHaveCount(
-    0,
-  );
-  await expect(page.getByRole("button", { name: /classify/i })).toHaveCount(0);
 });

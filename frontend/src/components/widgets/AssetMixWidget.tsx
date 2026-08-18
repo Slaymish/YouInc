@@ -17,7 +17,10 @@ const TIER_CLASS: Record<LiquidityTier, string> = {
 
 export function AssetMixWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   const { slices, totalCents } = assetMix(dashboard.balances);
-  if (!totalCents) return <NoData message="NO ASSETS" />;
+  if (!totalCents) return <NoData
+        message="Nothing on the asset side yet."
+        hint="Add what you own — a bank account, a house, KiwiSaver — and the mix shows here."
+      />;
 
   return (
     <div className="asset-mix">

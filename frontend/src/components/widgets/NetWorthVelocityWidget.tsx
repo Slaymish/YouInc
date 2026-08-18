@@ -24,7 +24,10 @@ export function NetWorthVelocityWidget({
   dashboard: LedgerDashboardData;
 }) {
   const velocity = netWorthVelocity(dashboard.netWorthTrend);
-  if (!velocity) return <NoData message="NEED 2+ MONTHS OF POSTINGS" />;
+  if (!velocity) return <NoData
+        message="Two months of history needed."
+        hint="Then this shows how fast your net worth is moving, and which way."
+      />;
 
   const { monthlyDeltaCents, direction, latestCents, milestones } = velocity;
   const arrow = direction === "up" ? "▲" : direction === "down" ? "▼" : "→";

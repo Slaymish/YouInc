@@ -11,6 +11,7 @@ import {
   finishAuthentication,
 } from "~/lib/authServerFns";
 import { isValidEmail } from "~/server/authFlowSteps";
+import { clearAuthCache } from "~/lib/authCache";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 
@@ -100,6 +101,7 @@ function SigninEmailPage() {
         const response = await runConditionalAuthentication(flow.options);
         if (cancelled) return;
         await finishAuthentication({ data: { token: flow.token, response } });
+        clearAuthCache();
         await router.navigate({ to: "/onboarding" });
       } catch {
         // Popover dismissed or no passkey chosen — ignore.

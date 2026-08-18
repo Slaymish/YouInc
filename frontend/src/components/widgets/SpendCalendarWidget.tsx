@@ -28,7 +28,10 @@ export function SpendCalendarWidget({
   dashboard: LedgerDashboardData;
 }) {
   const calendar = spendCalendar(dashboard.dailySpend);
-  if (!calendar) return <NoData message="NO DAILY ACTIVITY" />;
+  if (!calendar) return <NoData
+        message="No day-by-day spending yet."
+        hint="Every day of the month appears here, shaded by how much went out."
+      />;
 
   const { weeks, totalSpendCents, dayCount } = calendar;
 

@@ -9,7 +9,10 @@ const PAD = { top: 16, right: 16, bottom: 32, left: 60 };
 
 export function RollingAverageWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   const rows = rollingAverages(dashboard.pnl);
-  if (rows.length < 2) return <NoData message="NEED 2+ MONTHS FOR TREND" />;
+  if (rows.length < 2) return <NoData
+        message="Two months of history needed for a trend."
+        hint="This smooths out one-off months so you can see the direction."
+      />;
 
   const cW = W - PAD.left - PAD.right;
   const cH = H - PAD.top - PAD.bottom;

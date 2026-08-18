@@ -1,57 +1,22 @@
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
-import type { WidgetId } from "../dashboard/widgets";
+import { WIDGET_MAP, type WidgetId } from "../dashboard/widgets";
+import { Explainer } from "~/components/ui/Explainer";
+import { explainMetric } from "./metricExplainers";
+import { formatMoney, formatMonths, formatPercent } from "./format";
 
-function formatMoney(cents: number) {
-  return new Intl.NumberFormat("en-NZ", {
-    style: "currency",
-    currency: "NZD",
-  }).format(cents / 100);
-}
-
-function formatPercent(value: number | null) {
-  if (value === null || Number.isNaN(value)) return "n/a";
-  return new Intl.NumberFormat("en-NZ", {
-    style: "percent",
-    maximumFractionDigits: 1,
-  }).format(value);
-}
-
-function formatMonths(value: number | null) {
-  return value === null ? "n/a" : `${value.toFixed(1)}m`;
-}
-
-const METRIC_CONFIGS: Record<
-  string,
-  { label: string; value: (d: LedgerDashboardData) => string }
+// Label comes from WIDGET_MAP (the single source of truth for widget copy) —
+// this map only owns the value accessor per metric.
+const METRIC_VALUE_ACCESSORS: Partial<
+  Record<WidgetId, (d: LedgerDashboardData) => string>
 > = {
-  "metric-net-worth": {
-    label: "Net Worth",
-    value: (d) => formatMoney(d.totals.netWorthCents),
-  },
-  "metric-runway": {
-    label: "Runway",
-    value: (d) => formatMonths(d.totals.runwayMonths),
-  },
-  "metric-burn": {
-    label: "Burn / Mo",
-    value: (d) => formatMoney(d.totals.monthlyOverheadCents),
-  },
-  "metric-margin": {
-    label: "Margin",
-    value: (d) => formatPercent(d.totals.ebitdaMargin),
-  },
-  "metric-assets": {
-    label: "Assets",
-    value: (d) => formatMoney(d.totals.assetsCents),
-  },
-  "metric-liabilities": {
-    label: "Liabilities",
-    value: (d) => formatMoney(d.totals.liabilitiesCents),
-  },
-  "metric-available-liquidity": {
-    label: "Available Liquidity",
-    value: (d) => formatMoney(d.totals.availableLiquidityCents),
-  },
+  "metric-net-worth": (d) => formatMoney(d.totals.netWorthCents),
+  "metric-runway": (d) => formatMonths(d.totals.runwayMonths),
+  "metric-burn": (d) => formatMoney(d.totals.monthlyOverheadCents),
+  "metric-margin": (d) => formatPercent(d.totals.ebitdaMargin),
+  "metric-assets": (d) => formatMoney(d.totals.assetsCents),
+  "metric-liabilities": (d) => formatMoney(d.totals.liabilitiesCents),
+  "metric-available-liquidity": (d) =>
+    formatMoney(d.totals.availableLiquidityCents),
 };
 
 export function MetricWidget({
@@ -61,12 +26,21 @@ export function MetricWidget({
   id: WidgetId;
   dashboard: LedgerDashboardData;
 }) {
-  const config = METRIC_CONFIGS[id];
-  if (!config) return null;
+  const value = METRIC_VALUE_ACCESSORS[id];
+  if (!value) return null;
+  // Fall back to the raw id rather than rendering blank if the registry ever
+  // drops an entry this map still serves.
+  const label = WIDGET_MAP.get(id)?.label ?? id;
+  const explainer = explainMetric(id, dashboard);
   return (
     <div className="metric-inner">
-      <p>{config.label}</p>
-      <strong>{config.value(dashboard)}</strong>
+      <p>{label}</p>
+      <span className="metric-value">
+        <strong>{value(dashboard)}</strong>
+        {explainer ? (
+          <Explainer subject={label.toLowerCase()} lines={explainer} />
+        ) : null}
+      </span>
     </div>
   );
 }

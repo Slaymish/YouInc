@@ -1,6 +1,8 @@
 import { useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
 import type { ClassificationRule, RuleInput } from "~/server/tenantRules";
+import { ToastViewport } from "~/components/ui/Toast";
+import { useUndoToasts } from "~/components/ui/useUndo";
 
 // --- Server functions --------------------------------------------------------
 
@@ -221,6 +223,7 @@ export function RulesEditor({ initialRules }: { initialRules: ClassificationRule
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const toasts = useUndoToasts();
 
   function run(action: () => Promise<ClassificationRule[]>, after?: () => void) {
     setError(null);
@@ -232,6 +235,25 @@ export function RulesEditor({ initialRules }: { initialRules: ClassificationRule
         setError(errorMessage(err));
       }
     });
+  }
+
+  // Undo re-creates the rule from the snapshot we held. It mints a fresh uuid,
+  // so `journal_transactions.rule_id` on already-posted transactions stays
+  // pointed at the old id and won't re-link — provenance only, harmless here.
+  // `seq` is reassigned too, so ties within one priority may reorder.
+  function deleteRule(rule: ClassificationRule) {
+    run(
+      () => deleteRuleFn({ data: rule.id }),
+      () =>
+        toasts.notify({
+          message: `Deleted rule "${rule.ruleKey}".`,
+          onUndo: () =>
+            run(
+              () => createRuleFn({ data: ruleToForm(rule) }),
+              () => toasts.notify({ message: `Restored rule "${rule.ruleKey}".` }),
+            ),
+        }),
+    );
   }
 
   return (
@@ -296,7 +318,7 @@ export function RulesEditor({ initialRules }: { initialRules: ClassificationRule
                       <button
                         type="button"
                         className="mb-remove"
-                        onClick={() => run(() => deleteRuleFn({ data: r.id }))}
+                        onClick={() => deleteRule(r)}
                         disabled={pending}
                       >
                         Delete
@@ -339,6 +361,8 @@ export function RulesEditor({ initialRules }: { initialRules: ClassificationRule
           + Add rule
         </button>
       )}
+
+      <ToastViewport {...toasts} />
     </div>
   );
 }

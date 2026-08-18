@@ -74,7 +74,7 @@ test.describe(
       await page.getByLabel("Workspace name").fill("Passkey Co");
       await page.getByRole("button", { name: /create workspace/i }).click();
       await page.getByRole("button", { name: /go to my workspace/i }).click();
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/app$/);
 
       // --- Sign out ---
       await page.getByRole("button", { name: /sign out/i }).click();
@@ -86,7 +86,7 @@ test.describe(
       // Conditional-UI autofill may complete the sign-in on its own; otherwise
       // drive the explicit "Continue with passkey" button on step 2.
       const alreadyIn = await page
-        .waitForURL(/\/onboarding|\/workspace/, { timeout: 3000 })
+        .waitForURL(/\/onboarding|\/app/, { timeout: 3000 })
         .then(() => true)
         .catch(() => false);
 
@@ -98,7 +98,7 @@ test.describe(
           .click();
       }
 
-      await expect(page).toHaveURL(/\/onboarding|\/workspace/);
+      await expect(page).toHaveURL(/\/onboarding|\/app/);
     });
   },
 );

@@ -1,0 +1,33 @@
+/* Shown once, then gone for good. Quiet enough to ignore, clear enough to read. */
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 1rem;
+  border: 1px dashed var(--accent-line);
+  border-radius: 12px;
+  background: var(--accent-tint);
+}
+
+.hint__text {
+  margin: 0;
+  flex: 1;
+  min-width: 14rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.hint__dismiss {
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: var(--soft-raised-sm);
+}

@@ -1,0 +1,79 @@
+/* A plain list of what happened. No postings, no rule ids — those live in the
+ * Workshop. Amounts are tabular so the column reads as a column. */
+
+.txn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.txn-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.txn-row:last-child {
+  border-bottom: none;
+}
+
+.txn-row__what {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.txn-row__what strong {
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txn-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.txn-row__meta time {
+  font-variant-numeric: tabular-nums;
+}
+
+.txn-row__category {
+  color: var(--text-soft);
+}
+
+.txn-row__unsorted {
+  color: var(--warn);
+}
+
+.txn-row__amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.txn-row__amount--in {
+  color: var(--ok);
+}
+
+.txn-empty__line {
+  margin: 0;
+  font-family: var(--mk-serif);
+  font-size: 1.3rem;
+}
+
+.txn-empty__note {
+  margin: 0.4rem 0 0;
+  max-width: 46ch;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}

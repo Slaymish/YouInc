@@ -1,7 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { MarketingHeader } from "./shell/MarketingHeader";
 import { MarketingFooter } from "./shell/MarketingFooter";
-import { Atmosphere } from "./system/Atmosphere";
 import { useDarkTheme } from "./system/useDarkTheme";
 import { pageData, type StaticPageId } from "./staticPages";
 import "./marketing-tokens.css";
@@ -17,11 +16,11 @@ interface StaticMarketingPageProps {
 export function StaticMarketingPage({ id }: StaticMarketingPageProps) {
   useDarkTheme();
   const page = pageData(id);
+  const { authenticated } = useRouteContext({ from: "__root__" });
 
   return (
     <div className="mk">
-      <Atmosphere />
-      <MarketingHeader />
+      <MarketingHeader authenticated={authenticated} />
       <main className="static-page mk-content mk-page">
         <section className="static-page__hero" aria-labelledby="static-page-heading">
           <p className="mk-eyebrow">{page.eyebrow}</p>

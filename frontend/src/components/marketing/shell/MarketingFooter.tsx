@@ -14,43 +14,24 @@ interface FooterCol {
 
 const FOOTER_COLS: readonly FooterCol[] = [
   {
-    label: "Product",
+    label: "The project",
     links: [
-      { to: "/demo", label: "Live demo" },
-      { to: "/widgets", label: "Widget library" },
-      { href: SELF_HOST_URL, label: "Self-host guide" },
-      { to: "/integrations", label: "Integrations" },
+      { to: "/demo", label: "Demo" },
+      { href: SOURCE_URL, label: "Source on GitHub" },
+      { href: SELF_HOST_URL, label: "Setup guide" },
     ],
   },
   {
-    label: "Resources",
+    label: "Reference",
     links: [
       { to: "/docs", label: "Docs" },
-      { to: "/help", label: "Help" },
-      { to: "/changelog", label: "Changelog" },
-      { to: "/roadmap", label: "Roadmap" },
-      { to: "/compare", label: "Compare" },
-    ],
-  },
-  {
-    label: "Trust",
-    links: [
-      { to: "/security", label: "Security" },
+      { to: "/help", label: "Common questions" },
       { to: "/privacy", label: "Privacy" },
-      { to: "/terms", label: "Terms" },
-      { to: "/data-deletion", label: "Data deletion" },
-      { to: "/status", label: "Status" },
     ],
   },
   {
-    label: "Company",
-    links: [
-      { to: "/about", label: "About" },
-      { to: "/use-cases", label: "Use cases" },
-      { to: "/contact", label: "Contact" },
-      { href: SOURCE_URL, label: "Source on GitHub" },
-      { href: `mailto:${DEFAULT_EMAIL}`, label: DEFAULT_EMAIL },
-    ],
+    label: "Contact",
+    links: [{ href: `mailto:${DEFAULT_EMAIL}`, label: DEFAULT_EMAIL }],
   },
 ];
 
@@ -72,10 +53,6 @@ export function MarketingFooter() {
               <Logo variant="inverted" height={26} />
             </Link>
             <p className="mk-footer__tagline">{PRODUCT.heroHeadline}</p>
-            <a className="mk-footer__status" href="/status">
-              <span className="mk-footer__status-dot" aria-hidden="true" />
-              ALL SYSTEMS OPERATIONAL
-            </a>
           </div>
 
           <div className="mk-footer__cols">
@@ -121,7 +98,7 @@ export function MarketingFooter() {
             © {YEAR} {PRODUCT.name}
           </span>
           <span className="mk-footer__credit">
-            Open source. Built in New Zealand.
+            MIT licensed. Built in New Zealand.
           </span>
         </div>
       </div>

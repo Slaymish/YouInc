@@ -123,7 +123,35 @@ export const SAMPLE_DASHBOARD: LedgerDashboardData = {
   pnl,
   incomeBreakdown,
   expenseBreakdown,
-  suspenseQueue: [],
+  // Three items the rules couldn't place, so the demo can show the sorting task
+  // — the interaction people do most. Count and total match routing.suspenseCount
+  // / suspenseCents below.
+  suspenseQueue: [
+    {
+      externalId: "sample-suspense-1",
+      transactionDate: "2026-06-27",
+      description: "ATM WITHDRAWAL CUBA ST",
+      amountCents: -2_000,
+      direction: "out",
+      counterAccount: "Assets:Bank:BNZ:Everyday",
+    },
+    {
+      externalId: "sample-suspense-2",
+      transactionDate: "2026-06-24",
+      description: "SQ *THE HANGAR COFFEE",
+      amountCents: -1_650,
+      direction: "out",
+      counterAccount: "Assets:Bank:BNZ:Everyday",
+    },
+    {
+      externalId: "sample-suspense-3",
+      transactionDate: "2026-06-19",
+      description: "TRANSFER FROM J WILSON",
+      amountCents: 1_150,
+      direction: "in",
+      counterAccount: "Assets:Bank:BNZ:Everyday",
+    },
+  ],
   netWorthTrend,
   recentTransactions,
   recurringPayments,

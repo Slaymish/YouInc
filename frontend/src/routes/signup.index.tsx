@@ -10,7 +10,7 @@ import { SITE_URL } from "~/lib/sitemap";
 import { trackProductEvent } from "~/lib/productAnalytics";
 
 const SIGNUP_DESCRIPTION =
-  "Create your YouInc account and set up your own workspace in a couple of minutes. No card required.";
+  "Create an account on the YouInc instance you are running, and set up your workspace.";
 
 const SIGNUP_JSON_LD = jsonLdScript(
   jsonLdGraph([
@@ -91,11 +91,11 @@ function SignupEmailPage() {
     <AuthShell>
       <section className="auth-card" aria-labelledby="signup-heading">
         <AuthStepper index={0} count={3} />
-        <p className="auth-eyebrow">Start free</p>
+        <p className="auth-eyebrow">Your instance</p>
         <h1 id="signup-heading">Create your account</h1>
         <p className="auth-lede">
-          Run yourself like a company. Set up your workspace in a couple of
-          minutes. No card required.
+          This account lives on the instance you're running. Setting up your
+          workspace takes a couple of minutes.
         </p>
 
         {notice === "expired" ? (

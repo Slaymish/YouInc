@@ -922,3 +922,44 @@
     flex-wrap: nowrap;
   }
 }
+
+/* ── Empty states ──────────────────────────────────────────────────────────
+ * An empty card is the highest-attention moment in the app: someone is looking
+ * straight at a thing that doesn't work yet. Two lines — what goes here, and
+ * what fills it — read better than a shouted fragment. */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.no-data__line {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.no-data__hint {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Metric value + its "why this number?" toggle on one baseline. */
+.metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.metric-value strong {
+  min-width: 0;
+}

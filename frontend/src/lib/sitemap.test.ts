@@ -68,7 +68,7 @@ describe("buildSitemapXml", () => {
   });
 
   it("never includes an excluded private route", () => {
-    const privatePrefixes = ["/workspace", "/onboarding", "/admin", "/api/", "/auth/confirm"];
+    const privatePrefixes = ["/app", "/workspace", "/onboarding", "/admin", "/api/", "/auth/confirm"];
     for (const route of PUBLIC_ROUTES) {
       for (const prefix of privatePrefixes) {
         expect(route.path.startsWith(prefix)).toBe(false);

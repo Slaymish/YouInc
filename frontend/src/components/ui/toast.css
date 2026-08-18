@@ -1,0 +1,133 @@
+/* frontend/src/components/ui/toast.css
+ * Undo toasts. The host is a single shared live region pinned to the bottom of
+ * the viewport; it stays in the DOM permanently (empty most of the time), so it
+ * is pointer-transparent and only the toasts themselves take events. */
+
+.toast-host {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem 1.25rem;
+  pointer-events: none;
+}
+
+.toast-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(30rem, 100%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.7rem 0.7rem 0.95rem;
+  border: 1px solid var(--line-subtle);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--soft-raised-lg);
+  pointer-events: auto;
+}
+
+.toast__message {
+  flex: 1;
+  margin: 0;
+  color: var(--text);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.toast__undo,
+.toast__dismiss {
+  flex: none;
+  border: 1px solid var(--line-subtle);
+  border-radius: 6px;
+  background: var(--page);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast, 150ms) ease,
+    color var(--duration-fast, 150ms) ease;
+}
+
+.toast__undo {
+  padding: 0.35rem 0.85rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.toast__dismiss {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.toast__undo:hover,
+.toast__dismiss:hover {
+  border-color: var(--line);
+}
+
+.toast__dismiss:hover {
+  color: var(--text);
+}
+
+.toast__undo:focus-visible,
+.toast__dismiss:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Motion is opt-in: the reduced-motion default is a plain appearance. */
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: toast-rise 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes toast-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ── Inline two-step confirm (destructive, non-undoable actions) ──────────── */
+.confirm-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.confirm-inline__prompt {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* The mobile tab bar owns the bottom of the viewport (styles/app-shell.css), so
+   lift the stack clear of it rather than stacking on top. */
+@media (max-width: 1023px) {
+  .toast-host {
+    padding-bottom: calc(1.25rem + var(--app-tabbar-h, 0px));
+  }
+}

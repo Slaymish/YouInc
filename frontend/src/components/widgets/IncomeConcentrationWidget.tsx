@@ -17,7 +17,10 @@ export function IncomeConcentrationWidget({
   dashboard: LedgerDashboardData;
 }) {
   const concentration = incomeConcentration(dashboard.incomeBreakdown);
-  if (!concentration) return <NoData message="NO INCOME POSTINGS" />;
+  if (!concentration) return <NoData
+        message="No income recorded yet."
+        hint="This flags when most of your income comes from a single source."
+      />;
 
   const { topShare, topAccount, effectiveSources, level, shares } = concentration;
   const visible = shares.slice(0, MAX_SHARE_ROWS);

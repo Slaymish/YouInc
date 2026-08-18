@@ -125,8 +125,8 @@ function OnboardingPage() {
               {firstName ? `Welcome, ${firstName}.` : "Welcome to YouInc."}
             </h1>
             <p className="auth-lede">
-              You're three quick steps from a live CFO view of your finances.
-              Here's what you'll set up:
+              You're two quick steps from seeing your numbers, live. Here's
+              what you'll set up:
             </p>
             <ul className="onb-benefits">
               <li>Name your workspace, your personal "You Inc."</li>
@@ -135,8 +135,8 @@ function OnboardingPage() {
                 manually).
               </li>
               <li>
-                Watch your accounts become a live double-entry ledger and
-                dashboard.
+                Watch your dashboard fill in with real numbers, kept up to
+                date automatically.
               </li>
             </ul>
             <div className="onb-actions">
@@ -237,7 +237,7 @@ function OnboardingPage() {
               <button
                 className="auth-primary"
                 type="button"
-                onClick={() => window.location.replace("/workspace")}
+                onClick={() => window.location.replace("/app")}
               >
                 Go to my workspace →
               </button>

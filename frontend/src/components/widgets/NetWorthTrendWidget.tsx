@@ -8,7 +8,10 @@ const PAD = { top: 16, right: 16, bottom: 32, left: 64 };
 
 export function NetWorthTrendWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   const rows = dashboard.netWorthTrend;
-  if (rows.length < 2) return <NoData message="NEED 2+ MONTHS OF POSTINGS" />;
+  if (rows.length < 2) return <NoData
+        message="Two months of history needed to draw a line."
+        hint="Until then there is only one point to plot."
+      />;
 
   const cW = W - PAD.left - PAD.right;
   const cH = H - PAD.top - PAD.bottom;

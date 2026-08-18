@@ -24,7 +24,8 @@ export interface SitemapRoute {
 }
 
 // The full public marketing/content surface. Deliberately excludes anything
-// gated or non-canonical: /workspace, /onboarding, /admin/*, /api/*, and
+// gated or non-canonical: /app (and the legacy /workspace redirect),
+// /onboarding, /admin/*, /api/*, and
 // /auth/confirm (a redirect-only callback route with no content of its own).
 // It also excludes /signin and /signup: those routes exist for self-hosted
 // instances, and youinc.net offers no accounts, so advertising them to
@@ -32,21 +33,9 @@ export interface SitemapRoute {
 export const PUBLIC_ROUTES: readonly SitemapRoute[] = [
   { path: "/", changefreq: "weekly", priority: 1.0 },
   { path: "/demo", changefreq: "monthly", priority: 0.9 },
-  { path: "/widgets", changefreq: "monthly", priority: 0.7 },
-  { path: "/docs", changefreq: "monthly", priority: 0.7 },
+  { path: "/docs", changefreq: "monthly", priority: 0.8 },
   { path: "/help", changefreq: "monthly", priority: 0.6 },
-  { path: "/integrations", changefreq: "monthly", priority: 0.6 },
-  { path: "/use-cases", changefreq: "monthly", priority: 0.6 },
-  { path: "/compare", changefreq: "monthly", priority: 0.6 },
-  { path: "/about", changefreq: "monthly", priority: 0.5 },
-  { path: "/changelog", updated: "5 July 2026", changefreq: "weekly", priority: 0.5 },
-  { path: "/roadmap", changefreq: "monthly", priority: 0.4 },
-  { path: "/security", updated: "5 July 2026", changefreq: "monthly", priority: 0.5 },
-  { path: "/privacy", updated: "4 July 2026", changefreq: "monthly", priority: 0.4 },
-  { path: "/terms", updated: "4 July 2026", changefreq: "monthly", priority: 0.4 },
-  { path: "/data-deletion", updated: "4 July 2026", changefreq: "monthly", priority: 0.4 },
-  { path: "/status", changefreq: "daily", priority: 0.3 },
-  { path: "/contact", changefreq: "yearly", priority: 0.3 },
+  { path: "/privacy", changefreq: "yearly", priority: 0.3 },
 ];
 
 const MONTHS: Record<string, string> = {

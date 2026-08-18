@@ -5,11 +5,15 @@ import type {
   WorkspaceManualBalance,
 } from "~/server/workspaceLedger";
 import { formatMoney } from "~/components/widgets/format";
+import { ToastViewport } from "~/components/ui/Toast";
+import { useUndoToasts, type UndoToasts } from "~/components/ui/useUndo";
 
 // --- Server functions (each re-checks the Supabase user inside the DAL) ------
 
+// `asOfDate` is optional and only supplied by undo, which restores the deleted
+// row's original date rather than stamping today.
 const upsertBalanceFn = createServerFn({ method: "POST" })
-  .validator((data: { account: string; balanceCents: number }) => data)
+  .validator((data: { account: string; balanceCents: number; asOfDate?: string }) => data)
   .handler(async ({ data }): Promise<WorkspaceLedgerSummary> => {
     const { upsertWorkspaceBalance } = await import("~/server/workspaceLedger");
     return upsertWorkspaceBalance(data);
@@ -35,7 +39,63 @@ interface Props {
   onChange: (next: WorkspaceLedgerSummary) => void;
 }
 
-function BalanceRow({ row, onChange }: { row: WorkspaceManualBalance; onChange: Props["onChange"] }) {
+/**
+ * One row per place money sits, whether it syncs or you typed it. Synced rows
+ * are read-only — they come from transactions, so editing the total here would
+ * be a number with nothing behind it.
+ */
+function SyncedRow({ row }: { row: WorkspaceLedgerSummary["balances"][number] }) {
+  return (
+    <tr>
+      <td>
+        <code className="mb-account">{row.account}</code>
+        <span className={"mb-tag mb-tag--" + row.accountType.toLowerCase()}>
+          {row.accountType}
+        </span>
+        <span className="mb-tag mb-source">Synced</span>
+      </td>
+      <td className="mb-numeric">{formatMoney(row.balanceCents)}</td>
+      <td className="mb-actions" />
+    </tr>
+  );
+}
+
+/**
+ * Undo for a removed balance. Server-first like every other mutation here — no
+ * optimistic restore, because the route loader is invalidated after `onChange`
+ * and would clobber client-only state.
+ */
+async function restoreBalance(
+  removed: WorkspaceManualBalance,
+  onChange: Props["onChange"],
+  toasts: UndoToasts,
+): Promise<void> {
+  try {
+    onChange(
+      await upsertBalanceFn({
+        data: {
+          account: removed.account,
+          balanceCents: removed.balanceCents,
+          asOfDate: removed.asOfDate,
+        },
+      }),
+    );
+    toasts.notify({ message: `Restored ${removed.account}.` });
+  } catch (err) {
+    toasts.notify({ message: `Couldn't restore ${removed.account}: ${errorMessage(err)}` });
+  }
+}
+
+function BalanceRow({
+  row,
+  onChange,
+  onRemoved,
+}: {
+  row: WorkspaceManualBalance;
+  onChange: Props["onChange"];
+  /** Raises the undo toast in the parent — this row unmounts on delete. */
+  onRemoved: (removed: WorkspaceManualBalance) => void;
+}) {
   const [pending, startTransition] = useTransition();
   const [dollars, setDollars] = useState((row.balanceCents / 100).toFixed(2));
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +122,7 @@ function BalanceRow({ row, onChange }: { row: WorkspaceManualBalance; onChange: 
       try {
         const next = await deleteBalanceFn({ data: row.account });
         onChange(next);
+        onRemoved(row);
       } catch (err) {
         setError(errorMessage(err));
       }
@@ -73,6 +134,7 @@ function BalanceRow({ row, onChange }: { row: WorkspaceManualBalance; onChange: 
       <td>
         <code className="mb-account">{row.account}</code>
         <span className={"mb-tag mb-tag--" + row.accountType.toLowerCase()}>{row.accountType}</span>
+        <span className="mb-tag mb-source">Entered by hand</span>
       </td>
       <td className="mb-numeric">
         <input
@@ -153,9 +215,27 @@ function AddBalance({ onChange }: { onChange: Props["onChange"] }) {
 
 export function ManualBalancesEditor({ summary, onChange }: Props) {
   const rows = summary.manualBalances;
+  // Synced balances are derived from posted transactions; manual entries win
+  // where both exist, which is why these are the non-manual rows only.
+  const synced = summary.balances.filter((b) => !b.isManual);
+  const toasts = useUndoToasts();
+
+  // `manual_account_balances` is keyed on (tenant_id, account) and has no
+  // soft-delete column, so undo is a plain re-upsert from the row we held.
+  function offerUndo(removed: WorkspaceManualBalance) {
+    toasts.notify({
+      message: `Removed ${removed.account}.`,
+      onUndo: () => {
+        void restoreBalance(removed, onChange, toasts);
+      },
+    });
+  }
+
+  const hasRows = rows.length > 0 || synced.length > 0;
+
   return (
     <div className="mb-editor">
-      {rows.length > 0 ? (
+      {hasRows ? (
         <div className="mb-table-wrap">
           <table className="mb-table">
             <thead>
@@ -167,7 +247,15 @@ export function ManualBalancesEditor({ summary, onChange }: Props) {
             </thead>
             <tbody>
               {rows.map((row) => (
-                <BalanceRow key={row.account} row={row} onChange={onChange} />
+                <BalanceRow
+                  key={row.account}
+                  row={row}
+                  onChange={onChange}
+                  onRemoved={offerUndo}
+                />
+              ))}
+              {synced.map((row) => (
+                <SyncedRow key={row.account} row={row} />
               ))}
             </tbody>
           </table>
@@ -178,11 +266,13 @@ export function ManualBalancesEditor({ summary, onChange }: Props) {
         </p>
       )}
       <AddBalance onChange={onChange} />
-      <p className="mb-note">
-        {rows.length > 0
-          ? "Balances are updated by hand for now. Automatic bank sync via Akahu is coming — it will keep these current for you."
-          : "Prefer automatic updates? Bank sync via Akahu is coming soon."}
-      </p>
+      {synced.length > 0 ? (
+        <p className="mb-note">
+          Synced balances come from your transactions. Where you've entered a
+          balance yourself, we use yours.
+        </p>
+      ) : null}
+      <ToastViewport {...toasts} />
     </div>
   );
 }

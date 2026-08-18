@@ -19,7 +19,10 @@ function DeltaTag({ delta, invert }: { delta: number | null; invert?: boolean })
 
 export function MonthPulseWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   const pulse = monthPulse(dashboard.pnl);
-  if (!pulse) return <NoData message="NO MONTHLY DATA" />;
+  if (!pulse) return <NoData
+        message="Nothing for this month yet."
+        hint="Income and spending for the month appear here as transactions land."
+      />;
 
   return (
     <div className="pulse">

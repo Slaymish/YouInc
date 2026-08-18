@@ -38,7 +38,7 @@ test.describe(
       await page.getByLabel("Workspace name").fill(workspaceName);
       await page.getByRole("button", { name: /create workspace/i }).click();
       await page.getByRole("button", { name: /go to my workspace/i }).click();
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/app$/);
     }
 
     test("add, edit, and delete an account mapping (free-text account id)", async ({
@@ -48,8 +48,8 @@ test.describe(
       await signUpIntoWorkspace(page, email, "Mapping Co");
 
       // Account mappings live on the workspace Settings tab.
-      await page.getByRole("link", { name: "Settings" }).click();
-      await expect(page).toHaveURL(/\/workspace\/settings$/);
+      await page.getByRole("link", { name: "Workshop" }).click();
+      await expect(page).toHaveURL(/\/app\/workshop$/);
 
       const panel = page.locator(".ws-panel:has(#ws-account-mappings-heading)");
       await expect(

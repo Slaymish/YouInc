@@ -18,7 +18,10 @@ export function RunwayProjectionWidget({ dashboard }: { dashboard: LedgerDashboa
     .reduce((sum, row) => sum + row.balanceCents, 0);
   const monthlyBurnCents = dashboard.totals.monthlyOverheadCents;
 
-  if (!monthlyBurnCents) return <NoData message="NO BURN TO PROJECT" />;
+  if (!monthlyBurnCents) return <NoData
+        message="No spending on record to project from."
+        hint="Once there is a month of spending, this shows how long your money lasts."
+      />;
 
   const { months, points } = runwayProjection(cashCents, monthlyBurnCents);
   const low = months !== null && months < 3;

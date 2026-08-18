@@ -1,6 +1,7 @@
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
+import "~/components/ui/toast.css";
 import type {
   AkahuAccountSummary,
   AkahuConnectionStatus,
@@ -99,6 +100,20 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
   const [pending, startTransition] = useTransition();
   const [fromDate, setFromDate] = useState(defaultFromDate());
   const [toDate, setToDate] = useState("");
+  // Disconnect gets a two-step confirm rather than an undo: it destroys the
+  // Vault-stored Akahu token, and only Akahu can issue a replacement.
+  const [confirmingDisconnect, setConfirmingDisconnect] = useState(false);
+  const disconnectRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+
+  // Move focus onto the confirm button, and back to the trigger on cancel, so
+  // the step is reachable and escapable without a pointer.
+  useEffect(() => {
+    if (confirmingDisconnect) confirmRef.current?.focus();
+    else if (wasConfirming.current) disconnectRef.current?.focus();
+    wasConfirming.current = confirmingDisconnect;
+  }, [confirmingDisconnect]);
 
   // The OAuth callback (api.akahu.callback.ts) redirects the full browser
   // back to /workspace with either ?akahu_connected=1 or ?akahu_error=<code>.
@@ -148,11 +163,19 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
         const next = await disconnectFn();
         setStatus(next);
         setAccounts(null);
-        setMessage("Akahu disconnected.");
+        setConfirmingDisconnect(false);
+        setMessage(
+          "Akahu disconnected. Reconnecting means authorising a new token with Akahu.",
+        );
       } catch (err) {
         setError(errorMessage(err));
       }
     });
+  }
+
+  function cancelDisconnect() {
+    setConfirmingDisconnect(false);
+    setMessage("Disconnect cancelled.");
   }
 
   function loadAccounts() {
@@ -219,9 +242,50 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
             <button className="auth-primary" type="button" onClick={loadAccounts} disabled={pending}>
               {pending && accounts === null ? "Loading…" : "Load my accounts"}
             </button>
-            <button className="auth-secondary akahu-panel__disconnect" type="button" onClick={disconnect} disabled={pending}>
-              Disconnect
-            </button>
+            {confirmingDisconnect ? (
+              <div
+                className="confirm-inline"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") cancelDisconnect();
+                }}
+              >
+                <p className="confirm-inline__prompt">
+                  Really disconnect? Your stored Akahu token is destroyed — you'll
+                  need to authorise a new one with Akahu to reconnect.
+                </p>
+                <button
+                  ref={confirmRef}
+                  className="auth-secondary akahu-panel__disconnect"
+                  type="button"
+                  onClick={disconnect}
+                  disabled={pending}
+                >
+                  {pending ? "Disconnecting…" : "Yes, disconnect"}
+                </button>
+                <button
+                  className="auth-secondary"
+                  type="button"
+                  onClick={cancelDisconnect}
+                  disabled={pending}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                ref={disconnectRef}
+                className="auth-secondary akahu-panel__disconnect"
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  setMessage(null);
+                  setConfirmingDisconnect(true);
+                }}
+                disabled={pending}
+              >
+                Disconnect
+              </button>
+            )}
           </div>
 
           {accounts !== null ? (

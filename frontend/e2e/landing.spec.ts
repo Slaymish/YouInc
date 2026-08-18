@@ -1,31 +1,33 @@
 import { test, expect } from "@playwright/test";
 
-test("landing hero renders", async ({ page }) => {
+test("landing page describes the project and points at the demo", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  const demoCta = page
+    .getByRole("link", { name: /open the demo/i })
+    .first();
+  await expect(demoCta).toHaveAttribute("href", /\/demo$/);
+  await demoCta.click();
+  await expect(page).toHaveURL(/\/demo$/);
 });
 
-test("book-a-call links to the scheduler in a new tab", async ({ page }) => {
-  await page.goto("/");
-  const bookLink = page.getByRole("link", { name: "Book a call" }).first();
-  await expect(bookLink).toHaveAttribute("href", /cal\.com|calendly\.com/);
-  await expect(bookLink).toHaveAttribute("target", "_blank");
-});
-
-test("hero CTA routes into the quiz funnel, not straight to signup", async ({ page }) => {
+// The public surface is a demo plus docs. Nothing here is sold, and nothing
+// solicits: no price, no booking link, no support chat, no feedback prompt.
+test("landing page carries no product surface", async ({ page }) => {
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  const cta = page.getByRole("link", { name: /see your picture/i }).first();
-  await expect(cta).toBeVisible();
-  await expect(cta).toHaveAttribute("href", /\/start/);
-  await cta.click();
-  await expect(page).toHaveURL(/\/start$/);
+  await expect(page.locator("body")).not.toContainText(
+    /NZD \$|per month|\/mo\b|free trial|add a card|book a call/i,
+  );
+  await expect(page.locator('a[href*="cal.com"]')).toHaveCount(0);
   await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: /what are you trying to get a handle on/i,
-    }),
-  ).toBeVisible();
+    page.getByRole("button", { name: /ask hamish/i }),
+  ).toHaveCount(0);
+  await expect(page.locator("body")).not.toContainText(
+    /did you find what you needed/i,
+  );
 });
 
 test("signup page links back to sign-in and to the demo", async ({ page }) => {
@@ -38,45 +40,8 @@ test("signup page links back to sign-in and to the demo", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("public demo renders the real dashboard shell without auth", async ({
-  page,
-}) => {
+test("the demo runs without a session", async ({ page }) => {
   await page.goto("/demo");
-  await expect(page).toHaveURL(/\/demo$/); // not redirected to /login
-  // Same system-shell chrome as the authed /dashboard, not the old flat demo board.
-  await expect(
-    page.getByRole("heading", { name: "Entity Control" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Net Worth Trend", exact: true }),
-  ).toBeVisible();
-  // Full dashboard interactivity — tabs, customize/drag/resize — is available on sample data.
-  await expect(
-    page.getByRole("navigation", { name: "Dashboard views" }),
-  ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Customize" })).toBeVisible();
-});
-
-test("public demo's widget picker hides session-gated mutation widgets", async ({
-  page,
-}) => {
-  await page.goto("/demo");
-  // DashboardGrid is a client component; clicking before hydration attaches
-  // handlers is a no-op (see the waitlist-signup test above for the same
-  // pre-hydration pitfall). Wait for the network to settle first.
-  await page.waitForLoadState("networkidle");
-  await page.getByRole("button", { name: "Customize" }).click();
-  await page.getByRole("button", { name: "+ Add widget" }).click();
-  await expect(
-    page.getByRole("button", { name: "Ingestion", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Manual Accounts", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Source Systems", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Suspense Queue", exact: true }),
-  ).toHaveCount(0);
+  await expect(page).toHaveURL(/\/demo$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });

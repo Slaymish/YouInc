@@ -436,9 +436,12 @@ export interface CategoryAnomaly {
   account: string;
   currentCents: number;
   meanCents: number;
-  /** z-score of the current month against the category's prior history. */
+  /** z-score of the current month against the category's prior history. Positive = above normal, negative = below. */
   z: number;
+  /** currentCents - meanCents; sign matches direction (negative when below normal). */
   deltaCents: number;
+  /** Whether the current month ran above or below the category's own history. */
+  direction: "above" | "below";
 }
 
 export interface SpendingAnomalies {
@@ -452,8 +455,9 @@ const MIN_PRIOR_MONTHS = 3;
 const ANOMALY_Z_THRESHOLD = 1.5;
 
 /**
- * Flags expense categories whose latest month runs well above their own
- * history (z-score over prior months), turning passive reporting into an alert.
+ * Flags expense categories whose latest month runs well above or below their
+ * own history (z-score over prior months) — surfacing overspends as alerts
+ * and underspends as good news, using the same statistical test.
  */
 export function spendingAnomalies(
   categoryMonthly: CategoryMonthPoint[],
@@ -492,18 +496,19 @@ export function spendingAnomalies(
     if (std <= 0) continue;
 
     const z = (currentCents - meanCents) / std;
-    if (z >= ANOMALY_Z_THRESHOLD) {
+    if (Math.abs(z) >= ANOMALY_Z_THRESHOLD) {
       anomalies.push({
         account,
         currentCents,
         meanCents: Math.round(meanCents),
         z,
         deltaCents: Math.round(currentCents - meanCents),
+        direction: z >= 0 ? "above" : "below",
       });
     }
   }
 
-  anomalies.sort((a, b) => b.z - a.z);
+  anomalies.sort((a, b) => Math.abs(b.z) - Math.abs(a.z));
   return { month: currentMonth, hasEnoughHistory: true, anomalies };
 }
 
@@ -628,7 +633,7 @@ const CREDIT_UTILIZATION_WARN = 0.7;
  * A suspense backlog at or under this size reads as routine cleanup, not an
  * exception — shared by the Action Center severity below and the Control
  * Brief / Ledger Confidence banners (`ControlBriefWidget`,
- * `LedgerConfidenceWidget`) so "books not decision-grade" language only
+ * `LedgerConfidenceWidget`) so the stronger "these need sorting" warning only
  * appears once the backlog is actually large enough to matter.
  */
 export const SUSPENSE_MINOR_THRESHOLD = 10;
@@ -662,8 +667,8 @@ export function buildAttentionItems(
       {
         id: "no-database",
         severity: "critical",
-        label: "No ledger database",
-        detail: "Run an ingestion before anything else can report.",
+        label: "No data yet",
+        detail: "Sync your accounts to bring in transactions — there's nothing to show until then.",
         targetView: "books",
       },
     ];
@@ -678,7 +683,7 @@ export function buildAttentionItems(
       id: "runway",
       severity: "critical",
       label: `Runway ${formatMonths(runway)}`,
-      detail: "Below threshold — preserve liquidity before any allocation.",
+      detail: "Your cash won't stretch far at this rate — pull back on spending until it recovers.",
       targetView: "wealth",
     });
   }
@@ -689,10 +694,10 @@ export function buildAttentionItems(
     items.push({
       id: "suspense",
       severity: isMinor ? "review" : "action",
-      label: `${n.toLocaleString()} ${n === 1 ? "transaction" : "transactions"} to classify`,
+      label: `${n.toLocaleString()} ${n === 1 ? "transaction" : "transactions"} to categorise`,
       detail: isMinor
-        ? "A small backlog — route these whenever convenient."
-        : "Books aren't decision-grade until these are routed.",
+        ? "A small batch — sort them whenever it suits you."
+        : "These need categorising before the numbers can be trusted.",
       targetView: "books",
     });
   }
@@ -705,7 +710,7 @@ export function buildAttentionItems(
       id: "unmapped",
       severity: "action",
       label: `${unmapped} source ${unmapped === 1 ? "account" : "accounts"} unmapped`,
-      detail: "Map them so their balances post to the ledger.",
+      detail: "Map them so their balances show up correctly.",
       targetView: "books",
     });
   }
@@ -719,26 +724,30 @@ export function buildAttentionItems(
       id: "stale-sync",
       severity: "action",
       label: `Last sync ${staleDays} days ago`,
-      detail: "Refresh ingestion so figures reflect recent activity.",
+      detail: "Sync again so the numbers catch up with what's actually happened.",
       targetView: "books",
     });
   }
 
-  const { anomalies } = spendingAnomalies(dashboard.categoryMonthly);
-  if (anomalies.length > 0) {
-    const top = anomalies[0];
+  // Action Center is an alert list — only overspends belong here; underspends
+  // are good news and surface separately in SpendingAnomaliesWidget.
+  const overspend = spendingAnomalies(dashboard.categoryMonthly).anomalies.filter(
+    (anomaly) => anomaly.direction === "above",
+  );
+  if (overspend.length > 0) {
+    const top = overspend[0];
     const overshoot = top.meanCents ? top.deltaCents / top.meanCents : null;
     const lift = overshoot === null ? null : `+${formatPercent(overshoot)}`;
     items.push({
       id: "anomalies",
       severity: "review",
       label:
-        anomalies.length === 1
+        overspend.length === 1
           ? `${leafAccount(top.account)} ${lift ?? "above normal"}`
-          : `${anomalies.length} categories above normal`,
+          : `${overspend.length} categories above normal`,
       detail:
-        anomalies.length === 1
-          ? "Spending well above this category's own history."
+        overspend.length === 1
+          ? "Well above what's normal for this category."
           : `Led by ${leafAccount(top.account)}${lift ? ` (${lift})` : ""}.`,
       targetView: "cash-flow",
     });
@@ -759,8 +768,8 @@ export function buildAttentionItems(
           : `${newRecurring.length} new recurring payments`,
       detail:
         newRecurring.length === 1
-          ? `${formatMoney(first.monthlyEquivalentCents)}/mo of committed spend — confirm it's intended.`
-          : "Recently started commitments — confirm they're intended.",
+          ? `${formatMoney(first.monthlyEquivalentCents)}/mo — check this is one you meant to start.`
+          : "These started recently — check they're ones you meant to start.",
       targetView: "cash-flow",
     });
   }
@@ -774,7 +783,7 @@ export function buildAttentionItems(
       id: "runway-warn",
       severity: "review",
       label: `Runway ${formatMonths(runway)}`,
-      detail: "Getting tight — watch burn over the next few months.",
+      detail: "Getting tight — keep an eye on your spending over the next few months.",
       targetView: "wealth",
     });
   }
@@ -792,7 +801,7 @@ export function buildAttentionItems(
           ? `${leafAccount(top.account)} at ${formatPercent(top.utilization)}`
           : `${hotFacilities.length} facilities above ${formatPercent(CREDIT_UTILIZATION_WARN)}`,
       detail:
-        "High utilization shrinks available liquidity and headroom for timing gaps.",
+        "Using this much of your credit leaves less room to fall back on if you need it.",
       targetView: "wealth",
     });
   }

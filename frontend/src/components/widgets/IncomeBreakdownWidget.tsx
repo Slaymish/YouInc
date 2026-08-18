@@ -5,7 +5,10 @@ import { BreakdownList } from "./ExpenseBreakdownWidget";
 
 export function IncomeBreakdownWidget({ dashboard }: { dashboard: LedgerDashboardData }) {
   const rows = dashboard.incomeBreakdown;
-  if (!rows.length) return <NoData message="NO INCOME POSTINGS" />;
+  if (!rows.length) return <NoData
+        message="No income recorded yet."
+        hint="Once money comes in, this breaks it down by where it came from."
+      />;
 
   const total = rows.reduce((sum, row) => sum + row.amountCents, 0);
   const top = rows[0];

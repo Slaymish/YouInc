@@ -24,7 +24,10 @@ export function CashflowWaterfallWidget({
   dashboard: LedgerDashboardData;
 }) {
   const waterfall = cashflowWaterfall(dashboard.pnl, dashboard.categoryMonthly);
-  if (!waterfall) return <NoData message="NO MONTHLY CASHFLOW" />;
+  if (!waterfall) return <NoData
+        message="Not enough movement to chart yet."
+        hint="This shows where a month's money went, once a month of transactions is in."
+      />;
 
   const { steps, month, incomeCents, expensesCents, netCents, maxCents } = waterfall;
 
