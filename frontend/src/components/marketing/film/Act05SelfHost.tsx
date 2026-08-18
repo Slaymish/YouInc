@@ -15,7 +15,7 @@ export function Act05SelfHost() {
             <span className="mk-eyebrow__label">{SELF_HOST.eyebrow.label}</span>
           </p>
           <h2 id="selfhost-heading" className="act-selfhost__headline mk-display">
-            Your ledger, <em>on your machine.</em>
+            {SELF_HOST.headline.lead} <em>{SELF_HOST.headline.em}</em>
           </h2>
           <p className="act-selfhost__body mk-lede">{SELF_HOST.body}</p>
         </header>
@@ -50,8 +50,8 @@ export function Act05SelfHost() {
             Source on{" "}
             <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer">
               GitHub
-            </a>{" "}
-            — issues and pull requests welcome.
+            </a>
+            . Issues and pull requests welcome.
           </span>
         </div>
       </div>

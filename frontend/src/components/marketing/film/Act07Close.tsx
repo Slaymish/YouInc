@@ -16,7 +16,7 @@ export function Act07Close() {
           <span className="mk-eyebrow__label">{CLOSE.eyebrow.label}</span>
         </p>
         <h2 id="close-heading" className="act-close__headline mk-display">
-          Incorporate <em>yourself.</em>
+          {CLOSE.headline.lead} <em>{CLOSE.headline.em}</em>
         </h2>
         <div className="act-close__cta">
           <Link className="mk-btn mk-btn--primary" to="/demo">

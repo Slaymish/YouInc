@@ -21,7 +21,8 @@ export function Act02Engine() {
             <span className="mk-eyebrow__label">{ENGINE.eyebrow.label}</span>
           </p>
           <h2 id="engine-heading" className="visually-hidden">
-            The engine: every dollar gets an account, every entry balances
+            The engine: every dollar gets an account, every entry balances,
+            nothing gets guessed
           </h2>
 
           <ol className="act-engine__beats">

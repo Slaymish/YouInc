@@ -15,10 +15,10 @@ export function Act04Security() {
             <span className="mk-eyebrow__label">{SECURITY.eyebrow.label}</span>
           </p>
           <h2 id="security-heading" className="act-security__headline mk-display">
-            Built like infrastructure, <em>because it is.</em>
+            {SECURITY.headline.lead} <em>{SECURITY.headline.em}</em>
           </h2>
           <Link className="act-security__link" to="/security">
-            Read the security posture →
+            More on security →
           </Link>
         </div>
 

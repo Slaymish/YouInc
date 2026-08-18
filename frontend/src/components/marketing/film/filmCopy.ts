@@ -1,12 +1,16 @@
-// Narrative copy for "The Incorporation" landing film. Voice: assured, precise,
-// faintly cinematic. Short declaratives. No exclamation marks, no
-// supercharge/unlock/seamless. Feature claims stay consistent with config.ts and
-// the real engine (rules routing, NZFCC fallback, suspense safety, RLS, Vault).
+// Narrative copy for "The Incorporation" landing film. Voice: plain, short,
+// specific. No exclamation marks, no supercharge/unlock/seamless. Feature
+// claims stay consistent with config.ts and the real engine (rules routing,
+// NZFCC fallback, suspense safety, RLS, Vault).
+//
+// Headlines are split `lead` + `em` because the acts wrap the second half in
+// <em>. Keep the split here, not as literals in the components, so there is one
+// copy of every line.
 
 export const HERO = {
-  eyebrow: { index: "00", label: "Personal ERP — Open source, self-hosted" },
-  headline: "Run yourself like a company.",
-  reassurance: "Open source · Read-only bank access · Runs on your machine",
+  eyebrow: { index: "00", label: "Personal ERP · self-hosted" },
+  headline: { line1: "Run yourself", line2: "like a", em: "company." },
+  reassurance: "Open source · read-only bank access · runs on your machine",
 } as const;
 
 export const ENGINE = {
@@ -14,15 +18,15 @@ export const ENGINE = {
   beats: [
     {
       lead: "Every dollar gets an account.",
-      body: "Your bank feed lands as raw transactions. The engine posts each one to a real double-entry ledger — nothing floats untracked.",
+      body: "Your bank feed arrives as raw transactions. Each one is posted into a real double-entry ledger.",
     },
     {
       lead: "Every entry balances.",
-      body: "Double-entry isn't retro. It's why the numbers never lie: debits equal credits, on every transaction, always.",
+      body: "Debits equal credits on every transaction, so when the books stop balancing you find out.",
     },
     {
-      lead: "Nothing is silently wrong.",
-      body: "Rules route each transaction. Unknowns fall back to NZFCC categories, and anything uncertain lands in suspense — flagged, never guessed.",
+      lead: "Nothing gets guessed.",
+      body: "Rules sort each transaction, with NZFCC categories as the fallback. Anything still ambiguous waits in suspense rather than being filed somewhere plausible.",
     },
   ],
   // Sample balanced rows for the static ledger composition. date · payee ·
@@ -42,12 +46,12 @@ export const ENGINE = {
 export const COMMAND = {
   eyebrow: { index: "02", label: "Command" },
   headline: "The CFO view of you.",
-  body: "Net worth, runway, cashflow — live from your ledger, not a spreadsheet you abandoned in March.",
+  body: "Net worth, runway and cashflow, read straight off your ledger. Not a spreadsheet you abandoned in March.",
 } as const;
 
 export const PIPELINE = {
   eyebrow: { index: "03", label: "The Pipeline" },
-  headline: "Four steps from bank to board.",
+  headline: "Three steps from bank to board.",
   log: [
     { glyph: "$", label: "connect akahu", dots: 12, value: "read-only, 90 seconds" },
     { glyph: "→", label: "rules engine routing", dots: 6, value: "214 transactions posted" },
@@ -55,35 +59,35 @@ export const PIPELINE = {
     { glyph: "●", label: "dashboard live", dots: 9, value: "net worth ticking", live: true },
   ],
   steps: [
-    { title: "Connect", body: "Link your NZ bank through Akahu in about ninety seconds. Read-only — no payment access, ever." },
-    { title: "Route", body: "The rules engine classifies each transaction. Anything it isn't sure about is held, not guessed." },
-    { title: "Report", body: "A balanced ledger becomes the CFO view: net worth, runway, cashflow, and the one thing to do next." },
+    { title: "Connect", body: "Link your NZ bank through Akahu. Takes about ninety seconds, and the access is read-only." },
+    { title: "Route", body: "The rules engine classifies each transaction and holds back the ones it cannot place." },
+    { title: "Report", body: "The balanced ledger becomes your dashboard: net worth, runway, cashflow, and whatever is out of line." },
   ],
 } as const;
 
 export const SECURITY = {
-  eyebrow: { index: "04", label: "Security posture" },
-  headline: "Built like infrastructure, because it is.",
+  eyebrow: { index: "04", label: "Security" },
+  headline: { lead: "It can read your money.", em: "It can't move it." },
   entries: [
-    { label: "Read-only", body: "Akahu open-finance access, no payment scopes. YouInc can see your transactions; it can never move your money." },
-    { label: "Encrypted", body: "Bank tokens are sealed in Supabase Vault and read server-side only. They are never sent to the browser." },
-    { label: "Isolated", body: "Row-level security walls every tenant at the database. Your ledger is unreachable from anyone else's session." },
+    { label: "Read-only", body: "Akahu grants transaction access and nothing else. No payment scope is ever requested." },
+    { label: "Encrypted", body: "Bank tokens live in Supabase Vault and are read server-side only. They never reach the browser." },
+    { label: "Isolated", body: "Row-level security separates tenants in the database itself, so no other session can read your ledger." },
   ],
 } as const;
 
 export const SELF_HOST = {
   eyebrow: { index: "05", label: "Run it yourself" },
-  headline: "Your ledger, on your machine.",
-  body: "There is no account to create and nothing to subscribe to. Clone the repository, bring your own Postgres, and point it at your own Akahu connection. The instance is yours — including the parts you want to change.",
+  headline: { lead: "Your ledger,", em: "on your machine." },
+  body: "There is no account to create. Clone the repo, bring your own Postgres, and point it at your own Akahu connection. The instance is yours, including the parts you want to change.",
   steps: [
-    { title: "Clone", body: "One repository holds the engine, the dashboard, and the database migrations." },
-    { title: "Run", body: "Docker Compose brings up Postgres and the app locally. No hosted dependency, no telemetry." },
-    { title: "Own", body: "Your transactions never leave your infrastructure. Export the whole ledger as plain text whenever you like." },
+    { title: "Clone", body: "One repository: the engine, the dashboard and the database migrations." },
+    { title: "Run", body: "Docker Compose brings up Postgres and the app. No hosted dependency, no telemetry." },
+    { title: "Own", body: "Your transactions stay on your infrastructure. Export the whole ledger as plain text whenever you want." },
   ],
 } as const;
 
 export const CLOSE = {
   eyebrow: { index: "06", label: "Incorporate" },
-  headline: "Incorporate yourself.",
-  reassurance: "Open source · Self-hosted · Yours to fork",
+  headline: { lead: "Incorporate", em: "yourself." },
+  reassurance: "Open source · self-hosted · yours to fork",
 } as const;

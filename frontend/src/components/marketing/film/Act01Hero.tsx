@@ -42,11 +42,11 @@ export function Act01Hero() {
 
         <h1 id="hero-heading" className="act-hero__headline mk-display">
           <span className="act-hero__line">
-            <span className="act-hero__line-inner">Run yourself</span>
+            <span className="act-hero__line-inner">{HERO.headline.line1}</span>
           </span>
           <span className="act-hero__line">
             <span className="act-hero__line-inner">
-              like a <em>company.</em>
+              {HERO.headline.line2} <em>{HERO.headline.em}</em>
             </span>
           </span>
         </h1>

@@ -9,47 +9,33 @@ interface FaqItem {
 const FAQS: readonly FaqItem[] = [
   {
     q: "Is my bank data safe?",
-    a: "Connections are read-only and made through Akahu, New Zealand's regulated open-banking provider. YouInc never sees or stores your bank login, you choose which accounts are shared, and you can revoke access anytime.",
-  },
-  {
-    q: "Where is my data stored?",
-    a: "In your own database, on infrastructure you control. There is no hosted YouInc account and nothing is pooled, sold, or used for advertising. You can export the complete ledger anytime as plain-text accounting journals, so your history stays readable without YouInc.",
-  },
-  {
-    q: "What is Akahu?",
     a: (
       <>
+        The connection is read-only and runs through{" "}
         <a href="https://akahu.nz" target="_blank" rel="noopener noreferrer">
           Akahu
-        </a>{" "}
-        is New Zealand's open-finance hub — it's the secure bridge that lets apps
-        read your transactions with your consent, without handing over passwords.
+        </a>
+        , New Zealand's regulated open-finance hub. YouInc never sees your bank
+        login, you pick which accounts to share, and you can revoke access
+        whenever you want.
       </>
     ),
   },
   {
-    q: "Can I try it before connecting my bank?",
-    a: "Yes. The live demo uses sample data but the same dashboard shell, widget system, and layout controls as a connected account.",
+    q: "Where does my data live?",
+    a: "In your own Postgres, on infrastructure you control. There is no hosted YouInc account, so nothing is pooled or sold. Export the ledger any time as plain-text journals that hledger reads, and your history still opens if you stop using YouInc.",
   },
   {
-    q: "Is this only for New Zealand accounts?",
-    a: "Live bank sync currently depends on Akahu, so YouInc is built around New Zealand-connected accounts. Anything Akahu cannot see can still be added manually, or through an integration you write yourself.",
+    q: "Can I try it before connecting a bank?",
+    a: "Yes. The demo runs on sample data through the same dashboard, widgets and layout controls as a real account.",
   },
   {
-    q: "What if my account isn't with a bank Akahu supports?",
-    a: "You can add it as a manual account and keep its balance current by hand — it shows up alongside your live-synced accounts throughout the dashboard.",
+    q: "Does it only work with NZ banks?",
+    a: "Live sync does, because it goes through Akahu. Anything Akahu cannot reach you add as a manual account and keep current by hand; those sit alongside synced accounts everywhere in the dashboard.",
   },
   {
-    q: "How is this different from PocketSmith or a budgeting app?",
-    a: "Budgeting apps help you plan envelopes and track habits. YouInc keeps a double-entry ledger of what you own, owe, earn, and spend, then reports on it like a CFO: net worth, runway, burn, cashflow, and the exceptions worth your attention.",
-  },
-  {
-    q: "Can I get a widget that doesn't exist yet?",
-    a: "Build it. The widget registry is a plain TypeScript module in the repository, and every existing widget is a worked example. Pull requests welcome; open an issue first if you want a second opinion on the shape.",
-  },
-  {
-    q: "What happens if I stop using it?",
-    a: "Nothing to cancel — it is your instance. Export the full double-entry journal as plain text whenever you like; it works with open tools like hledger, so nothing about your history is locked in.",
+    q: "How is this different from a budgeting app?",
+    a: "Budgeting apps help you plan envelopes and stick to them. YouInc keeps a double-entry ledger of what you own, owe, earn and spend, then reports on it the way a CFO would: net worth, runway, burn, and the exceptions.",
   },
 ];
 

@@ -12,13 +12,13 @@ export const SOURCE_URL = "https://github.com/Slaymish/YouInc";
 /** Self-hosting instructions, served from the repo README. */
 export const SELF_HOST_URL = `${SOURCE_URL}#run-it-yourself`;
 
+// heroSub is the hero paragraph, the <meta name="description"> and the JSON-LD
+// description (see routes/index.tsx) — keep it under ~160 characters.
 export const PRODUCT = {
   name: "YouInc",
-  heroEyebrow: "Personal ERP · Open source · Self-hosted",
   heroHeadline: "Run yourself like a company.",
   heroSub:
-    "A double-entry ledger for your whole financial life, and the CFO view on top of it: net worth, runway, cashflow, and the one thing to do next. You run it, on your own machine, against your own data.",
-  heroReassurance: "Open source · Your data stays yours · No account required",
+    "A double-entry ledger for your own money, with a CFO dashboard on top. Your bank feed goes in; net worth and runway come out. Runs on your machine.",
 } as const;
 
 /**
