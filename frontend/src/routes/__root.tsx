@@ -82,7 +82,7 @@ export const Route = createRootRoute({
         content: 'A double-entry ledger for your own money, with a dashboard over it. Open source, runs on your machine.',
       },
       { name: 'twitter:image', content: `${SITE_URL}/marketing/og-cover.png` },
-      { name: 'theme-color', content: '#111111' },
+      { name: 'theme-color', content: '#0b0d10' },
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
@@ -106,7 +106,9 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    // Set in the SSR markup, not by an effect: app.css hangs its dark tokens off
+    // `:root[data-theme="dark"]`, so without it the first paint resolves light.
+    <html lang="en" data-theme="dark">
       <head>
         <HeadContent />
       </head>

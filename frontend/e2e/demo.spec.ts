@@ -111,3 +111,26 @@ test("the analysis pages render their boards", async ({ page }) => {
     page.locator("section.panel:has(h2:text-is('Net Worth Trend'))"),
   ).toBeVisible();
 });
+
+// Regression guard for the light soft-UI shadows that leaked onto the dark app:
+// the dark tokens hang off `:root[data-theme="dark"]`, so if <html> ever loses
+// the attribute the surfaces stay dark (`.ws-ledger-shell` remaps colour by
+// hand) while every var(--soft-*) silently falls back to the light stack.
+test("the document resolves the dark token set, not the light one", async ({
+  page,
+}) => {
+  await page.goto("/demo");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+  const { raised, scheme } = await page.evaluate(() => {
+    const style = getComputedStyle(document.documentElement);
+    return {
+      raised: style.getPropertyValue("--soft-raised"),
+      scheme: style.colorScheme,
+    };
+  });
+  expect(scheme).toBe("dark");
+  // The light stack's tell is an 0.8-opacity white halo; dark's is barely there.
+  expect(raised).not.toContain("rgba(255, 255, 255, 0.8)");
+  expect(raised).toContain("rgba(0, 0, 0, 0.55)");
+});
