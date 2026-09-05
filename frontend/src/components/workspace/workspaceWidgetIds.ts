@@ -23,10 +23,10 @@ import type { WidgetId } from "../dashboard/widgets";
 // Phase 4 (added here): pipeline[]/routing[]/suspenseQueue[] are now real
 // (workspaceSuspenseMath.ts / workspacePipeline.ts), so `attention` and
 // `ledger-confidence` (pure presentational — read only the `dashboard` prop)
-// and the new tenant-scoped `suspense-queue` (has its own resolve mutation,
-// tenantReclassify.ts) are safe to include.
+// and the new workspace-scoped `suspense-queue` (has its own resolve mutation,
+// reclassify.ts) are safe to include.
 //
-// Still excluded: `ingestion` / `source-systems` (no per-tenant sourceAccounts
+// Still excluded: `ingestion` / `source-systems` (no per-workspace sourceAccounts
 // yet) and `manual-accounts` (rendered directly on the /workspace route, not
 // through the grid).
 export const WORKSPACE_WIDGET_IDS: WidgetId[] = [

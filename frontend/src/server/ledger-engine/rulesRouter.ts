@@ -9,7 +9,7 @@ import type { RawTransaction } from "./rawTransaction";
  * tests/golden/fixtures/rules_snapshot.yaml.
  *
  * Deliberately no `from_file`/YAML loader here (Python has one): in the
- * multi-tenant target the config is per-tenant data loaded from the DB, so a
+ * multi-workspace target the config is per-workspace data loaded from the DB, so a
  * file loader would be dead weight. The router takes a plain config object,
  * matching Python's `__init__(config)`. The golden test parses the frozen YAML
  * snapshot into that object with js-yaml.

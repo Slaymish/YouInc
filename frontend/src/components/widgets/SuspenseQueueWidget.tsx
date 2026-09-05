@@ -1,20 +1,20 @@
 import { useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
 import type { LedgerDashboardData, SuspenseItem } from "~/components/dashboard/dashboardData";
-import type { ReclassifySuspenseItemInput } from "~/server/tenantReclassify";
+import type { ReclassifySuspenseItemInput } from "~/server/reclassify";
 import { formatMoney, leafAccount } from "./format";
 
-// Tenant-scoped rebuild of the retired single-tenant SuspenseQueueWidget (see
+// Tenant-scoped rebuild of the retired single-workspace SuspenseQueueWidget (see
 // git history at 6065eee~1). Reads `dashboard.suspenseQueue` /
 // `dashboard.knownAccounts` (workspaceDashboard.ts / workspaceSuspenseMath.ts)
-// and resolves ONE item at a time via tenantReclassify.ts's
+// and resolves ONE item at a time via reclassify.ts's
 // reclassifySuspenseItem — a balanced correction transaction, not a row
 // mutation (see that module's docs). No "sync + reclassify" action here: live
 // Akahu sync already has its own surface (AkahuConnectPanel.tsx).
 const reclassifyFn = createServerFn({ method: "POST" })
   .validator((data: ReclassifySuspenseItemInput) => data)
   .handler(async ({ data }): Promise<SuspenseItem[]> => {
-    const { reclassifySuspenseItem } = await import("~/server/tenantReclassify");
+    const { reclassifySuspenseItem } = await import("~/server/reclassify");
     return reclassifySuspenseItem(data);
   });
 

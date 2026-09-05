@@ -1,4 +1,4 @@
-/* Self-service workspace home — the signed-in landing for Supabase users whose
+/* Local workspace home — the dashboard for people whose
  * tenant exists but whose Postgres ledger read layer is still P2. Calm, guided,
  * built on the base app tokens. */
 
@@ -1014,4 +1014,11 @@
   font-size: 0.78rem;
   color: var(--danger, #c0492f);
   margin-top: 0.2rem;
+}
+
+.transaction-form { display: grid; gap: 1rem; max-width: 42rem; }
+.transaction-form label { display: grid; gap: .35rem; }
+.transaction-form input, .transaction-form select {
+  font: inherit; padding: .65rem; border-radius: .4rem;
+  border: 1px solid var(--line, #555); background: var(--surface, #17191d); color: inherit;
 }

@@ -2,7 +2,7 @@ import type { WidgetId } from "../dashboard/widgets";
 
 // Every registered widget. All of them only read the `dashboard` prop (the
 // old SQLite-mutation widgets — ingestion / manual-accounts / source-systems
-// / suspense-queue — were removed along with the retired single-tenant
+// / suspense-queue — were removed along with the retired single-workspace
 // `/dashboard` and `server/ledger.ts`), so it's safe to offer all of them on
 // /demo — this is the `allowedWidgetIds` passed to DashboardGrid.
 export const DEMO_WIDGET_IDS: WidgetId[] = [

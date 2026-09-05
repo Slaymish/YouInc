@@ -16,11 +16,11 @@ interface StaticMarketingPageProps {
 export function StaticMarketingPage({ id }: StaticMarketingPageProps) {
   useDarkTheme();
   const page = pageData(id);
-  const { authenticated } = useRouteContext({ from: "__root__" });
+  const { personalMode } = useRouteContext({ from: "__root__" });
 
   return (
     <div className="mk">
-      <MarketingHeader authenticated={authenticated} />
+      <MarketingHeader personalMode={personalMode} />
       <main className="static-page mk-content mk-page">
         <section className="static-page__hero" aria-labelledby="static-page-heading">
           <p className="mk-eyebrow">{page.eyebrow}</p>

@@ -1,7 +1,4 @@
-// Pure P&L math for the /workspace dashboard — dependency-free (no Supabase,
-// no `~/` aliases) so it can be unit-tested under the plugin-free vitest
-// config, mirroring workspaceSummary.ts. The Postgres fetch lives in
-// workspacePnl.ts and calls this.
+// Pure income and spending calculations.
 import {
   computeIncomeStatementTotals,
   computeRunwayMonths,

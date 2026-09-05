@@ -1,157 +1,121 @@
 # YouInc
 
-A self-hosted personal ERP: an executive dashboard over a double-entry ledger,
-with live bank sync via Akahu (NZ Open Finance).
+A personal money dashboard that runs on your computer. Track accounts, record
+income and expenses, review spending, and see your net worth. Transactions use
+a double-entry ledger so the numbers remain inspectable.
 
-**YouInc is not a service.** There is no hosted product, no account to create on
-youinc.net, and nothing to buy. The public site publishes a sample-data demo and
-the documentation; to use it on your own money, you run your own instance
-against your own database and your own Akahu credentials.
-
-## What it does
-
-- Double-entry ledger in Postgres, with isolation enforced by Supabase
-  Row-Level Security.
-- Live bank sync via Akahu: you supply your own enduring user token, stored
-  encrypted in Supabase Vault and never returned to the browser.
-- Transactions run through the ledger engine (rules routing, NZFCC fallback,
-  suspense safety) and post idempotently as `raw_transactions` + balanced
-  `journal_transactions` / `journal_entries`.
-- A configurable dashboard of widgets (net worth, runway, cashflow, balance
-  sheet, ledger controls, and more).
-- Public surface on youinc.net: the project page (`/`), the demo on sample
-  data (`/demo`), and the reference pages (`/docs`, `/help`, `/privacy`).
-
-See `docs/architecture_design.md`, `docs/persona_frontend_information_design.md`,
-and `docs/research_competitors.md` for background, and
-`docs/superpowers/specs/2026-07-05-production-hosting-design.md` for the current
-hosting design.
-
-## Architecture
-
-- **Frontend:** TanStack Start (React 19 + Nitro server) in `frontend/`. Uses
-  [pnpm](https://pnpm.io/).
-- **Backend:** Supabase (Postgres + Auth + RLS + Vault) — the single source of
-  truth. Schema and policies live in `supabase/migrations/`.
-- **Stateless:** the app holds no local disk state. All persistence is Supabase
-  over the network; there is no SQLite and no attached volume in production.
+**One app. One SQLite file. No signup, cloud database, or containers.**
 
 ## Run it yourself
 
-This is the supported way to use YouInc. You need
-[Supabase CLI](https://supabase.com/docs/guides/cli) and Docker.
+Install [Node.js](https://nodejs.org/) **22.13 or newer**, download or clone this
+repository, and run from its root:
 
 ```sh
-supabase start          # from the repo root: local Postgres/Auth/Studio stack
-supabase db reset       # apply all migrations (and re-run on migration changes)
+node scripts/setup.mjs
+node scripts/start.mjs
+```
 
+Setup installs the locked dependencies and builds the app. It needs an internet
+connection on first install. Everyday use needs no internet unless you enable
+bank sync. Open **http://127.0.0.1:3000**. Your dashboard is ready immediately.
+Stop with Ctrl-C and start again with the same command; your data remains.
+
+Start by adding account balances in **Accounts**, then record income or expenses
+in **Activity**. **Spending** and **Net worth** summarise your ledger. **Workshop**
+holds optional sorting rules and bank-account mappings. Try `/demo` to explore
+sample data without changing your own ledger.
+
+YouInc currently uses **NZD**, with no currency conversion. Manually maintained
+balances override transaction-derived balances for those accounts; update those
+snapshots as your balances change. Transactions still appear in spending reports.
+
+## Your data
+
+The app creates `~/.youinc/ledger.sqlite3` automatically. It includes transactions,
+manual balances, rules, account mappings and settings. No data is sent to the
+author and there is no product telemetry. Dashboard layout preferences stay in
+your browser.
+
+To choose another location, set `YOUINC_DB_PATH` to an absolute filename in
+`frontend/.env.local` (see `frontend/.env.example`). Keep the database on a local
+disk, not a shared network filesystem. Files are private to your operating-system
+account where POSIX permissions are supported; they are not encrypted by YouInc.
+
+## Back up and restore
+
+Use **Settings → Download database backup**. This takes a consistent SQLite
+snapshot even while the app is running. Keep a copy on a separate device.
+**Export ledger journal** produces hledger-compatible text for transactions;
+it does not include balance snapshots or settings and is not a full backup.
+
+To restore, stop YouInc and run:
+
+```sh
+node scripts/restore.mjs /path/to/youinc-backup.sqlite3 /path/to/restored.sqlite3
+```
+
+The restore command checks database integrity and journal balance, and refuses
+to overwrite an existing file. Set `YOUINC_DB_PATH=/path/to/restored.sqlite3` in
+`frontend/.env.local`, then restart. Bank credentials live in the environment
+file, not the database backup. Back up that file separately if you use bank sync.
+
+## Updates
+
+Download/pull the new source, run setup again, then restart. Setup never resets
+or deletes your database. Schema migrations run transactionally when the app
+opens the database. Back up before upgrading; retain the old source and backup
+if you need to go back to an earlier version.
+
+## Optional New Zealand bank sync
+
+Manual accounts and transaction entry work without bank credentials. For Akahu,
+put your own personal app and enduring user tokens in `frontend/.env.local`:
+
+```dotenv
+AKAHU_APP_TOKEN=your-app-token
+AKAHU_USER_TOKEN=your-user-token
+```
+
+Restart, add account mappings in Workshop, then load and sync your accounts in
+Accounts. Sync is on demand, with a date range and a local history of outcomes.
+Pending transactions are excluded; repeat imports do not duplicate postings.
+Disconnect revokes the token at Akahu. Remove it from your environment file;
+a replacement token requires restarting and enabling sync again in Settings.
+
+## Local access and the public demo
+
+The launcher binds to `127.0.0.1`. Personal mode rejects non-local Host and
+cross-origin requests. There is no application login: anyone with access to
+this computer's session can use the dashboard. Do not expose personal mode
+through a public reverse proxy. To run it on your own server, keep it bound to
+loopback and use an SSH tunnel (`ssh -L 3000:127.0.0.1:3000 your-server`).
+
+For a public portfolio demo, set `YOUINC_DEMO=1`. This serves the project page
+and sample-data demo and **disables access to the personal database**, including
+backups and exports. Publishing the demo is a separate deployment decision.
+
+## Development and checks
+
+```sh
 cd frontend
-pnpm install
-pnpm dev                # http://localhost:3000
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm build
+pnpm test:e2e
 ```
 
-The frontend defaults (in `src/lib/supabaseConfig.ts`) point at the local
-`supabase start` stack, so this works with no extra config. Create your account
-at `/signup`; local Supabase has email confirmation off, so signup goes straight
-to onboarding. On your own instance you are the only user — sign-up is open
-because there is nobody else pointed at your database.
+Node provides SQLite directly; there is no native database dependency to compile.
+The local integration tests use temporary databases and cover posting, rollback,
+reclassification, persistence, backup and restore. Browser tests use a separate
+temporary database, never your personal one.
 
-If `pnpm install` fails with `ECONNREFUSED` against `127.0.0.1:8080`, a local
-proxy is configured but not running — re-run with proxy vars unset:
+## Existing Supabase installations
 
-```sh
-env -u HTTPS_PROXY -u HTTP_PROXY -u ALL_PROXY -u https_proxy -u http_proxy -u all_proxy pnpm install
-```
+This version does not connect to or modify the former database. Keep your old
+instance and its backups while moving data. Automatic migration from the old
+hosted schema is not included. A new installation starts with an empty ledger;
+do not assume that existing cloud data has been transferred.
 
-## Tests
-
-```sh
-cd frontend
-pnpm test        # vitest — pure logic (validation, ledger math, derivations)
-pnpm test:e2e    # Playwright — public pages + signup/workspace flows (needs supabase running)
-pnpm build       # vite build + tsc --noEmit (typecheck)
-```
-
-Database behavior (RLS isolation, RPCs) is verified by SQL tests in
-`supabase/tests/` against the local stack, e.g.:
-
-```sh
-docker exec -i supabase_db_YouInc psql -U postgres -d postgres \
-  -v ON_ERROR_STOP=1 < supabase/tests/rls_isolation.sql
-```
-
-## Live Akahu sync
-
-You connect your bank via **OAuth2**: a "Connect with Akahu" button on the
-workspace launches the Akahu consent flow, returns an enduring user token to the
-callback, and the app stores it encrypted in Supabase Vault (never in the client
-bundle). The Akahu **app** credentials are server-side secrets on your instance.
-There is no tier or trial gate on live sync — they are your credentials.
-
-**Prerequisites:** Your Akahu app must be upgraded to a **Full App** with OAuth2
-enabled. Personal Apps do not support OAuth token exchange. Contact Akahu support to
-verify your app tier and enable OAuth if needed.
-
-**Required env vars** (server-side secrets only):
-- `AKAHU_APP_TOKEN` — App ID Token (also used as OAuth `client_id`)
-- `AKAHU_SECRET` — App Secret (required for OAuth token exchange; `AKAHU_APP_SECRET` is also supported)
-- `AKAHU_OAUTH_REDIRECT_URI` — Registered callback URI
-
-**Optional overrides:**
-- `AKAHU_BASE_URL` (default: `https://api.akahu.io/v1`)
-- `AKAHU_APP_ID_TOKEN` (default: same as `AKAHU_APP_TOKEN`)
-- `AKAHU_OAUTH_AUTHORIZE_URL` (default: `https://oauth.akahu.nz`)
-- `AKAHU_OAUTH_SCOPES` (default: `ENDURING_CONSENT`, matching the URL registered by Akahu)
-
-**Registering redirect URIs:** On the Akahu app dashboard, register both:
-- Production: `https://youinc.net/api/akahu/callback`
-- Local dev: `http://localhost:3000/api/akahu/callback`
-
-Without valid app credentials the workspace shows a "live sync not configured" note;
-manual accounts and sample data still work. If the Full App prerequisite is not met,
-the OAuth flow will fail gracefully with a user-friendly error.
-
-Disconnecting revokes the user token at Akahu before removing its encrypted Vault
-copy. This both removes Akahu's access and frees one of the development app's five
-user slots. If a user revokes access through Akahu first, the next API `401` removes
-the now-invalid local token automatically.
-
-## Product analytics
-
-The app has first-party, privacy-safe product analytics backed by Supabase. The
-owner view is **`/admin/analytics`** and uses the same `app_admins` allowlist as
-`/admin/feedback`. It shows the 30-day value funnel, 7-day engaged workspaces,
-7-day activation, sync reliability, event ranking, and daily signal volume.
-
-Durable outcomes (`signup_succeeded`, `email_confirmed`, `workspace_created`,
-`manual_account_created`, `ledger_value_created`, `akahu_connection_created`, `sync_started`,
-`sync_succeeded`, `sync_failed`) are emitted by database triggers. Application
-telemetry is intentionally limited to coarse intent/view events:
-`marketing_cta_clicked`, `signup_started`, `onboarding_started`,
-`akahu_connect_started`, `akahu_oauth_failed`, `dashboard_viewed`,
-`settings_opened`, and `sample_data_loaded`.
-
-The event store must never contain email addresses, URLs/query strings, IPs,
-user agents, transaction or merchant details, account/provider identifiers,
-balances, tokens, or free text. Client roles cannot read raw events; the admin
-RPC returns aggregates only. Apply migration
-`20260715120000_product_analytics.sql` before deploying the instrumented app.
-
-## Deployment
-
-youinc.net runs the demo and docs on Fly.io (stateless, scale-to-zero) backed by
-a Supabase project. The same setup works for your own instance —
-see `docs/deploy_fly.md` for the full walkthrough.
-
-## Licence
-
-MIT — see [`LICENSE`](LICENSE). Fork it, run it, change it, ship it. The point of
-publishing this is that you can own your own copy; a licence that made you ask
-permission first would defeat that.
-
-## Safety notes
-
-- Pending transactions are cached but not posted by default.
-- Every journal posting is validated so debits equal credits before commit.
-- Unmatched transactions route to a suspense account.
-- Real credentials are ignored by git; per-tenant data is isolated by RLS.
+MIT licensed — see [LICENSE](LICENSE).

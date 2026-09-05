@@ -5,7 +5,7 @@ import {
 } from "./workspaceLiquidityMath";
 
 describe("annotateLiquidityTier", () => {
-  it("tags each combined balance with its liquidity tier and the tenant currency", () => {
+  it("tags each combined balance with its liquidity tier and the workspace currency", () => {
     const rows = annotateLiquidityTier(
       [
         {

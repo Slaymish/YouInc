@@ -6,7 +6,6 @@ import { AccountMappingEditor } from "~/components/workspace/AccountMappingEdito
 import { SyncHistoryPanel } from "~/components/workspace/SyncHistoryPanel";
 import { useScrollSpy } from "~/hooks/useScrollSpy";
 import { workspaceStage } from "~/server/workspaceStage";
-import { trackProductEvent } from "~/lib/productAnalytics";
 
 export const Route = createFileRoute("/app/workshop")({
   component: Workshop,
@@ -28,10 +27,6 @@ function Workshop() {
     from: "/app",
   });
   const activeId = useScrollSpy(SECTIONS.map((s) => s.id));
-
-  useEffect(() => {
-    trackProductEvent("settings_opened");
-  }, []);
 
   const stage = workspaceStage({
     accountCount: ledger.totals.accountCount,

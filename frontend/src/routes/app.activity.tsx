@@ -1,3 +1,4 @@
+import { AddTransaction } from "~/components/activity/AddTransaction";
 import { createFileRoute, useLoaderData, useRouter } from "@tanstack/react-router";
 import { PageHeader } from "~/components/app/PageHeader";
 import { SortingTask } from "~/components/activity/SortingTask";
@@ -19,6 +20,8 @@ function ActivityPage() {
   return (
     <>
       <PageHeader title="Activity" context="What happened, newest first." />
+
+      <AddTransaction accounts={dashboard.balances.filter(b => b.accountType === 'Assets' || b.accountType === 'Liabilities').map(b => b.account)} />
 
       <section className="ws-panel" aria-labelledby="ws-sorting-heading">
         <div className="ws-panel__head">

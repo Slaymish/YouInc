@@ -1,11 +1,11 @@
 // Server-only TypeScript Akahu API client — a faithful port of the Python
 // AkahuClient (src/youinc_ledger/ingest_service/akahu_client.py): same headers
 // (Bearer user_token + X-Akahu-ID app_token), same pagination cursor handling,
-// same actionable error messages. Used by the multi-tenant live-sync path so
+// same actionable error messages. Used by the multi-workspace live-sync path so
 // self-service tenants can pull transactions without shelling to Python.
 //
 // Auth model: Akahu personal apps authenticate with an app token (server env,
-// shared) + an enduring per-user user token (stored per-tenant in Vault — see
+// shared) + an enduring per-user user token (stored per-workspace in Vault — see
 // migration 20260704120006). This is exactly what the Python CLI uses.
 
 export class AkahuApiError extends Error {

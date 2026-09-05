@@ -1,8 +1,8 @@
 // Shared `LedgerDashboardData` contract for the dashboard grid + widget
 // components. Originally defined in the SQLite-backed `~/server/ledger`
-// (the retired single-tenant `/dashboard`); moved here because the grid,
+// (the retired single-workspace `/dashboard`); moved here because the grid,
 // `renderWidget.tsx`, every read-only widget, the public `/demo` and
-// `/widgets` marketing pages, and the multi-tenant `/workspace` route
+// `/widgets` marketing pages, and the multi-workspace `/workspace` route
 // (via `server/workspaceDashboard.ts`) all depend on this exact shape and
 // needed a home that survives `ledger.ts`'s deletion.
 //
@@ -11,10 +11,10 @@
 // `ClassifyTransactionInput`, `AkahuAccountRow`, `AkahuAccountsResult`) were
 // dropped along with the widgets that used them exclusively
 // (IngestionWidget, ManualAccountsWidget, SourceSystemsWidget) — those
-// capabilities now live in the per-tenant Postgres path (`workspaceLedger.ts`,
-// `tenantIngestion.ts`, `akahuConnection.ts`, `tenantRules.ts`) with their own
-// types. `SuspenseQueueWidget` was rebuilt on the per-tenant path (Phase 4) —
-// see `workspaceSuspenseMath.ts` (read) / `tenantReclassify.ts` (mutation).
+// capabilities now live in the per-workspace Postgres path (`workspaceLedger.ts`,
+// `ingestion.ts`, `akahuConnection.ts`, `rules.ts`) with their own
+// types. `SuspenseQueueWidget` was rebuilt on the per-workspace path (Phase 4) —
+// see `workspaceSuspenseMath.ts` (read) / `reclassify.ts` (mutation).
 import type {
   CategoryMonthPoint,
   DailySpendPoint,

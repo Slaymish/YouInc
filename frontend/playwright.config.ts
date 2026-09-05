@@ -1,27 +1,19 @@
-import { defineConfig, devices } from "@playwright/test";
-
+import { defineConfig, devices } from '@playwright/test';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const directory = mkdtempSync(join(tmpdir(),'youinc-browser-'));
 export default defineConfig({
-  testDir: "./e2e",
-  timeout: 30_000,
-  use: { baseURL: "http://localhost:3000", trace: "on-first-retry" },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: "pnpm dev",
-    url: "http://localhost:3000/",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    env: {
-      // Point the app at the mock Akahu server the signup-flow spec starts on
-      // :59999. Harmless when the Akahu test is skipped (no server listening).
-      AKAHU_APP_TOKEN: "app_token_e2e",
-      AKAHU_BASE_URL: "http://127.0.0.1:59999",
-      // OAuth connect creds. The authorize endpoint is also the mock server
-      // above (never hits the real oauth.akahu.nz) — see the `/authorize`
-      // handler in signup-flow.spec.ts's mock — and the token exchange lands
-      // on the same mock server via AKAHU_BASE_URL.
-      AKAHU_APP_SECRET: "app_secret_e2e",
-      AKAHU_OAUTH_REDIRECT_URI: "http://localhost:3000/api/akahu/callback",
-      AKAHU_OAUTH_AUTHORIZE_URL: "http://127.0.0.1:59999/authorize",
-    },
-  },
+  testDir: './e2e', timeout: 30000, workers: 1,
+  use: {trace: 'on-first-retry'},
+  projects: [
+    {name:'personal',testMatch:'local.spec.ts',use:{...devices['Desktop Chrome'],baseURL:'http://127.0.0.1:3100'}},
+    {name:'demo',testMatch:/(landing|marketing-pages|demo)\.spec\.ts/,use:{...devices['Desktop Chrome'],baseURL:'http://127.0.0.1:3101'}},
+  ],
+  webServer: [
+    {command:'node .output/server/index.mjs',url:'http://127.0.0.1:3100',timeout:30000,reuseExistingServer:false,
+      env:{PORT:'3100',HOST:'127.0.0.1',NITRO_HOST:'127.0.0.1',YOUINC_DB_PATH:join(directory,'test.sqlite3'),YOUINC_DEMO:'0',AKAHU_APP_TOKEN:'',AKAHU_USER_TOKEN:''}},
+    {command:'node .output/server/index.mjs',url:'http://127.0.0.1:3101',timeout:30000,reuseExistingServer:false,
+      env:{PORT:'3101',HOST:'127.0.0.1',NITRO_HOST:'127.0.0.1',YOUINC_DB_PATH:join(directory,'must-not-open.sqlite3'),YOUINC_DEMO:'1'}},
+  ],
 });

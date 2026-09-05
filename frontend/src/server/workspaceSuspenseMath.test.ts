@@ -101,7 +101,7 @@ describe("computeSuspenseQueue", () => {
       { account: "Assets:Bank:Everyday", side: "credit", amountCents: 4000 },
     ]);
     // Correction reverses the suspense debit (credit) and posts the same side
-    // (debit) to the new target account — exactly what tenantReclassify.ts builds.
+    // (debit) to the new target account — exactly what reclassify.ts builds.
     const correction = txn(
       "t1-correction",
       reclassifyExternalId("ext-1", "corr-1"),

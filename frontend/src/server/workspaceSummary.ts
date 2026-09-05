@@ -1,13 +1,4 @@
-// Pure summary math for the self-service workspace ledger. Kept dependency-free
-// (no Supabase, no `~/` aliases) so it can be unit-tested under the plugin-free
-// vitest config — the Postgres reads live in workspaceLedger.ts and call this.
-//
-// Reproduces the exact conventions of the single-tenant SQLite dashboard
-// (server/ledger.ts): journal balances sum debit-positive / credit-negative;
-// a manual balance SUPERSEDES the journal-derived balance for the same account
-// AND any journal-derived parent prefix (e.g. a manual "Assets:Investments:
-// Sharesies:Spend" overrides journal "Assets:Investments:Sharesies"); assets
-// are positive, liabilities negative, net worth = assets - liabilities.
+// Merge transaction-derived balances with manually maintained snapshots.
 import { accountType } from "./accountType";
 
 export interface AccountBalance {

@@ -18,9 +18,9 @@ export const SELF_HOST_URL = `${SOURCE_URL}#run-it-yourself`;
 export const PRODUCT = {
   name: "YouInc",
   heroEyebrow: "Open source · Runs on your machine",
-  heroHeadline: "Run yourself like a company.",
+  heroHeadline: "Know where your money stands.",
   heroSub:
-    "A double-entry ledger for your own money, with a CFO dashboard on top. Your bank feed goes in; net worth and runway come out. Runs on your machine.",
+    "A personal money dashboard for accounts, spending and net worth. Runs on your computer, stores your data locally, and works without a bank connection.",
   heroReassurance: "MIT licensed · Your data stays on your machine",
 } as const;
 
@@ -43,7 +43,7 @@ export const USE_PATHS = {
     summary: "Your machine, your database, your bank connection.",
     cta: "Read the setup guide",
     features: [
-      "Postgres via Supabase, run locally or on a host you control",
+      "One local SQLite file, no database service to install",
       "Your own Akahu credentials for live New Zealand bank sync",
       "hledger-compatible plain-text exports, so the history stays readable elsewhere",
       "MIT licensed — fork it and change whatever you want",

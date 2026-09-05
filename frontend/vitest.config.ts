@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 // deliberately do not load the app's Vite plugins (React, TanStack Start). The
 // `~` alias mirrors tsconfig's path mapping so a handful of server modules that
 // import a `~/`-scoped value (e.g. webauthn.ts → marketing config) resolve; the
-// heavier boundaries they touch (TanStack request context, @simplewebauthn) are
+// heavier boundaries they touch (the TanStack request context) are
 // mocked per-test.
 export default defineConfig({
   resolve: {

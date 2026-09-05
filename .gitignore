@@ -10,3 +10,5 @@ ledger.journal
 *.sqlite3
 *.db
 .superpowers/
+
+.pnpm-store/

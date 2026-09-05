@@ -38,21 +38,6 @@ jobs:
 
       - run: pnpm test
 
-  deploy:
-    name: Deploy to Fly.io
-    needs: [test-frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    concurrency: youinc-ledger-deploy # serialize deploys even if CI re-triggers quickly
-    steps:
-      - uses: actions/checkout@v4
+      - run: pnpm exec playwright install --with-deps chromium
 
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-
-      # Builds the Dockerfile on Fly's remote builder (no local Docker needed
-      # in the runner) and rolls it out per fly.toml. --yes auto-confirms the
-      # non-interactive prompt when an old machine still has the (now-removed)
-      # volume attached; the app is stateless and ignores it.
-      - run: flyctl deploy --remote-only --yes
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - run: pnpm test:e2e

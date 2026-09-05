@@ -1,13 +1,10 @@
-import { createCsrfMiddleware, createStart } from "@tanstack/react-start";
-
-// Defining a custom start.ts disables Start's automatic CSRF middleware, so it
-// must be re-added explicitly to keep server functions protected. The legacy
-// passkey session gate was removed with server/auth.ts — Supabase-gated routes
-// enforce their own session inside their loaders (see routes/workspace.tsx).
-const csrfMiddleware = createCsrfMiddleware({
-  filter: (ctx) => ctx.handlerType === "serverFn",
+import { createCsrfMiddleware, createStart, createMiddleware } from '@tanstack/react-start';
+import { allowLocalRequest, isDemoMode } from './server/localAccess';
+const localOnly = createMiddleware().server(async ({ request, next }) => {
+  if (!isDemoMode() && !allowLocalRequest(request.url, request.headers.get('origin'))) {
+    return new Response('YouInc personal mode only accepts requests from localhost.', { status: 403 });
+  }
+  return next();
 });
-
-export const startInstance = createStart(() => ({
-  requestMiddleware: [csrfMiddleware],
-}));
+const csrf = createCsrfMiddleware({ filter: ctx => ctx.handlerType === 'serverFn' });
+export const startInstance = createStart(() => ({ requestMiddleware: [localOnly, csrf] }));

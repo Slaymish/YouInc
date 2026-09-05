@@ -20,7 +20,7 @@ interface Part {
 const INSIDE: readonly Part[] = [
   {
     title: "One ledger",
-    body: "Every transaction posts to a double-entry ledger in Postgres, so the totals on screen always add up to something you can inspect.",
+    body: "Every transaction posts to a local double-entry ledger, so the totals on screen always add up to something you can inspect.",
   },
   {
     title: "Bank sync",
@@ -38,11 +38,11 @@ const INSIDE: readonly Part[] = [
 
 export function ProjectHome() {
   useDarkTheme();
-  const { authenticated } = useRouteContext({ from: "__root__" });
+  const { personalMode } = useRouteContext({ from: "__root__" });
 
   return (
     <div className="mk">
-      <MarketingHeader authenticated={authenticated} />
+      <MarketingHeader personalMode={personalMode} />
 
       <main className="mk-content ph">
         <section className="ph-hero" aria-labelledby="ph-heading">
@@ -113,15 +113,14 @@ export function ProjectHome() {
         <section className="ph-block" aria-labelledby="ph-install-heading">
           <h2 id="ph-install-heading">Running your own copy</h2>
           <p>
-            Today that means cloning the repository and bringing up Postgres
-            through Supabase — the steps are in the docs, and it takes a
-            terminal and about ten minutes. Packaging it so you can download one
-            thing and run it is the next piece of work; a container image is the
-            likely first step.
+            Install Node.js 22.13 or newer, download the repository, and run
+            <code> node scripts/setup.mjs </code> followed by
+            <code> node scripts/start.mjs</code>. Your dashboard opens on your
+            computer with no signup or database service to configure.
           </p>
           <p className="ph-block__aside">
-            Until then the setup is genuinely a barrier, and it's worth saying so
-            rather than pretending otherwise.
+            Your data lives in one SQLite file. Settings includes database
+            backup and journal export. Bank sync is optional.
           </p>
           <div className="ph-hero__actions">
             <Link className="mk-btn mk-btn--ghost" to="/docs">

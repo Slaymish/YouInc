@@ -1,6 +1,6 @@
 import { useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
-import type { ClassificationRule, RuleInput } from "~/server/tenantRules";
+import type { ClassificationRule, RuleInput } from "~/server/rules";
 import { ToastViewport } from "~/components/ui/Toast";
 import { useUndoToasts } from "~/components/ui/useUndo";
 
@@ -8,7 +8,7 @@ import { useUndoToasts } from "~/components/ui/useUndo";
 
 const listRulesFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<ClassificationRule[]> => {
-    const { listRules } = await import("~/server/tenantRules");
+    const { listRules } = await import("~/server/rules");
     return listRules();
   },
 );
@@ -16,28 +16,28 @@ const listRulesFn = createServerFn({ method: "GET" }).handler(
 const createRuleFn = createServerFn({ method: "POST" })
   .validator((data: RuleInput) => data)
   .handler(async ({ data }): Promise<ClassificationRule[]> => {
-    const { createRule } = await import("~/server/tenantRules");
+    const { createRule } = await import("~/server/rules");
     return createRule(data);
   });
 
 const updateRuleFn = createServerFn({ method: "POST" })
   .validator((data: { id: string; input: RuleInput }) => data)
   .handler(async ({ data }): Promise<ClassificationRule[]> => {
-    const { updateRule } = await import("~/server/tenantRules");
+    const { updateRule } = await import("~/server/rules");
     return updateRule(data.id, data.input);
   });
 
 const setEnabledFn = createServerFn({ method: "POST" })
   .validator((data: { id: string; isEnabled: boolean }) => data)
   .handler(async ({ data }): Promise<ClassificationRule[]> => {
-    const { setRuleEnabled } = await import("~/server/tenantRules");
+    const { setRuleEnabled } = await import("~/server/rules");
     return setRuleEnabled(data.id, data.isEnabled);
   });
 
 const deleteRuleFn = createServerFn({ method: "POST" })
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ClassificationRule[]> => {
-    const { deleteRule } = await import("~/server/tenantRules");
+    const { deleteRule } = await import("~/server/rules");
     return deleteRule(id);
   });
 

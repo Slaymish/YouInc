@@ -46,37 +46,8 @@ const refreshLedgerFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
-const AKAHU_OAUTH_ERROR_COPY: Record<string, string> = {
-  auth: "You need to be signed in to connect Akahu. Please sign in and try again.",
-  not_configured: "Akahu OAuth isn't configured on this server yet.",
-  denied: "Akahu authorization was cancelled or denied.",
-  state: "Couldn't verify the Akahu connection request. Please try again.",
-  exchange: "Couldn't complete the Akahu connection. Please try again.",
-};
-
-function akahuOAuthErrorMessage(code: string): string {
-  return AKAHU_OAUTH_ERROR_COPY[code] ?? "Something went wrong connecting to Akahu.";
-}
-
-// Server errors that gate a plan-restricted action are prefixed
-// "TIER_RESTRICTED: " (see akahuConnection.ts connectAkahu) so callers could
-// branch on it without relying on the HTTP-ish status code, which doesn't
-// survive the server-fn serialization boundary. The UI already hides the
-// connect form for Free tenants, so this only surfaces if that check is
-// somehow bypassed — strip the marker and show the human sentence.
-const TIER_RESTRICTED_PREFIX = "TIER_RESTRICTED: ";
-
 function errorMessage(error: unknown): string {
-  const raw = (() => {
-    if (error instanceof Error) return error.message;
-    if (error && typeof error === "object" && "message" in error) {
-      return String((error as { message: unknown }).message);
-    }
-    return "Something went wrong — please try again.";
-  })();
-  return raw.startsWith(TIER_RESTRICTED_PREFIX)
-    ? raw.slice(TIER_RESTRICTED_PREFIX.length)
-    : raw;
+  return error instanceof Error ? error.message : 'Sync failed. Please try again.';
 }
 
 interface Props {
@@ -114,46 +85,6 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
     else if (wasConfirming.current) disconnectRef.current?.focus();
     wasConfirming.current = confirmingDisconnect;
   }, [confirmingDisconnect]);
-
-  // The OAuth callback (api.akahu.callback.ts) redirects the full browser
-  // back to /workspace with either ?akahu_connected=1 or ?akahu_error=<code>.
-  // Surface that as a banner once, strip it from the URL so a reload doesn't
-  // re-show it, and refetch the connection status the callback just changed.
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const connected = params.get("akahu_connected");
-    const errorCode = params.get("akahu_error");
-    if (!connected && !errorCode) return;
-
-    if (connected) {
-      setError(null);
-      setMessage("Akahu connected. Load your accounts to sync.");
-    } else if (errorCode) {
-      setMessage(null);
-      setError(akahuOAuthErrorMessage(errorCode));
-    }
-
-    params.delete("akahu_connected");
-    params.delete("akahu_error");
-    const query = params.toString();
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname + (query ? `?${query}` : ""),
-    );
-
-    startTransition(async () => {
-      try {
-        setStatus(await statusFn());
-      } catch {
-        // Keep the banner even if the refetch fails; a manual reload will
-        // pick up the real status via the route loader.
-      }
-    });
-    // Intentionally run once on mount only — this reads the URL the browser
-    // just landed on after the OAuth redirect.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   function disconnect() {
     setError(null);
@@ -250,7 +181,7 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
                 }}
               >
                 <p className="confirm-inline__prompt">
-                  Really disconnect? Your stored Akahu token is destroyed — you'll
+                  Really disconnect? Your Akahu token will be revoked — you'll
                   need to authorise a new one with Akahu to reconnect.
                 </p>
                 <button
@@ -339,26 +270,11 @@ export function AkahuConnectPanel({ status: initialStatus, onLedgerChange, onSyn
             )
           ) : null}
         </>
-      ) : status.oauthConfigured ? (
-        <>
-          <p className="akahu-panel__note">
-            Connect your bank through Akahu to sync transactions automatically.
-            You'll be taken to Akahu to authorize access, then brought back
-            here — your token is stored encrypted and never shown again.
-          </p>
-          <div className="akahu-panel__connect">
-            {/* Plain <a> (not TanStack Router's <Link>) so this is a real
-                full-page navigation to the server route, not a client-side
-                route match / fetch. */}
-            <a className="auth-primary akahu-panel__connect-link" href="/api/akahu/oauth/start">
-              Connect with Akahu
-            </a>
-          </div>
-        </>
       ) : (
         <p className="akahu-panel__note">
-          Akahu OAuth not configured — set AKAHU_SECRET + AKAHU_OAUTH_REDIRECT_URI
-          and verify a Full App with OAuth enabled.
+          Bank sync is optional. Set AKAHU_APP_TOKEN and AKAHU_USER_TOKEN in your
+          local environment file, then restart YouInc. After replacing a revoked
+          token, use Settings to enable sync again.
         </p>
       )}
 

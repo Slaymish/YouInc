@@ -1,29 +1,9 @@
-// Server-only: assembles a per-tenant `LedgerDashboardData` so the real
-// `DashboardGrid` (built for the single-tenant SQLite dashboard) can render
-// on the self-service `/workspace` route.
-//
-// PHASE 1+2+3+4 of the DashboardGrid port. Populated: totals P&L
-// (income/expenses/ebitda/margin/average-income/overhead/runway), liquidity
-// (cash/credit limit/credit headroom/available liquidity), creditFacilities,
-// balances[].liquidityTier (Phase 1), plus pnl monthly series, income/expense
-// breakdowns, net-worth trend, recent transactions, recurring payments, and
-// category/daily spend (Phase 2+3). Phase 4 (added here): suspense queue,
-// pipeline health, routing/classification confidence, and knownAccounts (the
-// classify-as picker's options) — see workspaceSuspenseMath.ts /
-// workspacePipeline.ts. Still left as a safe empty array: source accounts,
-// sync state — no per-tenant equivalent yet. The workspace widget allowlist
-// (`components/workspace/workspaceWidgetIds.ts`) only exposes widgets that
-// read fields this module actually populates.
-//
-// Every read here goes through the caller's RLS-scoped Supabase client
-// (never service_role) via getWorkspaceLedger / workspacePnl /
-// workspaceLiquidity / workspaceBreakdowns / workspaceJournal /
-// workspacePipeline.
+// Assembles the local ledger into the shared dashboard payload.
 import { getWorkspaceLedger } from "./workspaceLedger";
 import { getWorkspacePnl } from "./workspacePnl";
 import { getWorkspaceLiquidity } from "./workspaceLiquidity";
 import { getWorkspaceAccountBreakdowns } from "./workspaceBreakdowns";
-import { fetchTenantJournalEntries } from "./workspaceJournal";
+import { fetchJournalEntries } from "./workspaceJournal";
 import { getWorkspacePipelineHealth } from "./workspacePipeline";
 import { computeWorkspaceNetWorthTrend } from "./workspaceTrends";
 import { computeWorkspaceRecentTransactions } from "./workspaceTransactions";
@@ -39,16 +19,16 @@ import {
 } from "./workspaceSuspenseMath";
 import type { LedgerDashboardData } from "~/components/dashboard/dashboardData";
 
-/** The caller's tenant, reshaped into a Phase-1+2+3+4 `LedgerDashboardData`. */
+/** The caller's workspace, reshaped into a Phase-1+2+3+4 `LedgerDashboardData`. */
 export async function getWorkspaceDashboard(): Promise<LedgerDashboardData> {
   const ledger = await getWorkspaceLedger();
 
   const [pnl, liquidity, breakdowns, journalEntries, pipeline] = await Promise.all([
-    getWorkspacePnl(ledger.tenantId, ledger.totals.assetsCents),
-    getWorkspaceLiquidity(ledger.tenantId, ledger.balances, ledger.currency),
-    getWorkspaceAccountBreakdowns(ledger.tenantId),
-    fetchTenantJournalEntries(ledger.tenantId),
-    getWorkspacePipelineHealth(ledger.tenantId),
+    getWorkspacePnl(ledger.workspaceId, ledger.totals.assetsCents),
+    getWorkspaceLiquidity(ledger.workspaceId, ledger.balances, ledger.currency),
+    getWorkspaceAccountBreakdowns(ledger.workspaceId),
+    fetchJournalEntries(ledger.workspaceId),
+    getWorkspacePipelineHealth(ledger.workspaceId),
   ]);
 
   const netWorthTrend = computeWorkspaceNetWorthTrend(journalEntries);
@@ -67,7 +47,7 @@ export async function getWorkspaceDashboard(): Promise<LedgerDashboardData> {
   ].sort();
 
   return {
-    databasePath: `postgres:tenant:${ledger.tenantId}`,
+    databasePath: "local SQLite",
     databaseExists: true,
     generatedAt: new Date().toISOString(),
     manualBalances: ledger.manualBalances.map((balance) => ({

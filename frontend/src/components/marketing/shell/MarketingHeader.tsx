@@ -20,10 +20,10 @@ const SCROLL_THRESHOLD = 24;
 
 interface MarketingHeaderProps {
   /** Signed-in state, resolved by the caller. Defaults to false — unchanged, signed-out chrome. */
-  readonly authenticated?: boolean;
+  readonly personalMode?: boolean;
 }
 
-export function MarketingHeader({ authenticated = false }: MarketingHeaderProps) {
+export function MarketingHeader({ personalMode = false }: MarketingHeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -99,7 +99,7 @@ export function MarketingHeader({ authenticated = false }: MarketingHeaderProps)
           >
             GitHub
           </a>
-          {authenticated ? (
+          {personalMode ? (
             <Link className="mk-btn mk-btn--primary mk-header__cta" to="/app">
               <span className="mk-btn__label">Open YouInc</span>
             </Link>
@@ -161,7 +161,7 @@ export function MarketingHeader({ authenticated = false }: MarketingHeaderProps)
               >
                 <span className="mk-btn__label">GitHub</span>
               </a>
-              {authenticated ? (
+              {personalMode ? (
                 <Link
                   className="mk-btn mk-btn--primary"
                   to="/app"

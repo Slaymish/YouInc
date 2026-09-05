@@ -8,7 +8,7 @@ import { formatMoney } from "~/components/widgets/format";
 import { ToastViewport } from "~/components/ui/Toast";
 import { useUndoToasts, type UndoToasts } from "~/components/ui/useUndo";
 
-// --- Server functions (each re-checks the Supabase user inside the DAL) ------
+// Server functions keep local database access on the server.
 
 // `asOfDate` is optional and only supplied by undo, which restores the deleted
 // row's original date rather than stamping today.

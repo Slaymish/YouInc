@@ -5,9 +5,9 @@ import { PRODUCT } from "~/components/marketing/config";
 import { breadcrumbList, jsonLdGraph, jsonLdScript } from "~/lib/seo";
 import { SITE_URL } from "~/lib/sitemap";
 
-const checkSession = createServerFn({ method: "GET" }).handler(async () => {
-  const { getServerUser } = await import("~/server/supabaseServer");
-  return { authenticated: (await getServerUser()) !== null };
+const getMode = createServerFn({ method: "GET" }).handler(async () => {
+  const { isDemoMode } = await import('~/server/localAccess');
+  return { personalMode: !isDemoMode() };
 });
 
 const HOME_JSON_LD = jsonLdScript(
@@ -31,8 +31,8 @@ export const Route = createFileRoute("/")({
     scripts: [HOME_JSON_LD],
   }),
   loader: async () => {
-    const { authenticated } = await checkSession();
-    if (authenticated) {
+    const { personalMode } = await getMode();
+    if (personalMode) {
       throw redirect({ to: "/app" });
     }
   },

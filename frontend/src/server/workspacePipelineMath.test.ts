@@ -11,7 +11,7 @@ function row(partial: Partial<RawTransactionStatusRow>): RawTransactionStatusRow
 }
 
 describe("computePipelineHealth", () => {
-  it("returns all-zero/null health for an empty tenant", () => {
+  it("returns all-zero/null health for an empty workspace", () => {
     const health = computePipelineHealth([], null);
     expect(health).toEqual({
       rawCached: 0,

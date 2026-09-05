@@ -1,12 +1,4 @@
-// frontend/src/server/workspaceStage.ts
-//
-// Pure derivation of a self-service workspace's lifecycle "stage" from data the
-// /workspace loader already fetches. Used to drive progressive disclosure:
-// first-run users get a guided path (connect / add / sample) instead of six
-// empty editors; returning users go straight to their finances.
-//
-// Plugin-free (no Supabase import) so it can be unit-tested under vitest.
-
+// Determine which guidance to show as a local ledger fills up.
 /** How far along a workspace is in going from empty → live ledger. */
 export type WorkspaceStage =
   // No accounts and no posted transactions — brand new; show the guided path.

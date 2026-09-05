@@ -9,7 +9,7 @@ import { pyTruthy } from "./rawTransaction";
  * Two pieces cmd_sync owns: the sync-state key format, and the marker value the
  * cursor advances to after a batch. Persistence (set_sync_state) and the CLI
  * exit code (1 if the pipeline reported errors else 0) live in the caller — in
- * the multi-tenant target that becomes a per-tenant server function, so only
+ * the multi-workspace target that becomes a per-workspace server function, so only
  * the pure cursor computation is ported here.
  */
 

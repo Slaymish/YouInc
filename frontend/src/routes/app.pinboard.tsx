@@ -16,7 +16,7 @@ export const Route = createFileRoute("/app/pinboard")({
  */
 function PinboardPage() {
   const { account, dashboard } = useLoaderData({ from: "/app" });
-  const tenant = account.tenant!;
+  const workspace = account.workspace!;
 
   return (
     <>
@@ -31,7 +31,7 @@ function PinboardPage() {
       </Hint>
       <DashboardGrid
         dashboard={dashboard}
-        storageKey={`youinc.workspace.layout.v3.${tenant.id}`}
+        storageKey={`youinc.workspace.layout.v3.${workspace.id}`}
         allowedWidgetIds={WORKSPACE_WIDGET_IDS}
       />
     </>

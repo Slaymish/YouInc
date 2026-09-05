@@ -7,7 +7,7 @@ import type { LedgerStore } from "./pipeline";
  * pin: raw upsert reports newly-inserted, journals dedupe on external_id and
  * preserve insertion order, manual classifications override. Used by the
  * pipeline/sync golden tests as a stand-in for LedgerDatabase; also a usable
- * dry-run/test double for the real (Supabase-backed) store.
+ * dry-run/test double for the local SQLite store.
  */
 
 interface StoredJournal {

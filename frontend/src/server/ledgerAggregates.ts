@@ -1,12 +1,4 @@
-// Pure Phase-1 dashboard aggregation math, extracted VERBATIM from the inline
-// logic in `readLedgerDashboard()` (server/ledger.ts). These functions take
-// plain row arrays — no SQLite, no Supabase — so both the single-tenant
-// SQLite dashboard AND the per-tenant Postgres workspace dashboard
-// (workspacePnl.ts, workspaceLiquidity.ts) compute Phase-1 fields off the
-// exact same code path. Do NOT re-express any of this as SQL: the
-// differential parity test (see ledgerPostgresParity.integration.test.ts)
-// exists specifically to catch drift if the two callers ever diverge on the
-// rows they feed in.
+// Pure reporting mathematics shared by the dashboard and its tests.
 export type LiquidityTier = "cash" | "semi_liquid" | "illiquid";
 
 /** Verbatim from server/ledger.ts. Keep the two in lockstep. */
@@ -220,7 +212,7 @@ export function computeLiquidityTotals(
 
 // ── Phase 2+3: account breakdowns, net-worth trend, recent transactions ────
 // Extracted verbatim from the inline logic in `readLedgerDashboard()` so both
-// the SQLite dashboard and the per-tenant Postgres workspace dashboard
+// the SQLite dashboard and the per-workspace Postgres workspace dashboard
 // (workspaceBreakdowns.ts, workspaceTrends.ts, workspaceTransactions.ts)
 // compute these fields off the exact same code path.
 

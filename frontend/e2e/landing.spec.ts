@@ -30,14 +30,9 @@ test("landing page carries no product surface", async ({ page }) => {
   );
 });
 
-test("signup page links back to sign-in and to the demo", async ({ page }) => {
-  await page.goto("/signup");
-  await expect(
-    page.getByRole("link", { name: "Sign in", exact: true }),
-  ).toHaveAttribute("href", /\/signin$/);
-  await expect(
-    page.getByRole("link", { name: /open the live demo/i }),
-  ).toBeVisible();
+test("old signup URL leads to the demo without registration", async ({ page }) => {
+  await page.goto('/signup');
+  await expect(page).toHaveURL(/\/demo$/);
 });
 
 test("the demo runs without a session", async ({ page }) => {

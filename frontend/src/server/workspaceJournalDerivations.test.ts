@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { TenantJournalEntryRow } from "./workspaceJournal";
+import type { JournalEntryRow } from "./workspaceJournal";
 import { computeWorkspaceNetWorthTrend, toNetWorthEntryRows } from "./workspaceTrends";
 import { computeWorkspaceRecentTransactions, toJournalEntryDetailRows } from "./workspaceTransactions";
 import { computeWorkspaceRecurringPayments, toRecurringEntryRows } from "./workspaceRecurring";
@@ -10,10 +10,10 @@ import {
   toDailySpendEntryRows,
 } from "./workspaceSpending";
 
-// A small realistic tenant journal: salary in, rent + groceries out, plus a
+// A small realistic workspace journal: salary in, rent + groceries out, plus a
 // pure asset transfer (no Income/Expense leg) and a manual-sourced posting
 // that several of these transforms must exclude.
-const ROWS: TenantJournalEntryRow[] = [
+const ROWS: JournalEntryRow[] = [
   {
     transactionId: "t-salary",
     externalId: "tx_salary",

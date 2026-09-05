@@ -1,11 +1,4 @@
-// Pure validation/normalization for account-mapping edits, kept
-// dependency-free (no Supabase, no `~/` aliases) so it can be unit-tested under
-// the plugin-free vitest config. accountMappings.ts composes these.
-//
-// An account mapping is the DB form of rules.yaml's `account_mappings`: it
-// tells the ingestion pipeline which ledger account a synced Akahu account
-// should post to, and (for liabilities only) what its credit limit is.
-
+// Validate bank account mappings before saving.
 export type AccountMappingType = "asset" | "liability";
 
 export interface AccountMappingInput {

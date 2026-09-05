@@ -1,7 +1,4 @@
-// Pure validation/normalization for classification-rule edits, kept
-// dependency-free (no Supabase, no `~/` aliases) so it can be unit-tested under
-// the plugin-free vitest config. tenantRules.ts composes these.
-
+// Validate sorting rules before saving.
 export interface RuleInput {
   ruleKey: string;
   priority: number;
@@ -14,7 +11,7 @@ export interface RuleInput {
   memo: string | null;
 }
 
-/** Raised on invalid input; tenantRules maps this to a 400 Response. */
+/** Raised on invalid input; rules maps this to a 400 Response. */
 export class RuleValidationError extends Error {}
 
 /** rule_key: lowercase, non-alphanumerics collapsed to "_", trimmed. */

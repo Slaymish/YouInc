@@ -1,6 +1,6 @@
 // Server-only: derives the /workspace dashboard's recent-transactions journal
 // feed (Phase 2+3 of the DashboardGrid port — see workspaceDashboard.ts) from
-// the shared tenant journal fetch (workspaceJournal.ts), reusing
+// the shared workspace journal fetch (workspaceJournal.ts), reusing
 // computeRecentTransactions (ledgerAggregates.ts) VERBATIM so grouping,
 // sorting, and limiting match the SQLite dashboard exactly — see
 // ledgerPostgresParity.integration.test.ts.
@@ -9,13 +9,13 @@ import {
   type JournalEntryDetailRow,
   type JournalTransactionRow,
 } from "./ledgerAggregates";
-import type { TenantJournalEntryRow } from "./workspaceJournal";
+import type { JournalEntryRow } from "./workspaceJournal";
 
 const RECENT_TRANSACTIONS_LIMIT = 12;
 
 /** Every posting, mapped into the shared per-posting detail shape. */
 export function toJournalEntryDetailRows(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): JournalEntryDetailRow[] {
   return rows.map((row) => ({
     externalId: row.externalId,
@@ -29,9 +29,9 @@ export function toJournalEntryDetailRows(
   }));
 }
 
-/** The tenant's most recent reconstructed double-entry transactions. */
+/** The workspace's most recent reconstructed double-entry transactions. */
 export function computeWorkspaceRecentTransactions(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
   limit = RECENT_TRANSACTIONS_LIMIT,
 ): JournalTransactionRow[] {
   return computeRecentTransactions(toJournalEntryDetailRows(rows), limit);

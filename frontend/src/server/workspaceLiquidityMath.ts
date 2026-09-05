@@ -1,7 +1,4 @@
-// Pure liquidity math for the /workspace dashboard — dependency-free (no
-// Supabase, no `~/` aliases) so it can be unit-tested under the plugin-free
-// vitest config, mirroring workspaceSummary.ts. The Postgres fetch lives in
-// workspaceLiquidity.ts and calls this.
+// Pure cash and credit-facility calculations.
 import type { AccountBalance } from "./workspaceSummary";
 import {
   computeCashCents,

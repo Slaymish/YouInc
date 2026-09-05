@@ -15,7 +15,7 @@ import {
  *
  * The pipeline is pure orchestration over a persistence port (LedgerStore).
  * The Python engine drove SQLite directly; here the store is an interface so
- * the multi-tenant target can back it with the (deferred) Supabase DAL, while
+ * the app can back it with its transactional SQLite store, while
  * the golden test supplies an in-memory store that mirrors the exact SQLite
  * semantics the fixture pins (upsert insert/duplicate, journal existence,
  * manual-classification override).

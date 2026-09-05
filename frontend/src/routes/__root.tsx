@@ -8,15 +8,14 @@ import {
 } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import appCss from '~/styles/app.css?url'
-import { readAuthCache, writeAuthCache } from '~/lib/authCache'
 import { jsonLdGraph, jsonLdScript } from '~/lib/seo'
 import { SITE_URL } from '~/lib/sitemap'
 
 // Exposed to every route via beforeLoad context; read it with
 // `useRouteContext({ from: "__root__" })`.
-const checkSession = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getServerUser } = await import('~/server/supabaseServer')
-  return { authenticated: (await getServerUser()) !== null }
+const getMode = createServerFn({ method: 'GET' }).handler(async () => {
+  const { isDemoMode } = await import('~/server/localAccess')
+  return { personalMode: !isDemoMode() }
 })
 
 // Root-level knowledge-graph anchor: Organization + WebSite nodes that every
@@ -43,16 +42,7 @@ const ROOT_JSON_LD = jsonLdScript(
 )
 
 export const Route = createRootRoute({
-  // Resolved once per tab on the client and cached (see ~/lib/authCache for
-  // why): this `beforeLoad` re-runs on every navigation, and the session cookie
-  // almost never changes. Always fresh on the server.
-  beforeLoad: async () => {
-    const cached = readAuthCache()
-    if (cached !== undefined) return { authenticated: cached }
-    const { authenticated } = await checkSession()
-    writeAuthCache(authenticated)
-    return { authenticated }
-  },
+  beforeLoad: async () => getMode(),
   head: () => ({
     meta: [
       { charSet: 'utf-8' },

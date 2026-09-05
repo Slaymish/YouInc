@@ -1,25 +1,4 @@
-// Pure suspense-queue + routing-health math for the /workspace dashboard —
-// dependency-free (no Supabase, no `~/` aliases) so it can be unit-tested
-// under the plugin-free vitest config, mirroring workspaceSummary.ts. The
-// Postgres fetch/mutation lives in workspaceDashboard.ts (read) and
-// tenantReclassify.ts (write); both call into this module.
-//
-// Ported from the retired single-tenant SQLite `suspenseRow` / `routingRow` /
-// `suspenseQueueRows` queries in server/ledger.ts (see git history at
-// 6065eee~1). One important divergence from that SQLite version: this engine
-// now supports *reclassifying* a suspense item (tenantReclassify.ts), which
-// works by inserting a NEW correcting journal_transaction rather than
-// mutating the original row (immutability + audit trail). That correction:
-//   - reverses the original suspense-account posting (opposite side, same
-//     amount), and
-//   - posts the same amount, same side the suspense leg originally had, to
-//     the new target account.
-// So "is this transaction still in suspense" can no longer be answered by
-// looking at a single row — it's the NET of every suspense-account posting
-// tied to the same original transaction (original leg + any correction)."net
-// zero" means resolved; nonzero means still open. Corrections are linked to
-// their original transaction via the external_id convention below (see
-// `reclassifyExternalId` / `rootExternalId`) rather than a schema change.
+// Derive unresolved categories while preserving correction history.
 export interface SuspenseSourceEntry {
   /** Groups postings into one transaction; stable per-transaction key. */
   transactionId: string;
@@ -54,7 +33,7 @@ export interface SuspenseItem {
   counterAccount: string;
 }
 
-/** rule_id marker for a reclassify correction transaction (see tenantReclassify.ts). */
+/** rule_id marker for a reclassify correction transaction (see reclassify.ts). */
 export const RECLASSIFY_RULE_ID = "manual:reclass";
 /** rule_id marker the retired SQLite engine used for the opening-balance seed. */
 const OPENING_BALANCE_RULE_ID = "manual:opening_balance";
@@ -74,7 +53,7 @@ export function rootExternalId(externalId: string): string {
   return markerIndex === -1 ? externalId : externalId.slice(0, markerIndex);
 }
 
-/** True when `account` is the tenant's suspense account or a sub-account of it. */
+/** True when `account` is the workspace's suspense account or a sub-account of it. */
 export function isSuspenseAccount(account: string, suspenseAccount: string): boolean {
   return account === suspenseAccount || account.startsWith(`${suspenseAccount}:`);
 }
@@ -173,7 +152,7 @@ export function computeSuspenseQueue(
 }
 
 /**
- * Routing/classification health across the tenant's journal. Reclassify
+ * Routing/classification health across the workspace's journal. Reclassify
  * correction transactions (rule_id === RECLASSIFY_RULE_ID) are bookkeeping
  * plumbing, not user-facing transactions, so — like the retired SQLite
  * query's `source_account_id != 'manual'` filter — they're excluded from

@@ -20,20 +20,13 @@ import { Route as DocsRouteImport } from './routes/docs'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SignupIndexRouteImport } from './routes/signup.index'
-import { Route as SigninIndexRouteImport } from './routes/signin.index'
 import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as WorkspaceSplatRouteImport } from './routes/workspace.$'
-import { Route as SignupPasswordRouteImport } from './routes/signup.password'
-import { Route as SignupNameRouteImport } from './routes/signup.name'
-import { Route as SignupCredentialRouteImport } from './routes/signup.credential'
-import { Route as SigninPasswordRouteImport } from './routes/signin.password'
 import { Route as DemoSpendingRouteImport } from './routes/demo.spending'
 import { Route as DemoNetWorthRouteImport } from './routes/demo.net-worth'
 import { Route as DemoActivityRouteImport } from './routes/demo.activity'
 import { Route as DemoAccountsRouteImport } from './routes/demo.accounts'
-import { Route as AuthConfirmRouteImport } from './routes/auth.confirm'
 import { Route as AppWorkshopRouteImport } from './routes/app.workshop'
 import { Route as AppSpendingRouteImport } from './routes/app.spending'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
@@ -41,10 +34,8 @@ import { Route as AppPinboardRouteImport } from './routes/app.pinboard'
 import { Route as AppNetWorthRouteImport } from './routes/app.net-worth'
 import { Route as AppActivityRouteImport } from './routes/app.activity'
 import { Route as AppAccountsRouteImport } from './routes/app.accounts'
-import { Route as ApiAnalyticsRouteImport } from './routes/api.analytics'
-import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as ApiAkahuCallbackRouteImport } from './routes/api.akahu.callback'
-import { Route as ApiAkahuOauthStartRouteImport } from './routes/api.akahu.oauth.start'
+import { Route as ApiExportRouteImport } from './routes/api.export'
+import { Route as ApiBackupRouteImport } from './routes/api.backup'
 
 const WorkspaceRoute = WorkspaceRouteImport.update({
   id: '/workspace',
@@ -101,16 +92,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupIndexRoute = SignupIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SignupRoute,
-} as any)
-const SigninIndexRoute = SigninIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SigninRoute,
-} as any)
 const DemoIndexRoute = DemoIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -125,26 +106,6 @@ const WorkspaceSplatRoute = WorkspaceSplatRouteImport.update({
   id: '/$',
   path: '/$',
   getParentRoute: () => WorkspaceRoute,
-} as any)
-const SignupPasswordRoute = SignupPasswordRouteImport.update({
-  id: '/password',
-  path: '/password',
-  getParentRoute: () => SignupRoute,
-} as any)
-const SignupNameRoute = SignupNameRouteImport.update({
-  id: '/name',
-  path: '/name',
-  getParentRoute: () => SignupRoute,
-} as any)
-const SignupCredentialRoute = SignupCredentialRouteImport.update({
-  id: '/credential',
-  path: '/credential',
-  getParentRoute: () => SignupRoute,
-} as any)
-const SigninPasswordRoute = SigninPasswordRouteImport.update({
-  id: '/password',
-  path: '/password',
-  getParentRoute: () => SigninRoute,
 } as any)
 const DemoSpendingRoute = DemoSpendingRouteImport.update({
   id: '/spending',
@@ -165,11 +126,6 @@ const DemoAccountsRoute = DemoAccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
   getParentRoute: () => DemoRoute,
-} as any)
-const AuthConfirmRoute = AuthConfirmRouteImport.update({
-  id: '/auth/confirm',
-  path: '/auth/confirm',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const AppWorkshopRoute = AppWorkshopRouteImport.update({
   id: '/workshop',
@@ -206,24 +162,14 @@ const AppAccountsRoute = AppAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AppRoute,
 } as any)
-const ApiAnalyticsRoute = ApiAnalyticsRouteImport.update({
-  id: '/api/analytics',
-  path: '/api/analytics',
+const ApiExportRoute = ApiExportRouteImport.update({
+  id: '/api/export',
+  path: '/api/export',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/admin/analytics',
-  path: '/admin/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAkahuCallbackRoute = ApiAkahuCallbackRouteImport.update({
-  id: '/api/akahu/callback',
-  path: '/api/akahu/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAkahuOauthStartRoute = ApiAkahuOauthStartRouteImport.update({
-  id: '/api/akahu/oauth/start',
-  path: '/api/akahu/oauth/start',
+const ApiBackupRoute = ApiBackupRouteImport.update({
+  id: '/api/backup',
+  path: '/api/backup',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -235,12 +181,12 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
-  '/signin': typeof SigninRouteWithChildren
-  '/signup': typeof SignupRouteWithChildren
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/workspace': typeof WorkspaceRouteWithChildren
-  '/admin/analytics': typeof AdminAnalyticsRoute
-  '/api/analytics': typeof ApiAnalyticsRoute
+  '/api/backup': typeof ApiBackupRoute
+  '/api/export': typeof ApiExportRoute
   '/app/accounts': typeof AppAccountsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/net-worth': typeof AppNetWorthRoute
@@ -248,22 +194,13 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AppSettingsRoute
   '/app/spending': typeof AppSpendingRoute
   '/app/workshop': typeof AppWorkshopRoute
-  '/auth/confirm': typeof AuthConfirmRoute
   '/demo/accounts': typeof DemoAccountsRoute
   '/demo/activity': typeof DemoActivityRoute
   '/demo/net-worth': typeof DemoNetWorthRoute
   '/demo/spending': typeof DemoSpendingRoute
-  '/signin/password': typeof SigninPasswordRoute
-  '/signup/credential': typeof SignupCredentialRoute
-  '/signup/name': typeof SignupNameRoute
-  '/signup/password': typeof SignupPasswordRoute
   '/workspace/$': typeof WorkspaceSplatRoute
   '/app/': typeof AppIndexRoute
   '/demo/': typeof DemoIndexRoute
-  '/signin/': typeof SigninIndexRoute
-  '/signup/': typeof SignupIndexRoute
-  '/api/akahu/callback': typeof ApiAkahuCallbackRoute
-  '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -271,10 +208,12 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/workspace': typeof WorkspaceRouteWithChildren
-  '/admin/analytics': typeof AdminAnalyticsRoute
-  '/api/analytics': typeof ApiAnalyticsRoute
+  '/api/backup': typeof ApiBackupRoute
+  '/api/export': typeof ApiExportRoute
   '/app/accounts': typeof AppAccountsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/net-worth': typeof AppNetWorthRoute
@@ -282,22 +221,13 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AppSettingsRoute
   '/app/spending': typeof AppSpendingRoute
   '/app/workshop': typeof AppWorkshopRoute
-  '/auth/confirm': typeof AuthConfirmRoute
   '/demo/accounts': typeof DemoAccountsRoute
   '/demo/activity': typeof DemoActivityRoute
   '/demo/net-worth': typeof DemoNetWorthRoute
   '/demo/spending': typeof DemoSpendingRoute
-  '/signin/password': typeof SigninPasswordRoute
-  '/signup/credential': typeof SignupCredentialRoute
-  '/signup/name': typeof SignupNameRoute
-  '/signup/password': typeof SignupPasswordRoute
   '/workspace/$': typeof WorkspaceSplatRoute
   '/app': typeof AppIndexRoute
   '/demo': typeof DemoIndexRoute
-  '/signin': typeof SigninIndexRoute
-  '/signup': typeof SignupIndexRoute
-  '/api/akahu/callback': typeof ApiAkahuCallbackRoute
-  '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -308,12 +238,12 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
-  '/signin': typeof SigninRouteWithChildren
-  '/signup': typeof SignupRouteWithChildren
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/workspace': typeof WorkspaceRouteWithChildren
-  '/admin/analytics': typeof AdminAnalyticsRoute
-  '/api/analytics': typeof ApiAnalyticsRoute
+  '/api/backup': typeof ApiBackupRoute
+  '/api/export': typeof ApiExportRoute
   '/app/accounts': typeof AppAccountsRoute
   '/app/activity': typeof AppActivityRoute
   '/app/net-worth': typeof AppNetWorthRoute
@@ -321,22 +251,13 @@ export interface FileRoutesById {
   '/app/settings': typeof AppSettingsRoute
   '/app/spending': typeof AppSpendingRoute
   '/app/workshop': typeof AppWorkshopRoute
-  '/auth/confirm': typeof AuthConfirmRoute
   '/demo/accounts': typeof DemoAccountsRoute
   '/demo/activity': typeof DemoActivityRoute
   '/demo/net-worth': typeof DemoNetWorthRoute
   '/demo/spending': typeof DemoSpendingRoute
-  '/signin/password': typeof SigninPasswordRoute
-  '/signup/credential': typeof SignupCredentialRoute
-  '/signup/name': typeof SignupNameRoute
-  '/signup/password': typeof SignupPasswordRoute
   '/workspace/$': typeof WorkspaceSplatRoute
   '/app/': typeof AppIndexRoute
   '/demo/': typeof DemoIndexRoute
-  '/signin/': typeof SigninIndexRoute
-  '/signup/': typeof SignupIndexRoute
-  '/api/akahu/callback': typeof ApiAkahuCallbackRoute
-  '/api/akahu/oauth/start': typeof ApiAkahuOauthStartRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -352,8 +273,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/workspace'
-    | '/admin/analytics'
-    | '/api/analytics'
+    | '/api/backup'
+    | '/api/export'
     | '/app/accounts'
     | '/app/activity'
     | '/app/net-worth'
@@ -361,22 +282,13 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/spending'
     | '/app/workshop'
-    | '/auth/confirm'
     | '/demo/accounts'
     | '/demo/activity'
     | '/demo/net-worth'
     | '/demo/spending'
-    | '/signin/password'
-    | '/signup/credential'
-    | '/signup/name'
-    | '/signup/password'
     | '/workspace/$'
     | '/app/'
     | '/demo/'
-    | '/signin/'
-    | '/signup/'
-    | '/api/akahu/callback'
-    | '/api/akahu/oauth/start'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -384,10 +296,12 @@ export interface FileRouteTypes {
     | '/help'
     | '/onboarding'
     | '/privacy'
+    | '/signin'
+    | '/signup'
     | '/sitemap.xml'
     | '/workspace'
-    | '/admin/analytics'
-    | '/api/analytics'
+    | '/api/backup'
+    | '/api/export'
     | '/app/accounts'
     | '/app/activity'
     | '/app/net-worth'
@@ -395,22 +309,13 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/spending'
     | '/app/workshop'
-    | '/auth/confirm'
     | '/demo/accounts'
     | '/demo/activity'
     | '/demo/net-worth'
     | '/demo/spending'
-    | '/signin/password'
-    | '/signup/credential'
-    | '/signup/name'
-    | '/signup/password'
     | '/workspace/$'
     | '/app'
     | '/demo'
-    | '/signin'
-    | '/signup'
-    | '/api/akahu/callback'
-    | '/api/akahu/oauth/start'
   id:
     | '__root__'
     | '/'
@@ -424,8 +329,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/workspace'
-    | '/admin/analytics'
-    | '/api/analytics'
+    | '/api/backup'
+    | '/api/export'
     | '/app/accounts'
     | '/app/activity'
     | '/app/net-worth'
@@ -433,22 +338,13 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/spending'
     | '/app/workshop'
-    | '/auth/confirm'
     | '/demo/accounts'
     | '/demo/activity'
     | '/demo/net-worth'
     | '/demo/spending'
-    | '/signin/password'
-    | '/signup/credential'
-    | '/signup/name'
-    | '/signup/password'
     | '/workspace/$'
     | '/app/'
     | '/demo/'
-    | '/signin/'
-    | '/signup/'
-    | '/api/akahu/callback'
-    | '/api/akahu/oauth/start'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -459,15 +355,12 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
-  SigninRoute: typeof SigninRouteWithChildren
-  SignupRoute: typeof SignupRouteWithChildren
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WorkspaceRoute: typeof WorkspaceRouteWithChildren
-  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  ApiAnalyticsRoute: typeof ApiAnalyticsRoute
-  AuthConfirmRoute: typeof AuthConfirmRoute
-  ApiAkahuCallbackRoute: typeof ApiAkahuCallbackRoute
-  ApiAkahuOauthStartRoute: typeof ApiAkahuOauthStartRoute
+  ApiBackupRoute: typeof ApiBackupRoute
+  ApiExportRoute: typeof ApiExportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -549,20 +442,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/': {
-      id: '/signup/'
-      path: '/'
-      fullPath: '/signup/'
-      preLoaderRoute: typeof SignupIndexRouteImport
-      parentRoute: typeof SignupRoute
-    }
-    '/signin/': {
-      id: '/signin/'
-      path: '/'
-      fullPath: '/signin/'
-      preLoaderRoute: typeof SigninIndexRouteImport
-      parentRoute: typeof SigninRoute
-    }
     '/demo/': {
       id: '/demo/'
       path: '/'
@@ -583,34 +462,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/$'
       preLoaderRoute: typeof WorkspaceSplatRouteImport
       parentRoute: typeof WorkspaceRoute
-    }
-    '/signup/password': {
-      id: '/signup/password'
-      path: '/password'
-      fullPath: '/signup/password'
-      preLoaderRoute: typeof SignupPasswordRouteImport
-      parentRoute: typeof SignupRoute
-    }
-    '/signup/name': {
-      id: '/signup/name'
-      path: '/name'
-      fullPath: '/signup/name'
-      preLoaderRoute: typeof SignupNameRouteImport
-      parentRoute: typeof SignupRoute
-    }
-    '/signup/credential': {
-      id: '/signup/credential'
-      path: '/credential'
-      fullPath: '/signup/credential'
-      preLoaderRoute: typeof SignupCredentialRouteImport
-      parentRoute: typeof SignupRoute
-    }
-    '/signin/password': {
-      id: '/signin/password'
-      path: '/password'
-      fullPath: '/signin/password'
-      preLoaderRoute: typeof SigninPasswordRouteImport
-      parentRoute: typeof SigninRoute
     }
     '/demo/spending': {
       id: '/demo/spending'
@@ -639,13 +490,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/demo/accounts'
       preLoaderRoute: typeof DemoAccountsRouteImport
       parentRoute: typeof DemoRoute
-    }
-    '/auth/confirm': {
-      id: '/auth/confirm'
-      path: '/auth/confirm'
-      fullPath: '/auth/confirm'
-      preLoaderRoute: typeof AuthConfirmRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/app/workshop': {
       id: '/app/workshop'
@@ -696,32 +540,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/api/analytics': {
-      id: '/api/analytics'
-      path: '/api/analytics'
-      fullPath: '/api/analytics'
-      preLoaderRoute: typeof ApiAnalyticsRouteImport
+    '/api/export': {
+      id: '/api/export'
+      path: '/api/export'
+      fullPath: '/api/export'
+      preLoaderRoute: typeof ApiExportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/admin/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/akahu/callback': {
-      id: '/api/akahu/callback'
-      path: '/api/akahu/callback'
-      fullPath: '/api/akahu/callback'
-      preLoaderRoute: typeof ApiAkahuCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/akahu/oauth/start': {
-      id: '/api/akahu/oauth/start'
-      path: '/api/akahu/oauth/start'
-      fullPath: '/api/akahu/oauth/start'
-      preLoaderRoute: typeof ApiAkahuOauthStartRouteImport
+    '/api/backup': {
+      id: '/api/backup'
+      path: '/api/backup'
+      fullPath: '/api/backup'
+      preLoaderRoute: typeof ApiBackupRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -769,36 +599,6 @@ const DemoRouteChildren: DemoRouteChildren = {
 
 const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
 
-interface SigninRouteChildren {
-  SigninPasswordRoute: typeof SigninPasswordRoute
-  SigninIndexRoute: typeof SigninIndexRoute
-}
-
-const SigninRouteChildren: SigninRouteChildren = {
-  SigninPasswordRoute: SigninPasswordRoute,
-  SigninIndexRoute: SigninIndexRoute,
-}
-
-const SigninRouteWithChildren =
-  SigninRoute._addFileChildren(SigninRouteChildren)
-
-interface SignupRouteChildren {
-  SignupCredentialRoute: typeof SignupCredentialRoute
-  SignupNameRoute: typeof SignupNameRoute
-  SignupPasswordRoute: typeof SignupPasswordRoute
-  SignupIndexRoute: typeof SignupIndexRoute
-}
-
-const SignupRouteChildren: SignupRouteChildren = {
-  SignupCredentialRoute: SignupCredentialRoute,
-  SignupNameRoute: SignupNameRoute,
-  SignupPasswordRoute: SignupPasswordRoute,
-  SignupIndexRoute: SignupIndexRoute,
-}
-
-const SignupRouteWithChildren =
-  SignupRoute._addFileChildren(SignupRouteChildren)
-
 interface WorkspaceRouteChildren {
   WorkspaceSplatRoute: typeof WorkspaceSplatRoute
 }
@@ -819,15 +619,12 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
-  SigninRoute: SigninRouteWithChildren,
-  SignupRoute: SignupRouteWithChildren,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WorkspaceRoute: WorkspaceRouteWithChildren,
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
-  ApiAnalyticsRoute: ApiAnalyticsRoute,
-  AuthConfirmRoute: AuthConfirmRoute,
-  ApiAkahuCallbackRoute: ApiAkahuCallbackRoute,
-  ApiAkahuOauthStartRoute: ApiAkahuOauthStartRoute,
+  ApiBackupRoute: ApiBackupRoute,
+  ApiExportRoute: ApiExportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

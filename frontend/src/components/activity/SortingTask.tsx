@@ -1,7 +1,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { createServerFn } from "@tanstack/react-start";
 import type { LedgerDashboardData, SuspenseItem } from "~/components/dashboard/dashboardData";
-import type { ReclassifySuspenseItemInput } from "~/server/tenantReclassify";
+import type { ReclassifySuspenseItemInput } from "~/server/reclassify";
 import { formatMoney } from "~/components/widgets/format";
 import { ToastViewport } from "~/components/ui/Toast";
 import { useUndoToasts } from "~/components/ui/useUndo";
@@ -16,7 +16,7 @@ import "./sorting-task.css";
 const reclassifyFn = createServerFn({ method: "POST" })
   .validator((data: ReclassifySuspenseItemInput) => data)
   .handler(async ({ data }): Promise<SuspenseItem[]> => {
-    const { reclassifySuspenseItem } = await import("~/server/tenantReclassify");
+    const { reclassifySuspenseItem } = await import("~/server/reclassify");
     return reclassifySuspenseItem(data);
   });
 

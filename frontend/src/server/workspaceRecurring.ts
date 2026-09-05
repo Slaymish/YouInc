@@ -1,17 +1,17 @@
 // Server-only: derives the /workspace dashboard's recurring-payments feed
 // (Phase 2+3 of the DashboardGrid port — see workspaceDashboard.ts) from the
-// shared tenant journal fetch (workspaceJournal.ts), reusing
+// shared workspace journal fetch (workspaceJournal.ts), reusing
 // computeRecurringPayments (analytics.ts, itself detectRecurring +
 // computeRecurringGroups) VERBATIM so detection matches the SQLite dashboard
 // exactly — see ledgerPostgresParity.integration.test.ts.
 import { computeRecurringPayments, type RecurringEntryRow, type RecurringPayment } from "./analytics";
-import type { TenantJournalEntryRow } from "./workspaceJournal";
+import type { JournalEntryRow } from "./workspaceJournal";
 
 const MANUAL_SOURCE_ACCOUNT_ID = "manual";
 
 /** Expenses:%/debit postings for non-manual-sourced transactions. */
 export function toRecurringEntryRows(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): RecurringEntryRow[] {
   return rows
     .filter(
@@ -29,9 +29,9 @@ export function toRecurringEntryRows(
     }));
 }
 
-/** The tenant's detected recurring payments from the full journal fetch. */
+/** The workspace's detected recurring payments from the full journal fetch. */
 export function computeWorkspaceRecurringPayments(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): RecurringPayment[] {
   return computeRecurringPayments(toRecurringEntryRows(rows));
 }

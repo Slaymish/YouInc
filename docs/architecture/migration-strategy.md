@@ -1,3 +1,7 @@
+# Historical design
+
+This document describes the retired hosted architecture. See [the current README](../../README.md) for the local SQLite application.
+
 # Migration Strategy — SQLite → Supabase (Phase 0)
 
 Scope: move the existing single-owner install (three local SQLite DBs +

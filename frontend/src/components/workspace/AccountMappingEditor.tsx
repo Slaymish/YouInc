@@ -40,7 +40,7 @@ const deleteAccountMappingFn = createServerFn({ method: "POST" })
   });
 
 // Reuses the existing Akahu accounts listing so the "Akahu account" field can
-// be a dropdown when the tenant is connected. Throws (409) when Akahu isn't
+// be a dropdown when the workspace is connected. Throws (409) when Akahu isn't
 // connected yet — the editor catches that and stays on free-text entry.
 const listConnectedAccountsFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<AkahuAccountSummary[]> => {

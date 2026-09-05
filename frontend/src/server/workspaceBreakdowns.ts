@@ -1,4 +1,4 @@
-// Server-only, tenant-scoped Postgres income/expense breakdown read for the
+// Server-only, workspace-scoped Postgres income/expense breakdown read for the
 // self-service /workspace dashboard (Phase 2+3 of the DashboardGrid port —
 // see workspaceDashboard.ts).
 //
@@ -16,10 +16,10 @@ export interface WorkspaceAccountBreakdowns {
   expenseBreakdown: AccountTotal[];
 }
 
-/** The caller's tenant income/expense breakdowns (Phase 2+3 fields only). */
+/** The caller's workspace income/expense breakdowns (Phase 2+3 fields only). */
 export async function getWorkspaceAccountBreakdowns(
-  tenantId: string,
+  workspaceId: string,
 ): Promise<WorkspaceAccountBreakdowns> {
-  const rows = await fetchIncomeStatementRows(tenantId);
+  const rows = await fetchIncomeStatementRows(workspaceId);
   return computeAccountBreakdowns(rows);
 }

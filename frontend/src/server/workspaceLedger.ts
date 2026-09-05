@@ -1,22 +1,4 @@
-// Server-only, tenant-scoped Postgres ledger DAL for the self-service workspace
-// (Phase 2, first slice).
-//
-// Why this exists / what it deliberately does NOT do:
-//   The full local dashboard (`server/ledger.ts`) reads the owner's SQLite file
-//   and is single-tenant. Porting the *entire* dashboard to Postgres is a large
-//   effort tracked as the rest of P2. This module ships the honest self-service
-//   loop that needs no Akahu: a signed-in user's own manual account balances,
-//   read and written through Supabase under their RLS context (never
-//   service_role), and summarized into net worth / assets / liabilities using
-//   the SAME conventions as the SQLite dashboard:
-//     * account "type" = the first ":"-segment of the ledger account path;
-//     * assets are stored/summed as positive, liabilities as negative;
-//       liabilities are surfaced as a positive magnitude and net worth =
-//       assets - liabilities.
-//
-// Journal-derived balances (Akahu ingestion) are the next P2 slice and are not
-// read here yet — a fresh self-serve tenant has none until sync lands.
-import { getSupabaseServerClient, getServerUser } from "./supabaseServer";
+import { rows, execute, setting } from "./database";
 import { accountType } from "./accountType";
 import { throwServerError } from "./serverError";
 import {
@@ -37,9 +19,9 @@ export interface WorkspaceManualBalance {
 }
 
 export interface WorkspaceLedgerSummary {
-  tenantId: string;
+  workspaceId: string;
   currency: string;
-  /** The tenant's configured suspense/fallback account (default: Expenses:Uncategorized:Suspense). */
+  /** The workspace's configured suspense/fallback account (default: Expenses:Uncategorized:Suspense). */
   suspenseAccount: string;
   /** Editable manual balances (the accounts a user maintains by hand). */
   manualBalances: WorkspaceManualBalance[];
@@ -63,35 +45,15 @@ interface JournalEntryDbRow {
   amount_cents: number;
 }
 
-interface TenantContext {
-  tenantId: string;
+interface WorkspaceContext {
+  workspaceId: string;
   currency: string;
   suspenseAccount: string;
 }
 
-/** Resolve the caller's primary tenant (id + default currency + suspense account), or throw 401. */
-async function requireTenant(): Promise<TenantContext> {
-  const user = await getServerUser();
-  if (!user) {
-    throwServerError("You must be signed in.", 401);
-  }
-  const supabase = getSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("tenants")
-    .select("id, default_currency, suspense_account")
-    .order("created_at", { ascending: true })
-    .limit(1);
-  if (error) {
-    throwServerError(error.message || "Could not load your workspace.", 400);
-  }
-  const row = data?.[0] as
-    | { id: string; default_currency: string; suspense_account: string }
-    | undefined;
-  if (!row) {
-    // Signed in but no tenant yet — onboarding not finished.
-    throwServerError("No workspace found. Finish onboarding first.", 409);
-  }
-  return { tenantId: row.id, currency: row.default_currency, suspenseAccount: row.suspense_account };
+/** Resolve the caller's primary workspace (id + default currency + suspense account), or throw 401. */
+async function workspaceContext(): Promise<WorkspaceContext> {
+  return { workspaceId: 'local', currency: setting('currency'), suspenseAccount: setting('suspense') };
 }
 
 /** Aggregate journal entries into per-account balances: debit +, credit −. */
@@ -111,7 +73,7 @@ function aggregateJournalBalances(
 }
 
 function summarize(
-  tenant: TenantContext,
+  workspace: WorkspaceContext,
   manualRows: ManualBalanceDbRow[],
   journalRows: JournalEntryDbRow[],
 ): WorkspaceLedgerSummary {
@@ -135,9 +97,9 @@ function summarize(
   );
 
   return {
-    tenantId: tenant.tenantId,
-    currency: tenant.currency,
-    suspenseAccount: tenant.suspenseAccount,
+    workspaceId: workspace.workspaceId,
+    currency: workspace.currency,
+    suspenseAccount: workspace.suspenseAccount,
     manualBalances,
     balances,
     hasJournalBalances: journalBalances.length > 0,
@@ -145,33 +107,12 @@ function summarize(
   };
 }
 
-/** The caller's tenant ledger summary: journal-derived + manual balances. */
+/** The caller's workspace ledger summary: journal-derived + manual balances. */
 export async function getWorkspaceLedger(): Promise<WorkspaceLedgerSummary> {
-  const tenant = await requireTenant();
-  const supabase = getSupabaseServerClient();
-
-  const [manualRes, journalRes] = await Promise.all([
-    supabase
-      .from("manual_account_balances")
-      .select("account, balance_cents, as_of_date, updated_at")
-      .eq("tenant_id", tenant.tenantId)
-      .order("account", { ascending: true }),
-    supabase
-      .from("journal_entries")
-      .select("account, side, amount_cents")
-      .eq("tenant_id", tenant.tenantId),
-  ]);
-  if (manualRes.error) {
-    throwServerError(manualRes.error.message || "Could not load balances.", 400);
-  }
-  if (journalRes.error) {
-    throwServerError(journalRes.error.message || "Could not load ledger.", 400);
-  }
-  return summarize(
-    tenant,
-    (manualRes.data ?? []) as ManualBalanceDbRow[],
-    (journalRes.data ?? []) as JournalEntryDbRow[],
-  );
+  const workspace = await workspaceContext();
+  return summarize(workspace,
+    rows<ManualBalanceDbRow>('SELECT * FROM manual_account_balances ORDER BY account'),
+    rows<JournalEntryDbRow>('SELECT account, side, amount_cents FROM journal_entries'));
 }
 
 export interface UpsertWorkspaceBalanceInput {
@@ -181,8 +122,8 @@ export interface UpsertWorkspaceBalanceInput {
 }
 
 /**
- * Insert or update one manual account balance for the caller's tenant, then
- * return the refreshed summary. RLS confines the write to the caller's tenant;
+ * Insert or update one manual account balance for the caller's workspace, then
+ * return the refreshed summary. RLS confines the write to the caller's workspace;
  * we also set tenant_id explicitly (required by the NOT NULL column + policy
  * WITH CHECK). Account paths must be namespaced (contain a ":") so accountType()
  * can classify them as Assets/Liabilities/etc.
@@ -190,7 +131,7 @@ export interface UpsertWorkspaceBalanceInput {
 export async function upsertWorkspaceBalance(
   input: UpsertWorkspaceBalanceInput,
 ): Promise<WorkspaceLedgerSummary> {
-  const tenant = await requireTenant();
+  const workspace = await workspaceContext();
 
   const account = input.account.trim();
   if (!account.includes(":")) {
@@ -205,36 +146,19 @@ export async function upsertWorkspaceBalance(
   const balanceCents = Math.round(input.balanceCents);
   const asOfDate = input.asOfDate ?? new Date().toISOString().slice(0, 10);
 
-  const supabase = getSupabaseServerClient();
-  const { error } = await supabase.from("manual_account_balances").upsert(
-    {
-      tenant_id: tenant.tenantId,
-      account,
-      balance_cents: balanceCents,
-      as_of_date: asOfDate,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "tenant_id,account" },
-  );
-  if (error) {
-    throwServerError(error.message || "Could not save the balance.", 400);
-  }
+  if (!Number.isSafeInteger(balanceCents)) throw new Error('Balance is too large.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(asOfDate) || !Number.isFinite(Date.parse(asOfDate)) || new Date(asOfDate).toISOString().slice(0,10) !== asOfDate) throw new Error('Enter a valid date.');
+  execute(`INSERT INTO manual_account_balances VALUES (?,?,?,?)
+    ON CONFLICT(account) DO UPDATE SET balance_cents=excluded.balance_cents,
+    as_of_date=excluded.as_of_date, updated_at=excluded.updated_at`,
+    account, balanceCents, asOfDate, new Date().toISOString());
   return getWorkspaceLedger();
 }
 
-/** Remove a manual account balance from the caller's tenant. */
+/** Remove a manual account balance from the caller's workspace. */
 export async function deleteWorkspaceBalance(
   account: string,
 ): Promise<WorkspaceLedgerSummary> {
-  const tenant = await requireTenant();
-  const supabase = getSupabaseServerClient();
-  const { error } = await supabase
-    .from("manual_account_balances")
-    .delete()
-    .eq("tenant_id", tenant.tenantId)
-    .eq("account", account.trim());
-  if (error) {
-    throwServerError(error.message || "Could not remove the account.", 400);
-  }
+  execute('DELETE FROM manual_account_balances WHERE account = ?', account.trim());
   return getWorkspaceLedger();
 }

@@ -132,5 +132,13 @@ test("the document resolves the dark token set, not the light one", async ({
   expect(scheme).toBe("dark");
   // The light stack's tell is an 0.8-opacity white halo; dark's is barely there.
   expect(raised).not.toContain("rgba(255, 255, 255, 0.8)");
-  expect(raised).toContain("rgba(0, 0, 0, 0.55)");
+  expect(raised).toMatch(/rgba\(0, 0, 0, 0\.55\)|#0000008c/);
+});
+
+test('public demo refuses backup and export access',async ({request}) => {
+  for (const path of ['/api/backup','/api/export']) {
+    const response=await request.get(path);
+    expect(response.ok()).toBe(false);
+    expect(response.headers()['content-disposition']).toBeUndefined();
+  }
 });

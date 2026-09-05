@@ -1,3 +1,7 @@
+# Historical design
+
+This document describes the retired hosted architecture. See [the current README](../README.md) for the local SQLite application.
+
 # Deploying YouInc (Fly.io + Supabase Cloud)
 
 The app is **stateless**: all persistence is a Supabase Cloud project (Postgres

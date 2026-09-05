@@ -1,6 +1,6 @@
 // Server-only: derives the /workspace dashboard's category-monthly and
 // daily-spend feeds (Phase 2+3 of the DashboardGrid port — see
-// workspaceDashboard.ts) from the shared tenant journal fetch
+// workspaceDashboard.ts) from the shared workspace journal fetch
 // (workspaceJournal.ts), reusing computeCategoryMonthly / computeDailySpend
 // (analytics.ts) VERBATIM so both match the SQLite dashboard exactly — see
 // ledgerPostgresParity.integration.test.ts.
@@ -12,13 +12,13 @@ import {
   type DailySpendEntryRow,
   type DailySpendPoint,
 } from "./analytics";
-import type { TenantJournalEntryRow } from "./workspaceJournal";
+import type { JournalEntryRow } from "./workspaceJournal";
 
 const MANUAL_SOURCE_ACCOUNT_ID = "manual";
 
 /** Expenses:% postings, mapped into the shared (month, account) shape. */
 export function toCategoryMonthlyEntryRows(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): CategoryMonthlyEntryRow[] {
   return rows
     .filter((row) => row.account.startsWith("Expenses:"))
@@ -37,7 +37,7 @@ export function toCategoryMonthlyEntryRows(
  * `COUNT(DISTINCT jt.id)` over the unfiltered join.
  */
 export function toDailySpendEntryRows(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): DailySpendEntryRow[] {
   return rows
     .filter((row) => row.sourceAccountId !== MANUAL_SOURCE_ACCOUNT_ID)
@@ -50,16 +50,16 @@ export function toDailySpendEntryRows(
     }));
 }
 
-/** The tenant's category-monthly spend from the full journal fetch. */
+/** The workspace's category-monthly spend from the full journal fetch. */
 export function computeWorkspaceCategoryMonthly(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): CategoryMonthPoint[] {
   return computeCategoryMonthly(toCategoryMonthlyEntryRows(rows));
 }
 
-/** The tenant's daily spend/income from the full journal fetch. */
+/** The workspace's daily spend/income from the full journal fetch. */
 export function computeWorkspaceDailySpend(
-  rows: readonly TenantJournalEntryRow[],
+  rows: readonly JournalEntryRow[],
 ): DailySpendPoint[] {
   return computeDailySpend(toDailySpendEntryRows(rows));
 }
