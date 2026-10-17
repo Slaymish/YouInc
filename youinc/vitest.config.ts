@@ -5,5 +5,5 @@ import { defineConfig } from 'vitest/config';
  * vitest transpiles the `.ts` imports the same way `node` strips them.
  */
 export default defineConfig({
-  test: { environment: 'node', include: ['tests/**/*.test.ts'] },
+  test: { environment: 'node', include: ['tests/**/*.test.ts', 'spend-authority/**/*.test.ts'] },
 });

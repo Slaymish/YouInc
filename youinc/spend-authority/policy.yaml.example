@@ -1,0 +1,34 @@
+# Standing spending authority. Edit this file; the agent cannot.
+#
+# The limits are deliberately at the top: this is the whole trust surface.
+# Money is in decimal dollars; currency is NZD.
+
+currency: NZD
+
+# Nothing may be bought unattended while mode is `notify`.
+# Switch to `unattended` only after the limits below are set to something you
+# would be relaxed about losing in one go.
+mode: notify
+
+# --- the ladder (see proposals/agent-spending-authority-2026-10-17.md) ---
+# T1, proposed starting point: raise mode to unattended when you are ready.
+per_purchase_limit: 50        # the most any single thing may cost
+per_call_limit: 50            # the most one unattended run may spend in total
+monthly_limit: 50             # the most a calendar month may total
+require_approval_above: 25    # ask before spending this much, even under limits
+
+# Categories the agent may spend in, as ledger paths. Empty = nothing at all.
+allowlist:
+  - Software
+  - Subscriptions
+  - Hardware
+  - Books
+  - Groceries
+
+# Never, whatever the limits say.
+denylist:
+  - temu.com
+
+# Always refused, never earnable back: gambling, crypto, cash advances, loans,
+# insurance, investments. Extend only upward in risk, never downward.
+hard_blocked: []
