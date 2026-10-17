@@ -1,0 +1,17 @@
+{
+  "name": "youinc-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent-first personal ledger: anchored balances over a double-entry journal, read from one SQLite file.",
+  "engines": { "node": ">=22.13" },
+  "bin": { "youinc": "./cli.ts" },
+  "scripts": {
+    "start": "node cli.ts",
+    "test": "vitest run",
+    "typecheck": "../frontend/node_modules/.bin/tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}
