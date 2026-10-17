@@ -6,6 +6,7 @@ import { doctor } from './doctor.ts';
 import { loadRoutingConfig, upsertRule, disableRule, listRules } from './config.ts';
 import { applyPairs, candidates, proposePairs } from './transfers.ts';
 import { reclassify, setManualBalance } from './adjust.ts';
+import { repost } from './repost.ts';
 import { monthlyCashflow, spendByAccount, incomeByAccount, suspenseQueue, accountMappings } from './reports.ts';
 import { sync } from './sync.ts';
 import { AkahuError } from './akahu.ts';
@@ -93,6 +94,13 @@ const USAGE = `youinc — agent-first personal ledger
   youinc income [--from] [--to] [--human]
   youinc cashflow [--from] [--to] [--human]
   youinc suspense [--limit N] [--human]
+
+  youinc repost [--dry-run] [--human]
+      Rebuild every derived journal from the stored raw transactions using the
+      current rules, then re-pair transfers. Clears the processed marks so the
+      derivation is fresh; keeps manual:* journals and every anchor/statement.
+      Run this after adding or changing rules — classification is decided at
+      posting time, not at read time.
 
   youinc pair-transfers [--dry-run] [--window-days N] [--human]
   youinc reclassify <external-id> --to <Ledger:Account>
@@ -277,6 +285,15 @@ async function main(argv: string[]): Promise<number> {
         [[String(applied.applied), String(applied.errors.length), String(remaining.unpaired.length)]],
       ), args);
       return applied.errors.length ? 2 : 0;
+    }
+
+    case 'repost': {
+      const result = repost(db, loadRoutingConfig(db), { dryRun: flag(args, 'dry-run') });
+      emit(result, table(
+        ['kept', 'cleared', 'posted', 'pairs', 'errors'],
+        [[String(result.kept), String(result.cleared), String(result.posted), String(result.appliedPairs), String(result.pairErrors.length)]],
+      ), args);
+      return result.pairErrors.length ? 2 : 0;
     }
 
     case 'reclassify': {

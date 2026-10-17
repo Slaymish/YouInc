@@ -1,6 +1,6 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
-import { atomic, rows, execute } from './database.ts';
+import { atomic, rows, execute, one } from './database.ts';
 import type { RawTransaction } from './rawTransaction.ts';
 import type { JournalTransaction, Posting } from './journal.ts';
 import { posting, validateBalanced } from './journal.ts';
@@ -161,6 +161,21 @@ export function importAccount(
       try {
         const transaction = fromPayload(payload);
         if (insertRaw(db, transaction)) result.rawInserted += 1;
+        // A row already consumed by a transfer pair (or skipped as pending or
+        // zero) must never post again. Without this check, pairing — which
+        // resets `processed_at` on both legs — let the next sync re-post each
+        // leg as a lone journal alongside the pair, quietly double-counting
+        // every transfer and dumping card payments into suspense as credits.
+        const prior = one<{ skipped_reason: string | null }>(
+          db, 'SELECT skipped_reason FROM raw_transactions WHERE idempotency_hash = ?', transaction.idempotencyHash,
+        );
+        if (prior?.skipped_reason) {
+          if (prior.skipped_reason === 'pending') result.skipped.pending += 1;
+          else if (prior.skipped_reason === 'zero_amount') result.skipped.zero_amount += 1;
+          else if (prior.skipped_reason === 'transfer_counterpart') result.skipped.transfer_counterpart += 1;
+          else result.skipped.duplicate += 1;
+          continue;
+        }
         if (transaction.isPending && discardPending) { markSkipped(db, transaction.idempotencyHash, 'pending'); result.skipped.pending += 1; continue; }
         if (transaction.amountCents === 0) { markSkipped(db, transaction.idempotencyHash, 'zero_amount'); result.skipped.zero_amount += 1; continue; }
         if (journalExists(db, transaction.idempotencyHash)) { result.skipped.duplicate += 1; continue; }

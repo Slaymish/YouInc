@@ -13,6 +13,7 @@ import { spendByAccount } from '../reports.ts';
 import { applyPairs, candidates, proposePairs } from '../transfers.ts';
 import { loadRoutingConfig } from '../config.ts';
 import { reclassify } from '../adjust.ts';
+import { repost } from '../repost.ts';
 
 /**
  * Reconciliation and sync behaviour, exercised end to end against a real
@@ -203,6 +204,24 @@ describe('transfers between own accounts', () => {
     expect(lone.n).toBe(0);
   });
 
+  test('a second sync never re-posts a leg the pair already consumed', async () => {
+    // Regression: applyPairs resets `processed_at` on both legs, and import
+    // used to post any raw row without a journal — so the next sync re-posted
+    // each paired leg as a lone journal beside the pair. Every transfer was
+    // then counted twice and card payments landed in suspense as credits.
+    const out = txn('trn_out', BNZ._id, '2026-10-15', -500, 'Transfer to Sharesies');
+    const inn = txn('trn_in', SHARESIES_SPEND._id, '2026-10-16', 500, 'Deposit from BNZ');
+    const { client } = stubClient([BNZ, SHARESIES_SPEND], { [BNZ._id]: [out], [SHARESIES_SPEND._id]: [inn] });
+    await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
+    await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-18T00:00:00Z') });
+
+    const journals = db.prepare('SELECT COUNT(*) AS n FROM journal_transactions').get() as { n: number };
+    expect(journals.n).toBe(1);
+    const legs = db.prepare("SELECT COUNT(*) AS n FROM journal_entries WHERE account = 'Assets:Sharesies:Spend'").get() as { n: number };
+    expect(legs.n).toBe(1);
+    expect(spendByAccount(db, '2026-10-01', '2026-10-31', 'top')).toEqual([]);
+  });
+
   test('a transfer is not booked as spending', async () => {
     const out = txn('trn_out', BNZ._id, '2026-10-15', -500, 'Transfer to Sharesies');
     const inn = txn('trn_in', SHARESIES_SPEND._id, '2026-10-16', 500, 'Deposit from BNZ');
@@ -248,8 +267,6 @@ describe('transfers between own accounts', () => {
   });
 });
 
-function SHARIESIES_PLACEHOLDER() { return SHARESIES_SPEND; }
-
 describe('corrections and integrity', () => {
   test('reclassify posts a correction and leaves the original journal intact', async () => {
     const { client } = stubClient([BNZ], { [BNZ._id]: [txn('trn_1', BNZ._id, '2026-10-16', -50, 'Countdown Wellington')] });
@@ -259,6 +276,48 @@ describe('corrections and integrity', () => {
     expect(result.fromAccount).toBe('Expenses:Uncategorized:Suspense');
     expect(db.prepare('SELECT COUNT(*) AS n FROM journal_transactions WHERE external_id = ?').get(row.id)).toEqual({ n: 1 });
     expect(doctor(db, 'x').unbalancedJournals).toHaveLength(0);
+  });
+
+  test('repost applies a new rule to history without touching balances', async () => {
+    // Classification is decided at import time, so a new rule must be able to
+    // rebuild the postings it applies to. Repost derives again from the stored
+    // raw rows: same evidence, current rules, one pass.
+    const { client } = stubClient([BNZ], {
+      [BNZ._id]: [
+        txn('trn_shop', BNZ._id, '2026-10-14', -50, 'Countdown Wellington'),
+        txn('trn_coffee', BNZ._id, '2026-10-15', -5, 'Sierra Cafe Lambton'),
+      ],
+    });
+    await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
+    expect(spendByAccount(db, '2026-10-01', '2026-10-31', 'top')[0].group).toBe('Expenses:Uncategorized');
+
+    // Bank descriptions are inconsistently cased (Woolworths / WOOLWORTHS), so
+    // a real rule carries the inline flag; the engine translates `(?i)`.
+    db.prepare(`INSERT INTO classification_rules (id, rule_key, seq, priority, is_enabled, match_description_regex, match_merchant_regex, match_amount_greater_than, match_amount_abs_greater_than, route_target_account, route_memo)
+                VALUES ('r1','countdown',0,10,1,'(?i)countdown',NULL,NULL,NULL,'Expenses:Groceries',NULL)`).run();
+
+    const result = repost(db, loadRoutingConfig(db));
+    expect(result.posted).toBe(2);
+    const groups = spendByAccount(db, '2026-10-01', '2026-10-31', 'top').map((g) => g.group);
+    expect(groups).toContain('Expenses:Groceries');
+    // Balances are untouched by a reclassification of history.
+    const [operating] = reconcile(db, { now: new Date('2026-10-17T01:00:00Z') });
+    expect(operating.reportedCents).toBe(operating.ledgerCents);
+    expect(doctor(db, 'x').unbalancedJournals).toHaveLength(0);
+  });
+
+  test('repost keeps a hand-classified journal and transfer pairs single', async () => {
+    const out = txn('trn_out', BNZ._id, '2026-10-15', -500, 'Transfer to Sharesies');
+    const inn = txn('trn_in', SHARESIES_SPEND._id, '2026-10-16', 500, 'Deposit from BNZ');
+    const { client } = stubClient([BNZ, SHARESIES_SPEND], { [BNZ._id]: [out], [SHARESIES_SPEND._id]: [inn] });
+    await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
+    const hand = db.prepare("SELECT external_id AS id FROM journal_transactions WHERE external_id NOT LIKE 'transfer:%'").get() as { id: string } | undefined;
+    if (hand) reclassify(db, hand.id, 'Expenses:Groceries');
+
+    const result = repost(db, loadRoutingConfig(db));
+    expect(result.appliedPairs).toBe(1);
+    expect(db.prepare("SELECT COUNT(*) AS n FROM journal_transactions WHERE rule_id LIKE 'manual:%'").get()).toEqual({ n: hand ? 1 : 0 });
+    expect(db.prepare("SELECT COUNT(*) AS n FROM journal_transactions WHERE rule_id = 'transfer:pair'").get()).toEqual({ n: 1 });
   });
 
   test('doctor catches an unbalanced journal', () => {

@@ -60,7 +60,9 @@ export function spendByAccount(
 ): SpendRow[] {
   const key =
     groupBy === 'top'
-      ? "substr(e.account, 1, instr(substr(e.account, 10), ':') + 9)"
+      // Two levels: `Expenses:Groceries` is already top-level and must not
+      // collapse to `Expenses:` just because it has no third segment.
+      ? "CASE WHEN instr(substr(e.account, 10), ':') = 0 THEN e.account ELSE substr(e.account, 1, instr(substr(e.account, 10), ':') + 8) END"
       : groupBy === 'month'
         ? 'substr(j.transaction_date, 1, 7)'
         : 'e.account';
