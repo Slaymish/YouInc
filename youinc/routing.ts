@@ -59,12 +59,16 @@ export interface AccountMapping {
 
 export interface RoutingConfig {
   suspenseAccount: string;
+  /** Where an unexplained INFLOW goes. A credit on an expense account reads as
+   *  negative spending, so money-in of unknown origin gets its own home. */
+  suspenseIncomeAccount: string;
   rules: Rule[];
   nzfccMappings: Record<string, string>;
   accountMappings: Record<string, AccountMapping>;
 }
 
 export const DEFAULT_SUSPENSE = 'Expenses:Uncategorized:Suspense';
+export const DEFAULT_SUSPENSE_INCOME = 'Income:Unidentified';
 
 /** Python `re.search` accepts a leading inline flag group; V8 does not. */
 function translatePythonRegex(pattern: string): RegExp {
@@ -115,7 +119,12 @@ export function route(config: RoutingConfig, transaction: RawTransaction): Route
     return { targetAccount: config.nzfccMappings[transaction.nzfcc], ruleId: `nzfcc:${transaction.nzfcc}`, memo: null, matchedBy: 'nzfcc' };
   }
 
-  return { targetAccount: config.suspenseAccount, ruleId: null, memo: null, matchedBy: 'suspense' };
+  // Sign decides which suspense: an unexplained outflow is spending, an
+  // unexplained inflow is not negative spending.
+  const fallback = transaction.amountCents > 0
+    ? (config.suspenseIncomeAccount || DEFAULT_SUSPENSE_INCOME)
+    : config.suspenseAccount;
+  return { targetAccount: fallback, ruleId: null, memo: null, matchedBy: 'suspense' };
 }
 
 /**

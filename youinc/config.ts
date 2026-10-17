@@ -1,7 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { rows, one, setting } from './database.ts';
 import type { RoutingConfig } from './routing.ts';
-import { DEFAULT_SUSPENSE } from './routing.ts';
+import { DEFAULT_SUSPENSE, DEFAULT_SUSPENSE_INCOME } from './routing.ts';
 
 /**
  * DB → routing config, the same assembly the dashboard's ingestion.ts did:
@@ -35,6 +35,7 @@ export function loadRoutingConfig(db: DatabaseSync): RoutingConfig {
 
   return {
     suspenseAccount: setting(db, 'suspense') || DEFAULT_SUSPENSE,
+    suspenseIncomeAccount: setting(db, 'suspense_income') || DEFAULT_SUSPENSE_INCOME,
     rules: rules.map((r) => ({
       id: r.rule_key,
       priority: Number(r.priority),

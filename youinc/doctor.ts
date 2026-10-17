@@ -51,7 +51,8 @@ export function doctor(db: DatabaseSync, ledgerPath: string, now = new Date()): 
     one<{ n: number }>(
       db,
       `SELECT COUNT(*) AS n FROM journal_entries
-        WHERE account = 'Expenses:Uncategorized:Suspense' AND side = 'debit'`,
+        WHERE (account = 'Expenses:Uncategorized:Suspense' AND side = 'debit')
+           OR (account = 'Income:Unidentified' AND side = 'credit')`,
     )?.n ?? 0,
   );
 

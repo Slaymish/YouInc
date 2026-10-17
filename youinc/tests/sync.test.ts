@@ -12,7 +12,7 @@ import { doctor } from '../doctor.ts';
 import { spendByAccount } from '../reports.ts';
 import { applyPairs, candidates, proposePairs } from '../transfers.ts';
 import { loadRoutingConfig } from '../config.ts';
-import { reclassify } from '../adjust.ts';
+import { reclassify, setManualBalance } from '../adjust.ts';
 import { repost } from '../repost.ts';
 
 /**
@@ -118,6 +118,27 @@ describe('anchored balances', () => {
     expect(unmapped.n).toBe(0);
     const posted = db.prepare("SELECT COUNT(*) AS n FROM journal_entries WHERE account = 'Assets:BNZ:Operating'").get() as { n: number };
     expect(posted.n).toBe(1);
+  });
+
+  test('an unexplained inflow goes to income suspense, not into expenses', async () => {
+    // A credit on an expense account reads as negative spending. Money arriving
+    // from an unknown source is its own question, not a refund.
+    const { client } = stubClient([BNZ], {
+      [BNZ._id]: [
+        txn('trn_in', BNZ._id, '2026-10-16', 250, 'Deposit from J Smith'),
+        txn('trn_out', BNZ._id, '2026-10-16', -40, 'Countdown Wellington'),
+      ],
+    });
+    await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
+
+    const rows = db.prepare(
+      "SELECT account, side FROM journal_entries e JOIN journal_transactions j ON j.id = e.journal_transaction_id WHERE j.description LIKE 'Deposit%' ORDER BY side",
+    ).all() as Array<{ account: string; side: string }>;
+    expect(rows.find((r) => r.side === 'credit')?.account).toBe('Income:Unidentified');
+    // The expense side of the ledger carries only the outflow.
+    const spend = spendByAccount(db, '2026-10-01', '2026-10-31', 'top');
+    expect(spend).toHaveLength(1);
+    expect(spend[0].cents).toBe(4_000);
   });
 
   test('a later sync re-anchors: the ledger can never stay behind the bank', async () => {
@@ -318,6 +339,20 @@ describe('corrections and integrity', () => {
     expect(result.appliedPairs).toBe(1);
     expect(db.prepare("SELECT COUNT(*) AS n FROM journal_transactions WHERE rule_id LIKE 'manual:%'").get()).toEqual({ n: hand ? 1 : 0 });
     expect(db.prepare("SELECT COUNT(*) AS n FROM journal_transactions WHERE rule_id = 'transfer:pair'").get()).toEqual({ n: 1 });
+  });
+
+  test('a manual account outside Akahu is registered, anchored and reported', () => {
+    // A savings app or wallet he holds but Akahu cannot see. Without a mapping
+    // it is invisible to reconcile, so set-balance can create a balance-only
+    // account rather than leaving it out of net worth.
+    setManualBalance(db, 'manual_blossom', 57_234, '2026-10-17', 'Assets:Blossom');
+    const account = reconcile(db, { now: new Date('2026-10-17T12:00:00Z') })
+      .find((a) => a.ledgerAccount === 'Assets:Blossom');
+    expect(account?.status).toBe('balance-only');
+    expect(account?.reportedCents).toBe(57_234);
+    // No feed, so nothing pretends to reconcile against it.
+    expect(account?.ledgerCents).toBeNull();
+    expect(() => setManualBalance(db, 'manual_unknown', 100, '2026-10-17')).toThrow(/--ledger/);
   });
 
   test('doctor catches an unbalanced journal', () => {

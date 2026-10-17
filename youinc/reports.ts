@@ -67,11 +67,17 @@ export function spendByAccount(
         ? 'substr(j.transaction_date, 1, 7)'
         : 'e.account';
   const rows = db.prepare(
-    `SELECT ${key} AS grp, SUM(e.amount_cents) AS cents, COUNT(*) AS n
+    // Net, not debits-only. A refund, a reimbursement or a reclassification
+    // contra posts a CREDIT to an expense account; summing debits alone counts
+    // the original spend and ignores the money coming back, which overstates
+    // every category that ever had one.
+    `SELECT ${key} AS grp,
+            SUM(CASE e.side WHEN 'debit' THEN e.amount_cents ELSE -e.amount_cents END) AS cents,
+            COUNT(*) AS n
        FROM journal_entries e JOIN journal_transactions j ON j.id = e.journal_transaction_id
-      WHERE e.account LIKE 'Expenses:%' AND e.side = 'debit'
+      WHERE e.account LIKE 'Expenses:%'
         AND j.transaction_date BETWEEN ? AND ?
-      GROUP BY grp ORDER BY cents DESC`,
+      GROUP BY grp HAVING cents != 0 ORDER BY cents DESC`,
   ).all(from, to) as Array<{ grp: string; cents: number; n: number }>;
   return rows.map((r) => ({ group: String(r.grp), cents: Number(r.cents), count: Number(r.n) }));
 }
@@ -107,7 +113,8 @@ export function suspenseQueue(db: DatabaseSync, limit = 50): UncategorisedRow[] 
     `SELECT j.external_id AS externalId, j.transaction_date AS transactionDate, j.description,
             e.amount_cents AS cents, e.account
        FROM journal_entries e JOIN journal_transactions j ON j.id = e.journal_transaction_id
-      WHERE e.account = 'Expenses:Uncategorized:Suspense' AND e.side = 'debit'
+      WHERE (e.account = 'Expenses:Uncategorized:Suspense' AND e.side = 'debit')
+         OR (e.account = 'Income:Unidentified' AND e.side = 'credit')
       ORDER BY j.transaction_date DESC LIMIT ?`,
   ).all(limit) as Array<Record<string, unknown>>;
   return rows.map((r) => ({

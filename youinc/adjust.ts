@@ -1,4 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite';
+import { randomUUID } from 'node:crypto';
 import { execute, one, rows } from './database.ts';
 import { insertJournal } from './journal-store.ts';
 import { journalExists, postJournal } from './import.ts';
@@ -76,9 +77,27 @@ export function setManualBalance(
   akahuAccountId: string,
   balanceCents: number,
   asOf: string,
+  ledgerAccount?: string,
 ): void {
-  const mapping = one<{ ledger_account: string }>(db, 'SELECT ledger_account FROM account_mappings WHERE akahu_account_id = ?', akahuAccountId);
-  if (!mapping) throw new Error(`No mapped account ${akahuAccountId}; run \`youinc accounts\` to see mapped ids`);
+  let mapping = one<{ ledger_account: string }>(db, 'SELECT ledger_account FROM account_mappings WHERE akahu_account_id = ?', akahuAccountId);
+  if (!mapping) {
+    // An asset he holds outside Akahu (a savings app, a wallet). It needs a
+    // mapping row to be reconciled and reported at all, and it will never have
+    // a feed, so it is registered as balance-only rather than invented as a
+    // bank account.
+    if (!ledgerAccount) throw new Error(`No mapped account ${akahuAccountId}; pass --ledger Assets:Name to register it, or run \`youinc accounts\` to see mapped ids`);
+    if (!ledgerAccount.includes(':')) throw new Error('--ledger must be a ledger path like Assets:Blossom');
+    const now = new Date().toISOString();
+    execute(
+      db,
+      `INSERT INTO account_mappings
+         (id, akahu_account_id, name, ledger_account, account_type, has_feed, connection, connection_id,
+          connection_has_feed, formatted_account, credit_limit_cents, created_at, updated_at)
+       VALUES (?,?,?,?, 'asset', 0, 'manual', NULL, 0, NULL, NULL, ?, ?)`,
+      randomUUID(), akahuAccountId, ledgerAccount.split(':').pop() ?? ledgerAccount, ledgerAccount, now, now,
+    );
+    mapping = { ledger_account: ledgerAccount };
+  }
   execute(
     db,
     `INSERT INTO account_balances

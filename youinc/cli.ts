@@ -313,10 +313,10 @@ async function main(argv: string[]): Promise<number> {
       const amount = toCents((args._ as string[])[2] ?? '');
       const asOf = string(args, 'as-of') ?? new Date().toISOString().slice(0, 10);
       if (!account || amount === null) {
-        process.stderr.write('usage: youinc set-balance <acc_id> <amount> --as-of YYYY-MM-DD\n');
+        process.stderr.write('usage: youinc set-balance <acc_id> <amount> --as-of YYYY-MM-DD [--ledger Assets:Name]\n');
         return 2;
       }
-      setManualBalance(db, account, amount, asOf);
+      setManualBalance(db, account, amount, asOf, string(args, 'ledger'));
       emit({ account, balanceCents: amount, asOf }, `Balance for ${account} set to ${formatCents(amount)} as of ${asOf}.`, args);
       return 0;
     }
