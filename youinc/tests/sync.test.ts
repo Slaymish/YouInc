@@ -1,5 +1,6 @@
 import { test, describe, beforeEach, afterEach, expect } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { DatabaseSync } from 'node:sqlite';
@@ -101,6 +102,21 @@ describe('anchored balances', () => {
     expect(operating?.status).toBe('agrees');
     // Default mode reports the balance, not an explanation, for a fresh gap.
     expect(operating?.gap).toHaveLength(0);
+  });
+
+  test('a first sync posts to the mapped ledger account, never Assets:Unmapped', async () => {
+    // Regression: routing used to be loaded before the mappings were upserted,
+    // so the very first sync filed everything under Assets:Unmapped:<id> and
+    // never self-corrected on later runs.
+    const { client } = stubClient([BNZ], {
+      [BNZ._id]: [txn('trn_1', BNZ._id, '2026-10-16', -50, 'Countdown Wellington')],
+    });
+    await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
+
+    const unmapped = db.prepare("SELECT COUNT(*) AS n FROM journal_entries WHERE account LIKE 'Assets:Unmapped:%'").get() as { n: number };
+    expect(unmapped.n).toBe(0);
+    const posted = db.prepare("SELECT COUNT(*) AS n FROM journal_entries WHERE account = 'Assets:BNZ:Operating'").get() as { n: number };
+    expect(posted.n).toBe(1);
   });
 
   test('a later sync re-anchors: the ledger can never stay behind the bank', async () => {
@@ -279,18 +295,22 @@ describe('money formatting', () => {
 });
 
 describe('the CLI as an agent would call it', () => {
+  const runCli = (args: string[], dirPath: string) => {
+    // Credentials are stripped: the assertion below is about the CLI's own
+    // reporting, not about whatever the developer's shell happens to export.
+    const env = { ...process.env, YOUINC_DB_PATH: join(dirPath, 'ledger.sqlite3'), AKAHU_APP_TOKEN: '', AKAHU_USER_TOKEN: '' };
+    try {
+      return { code: 0, out: execFileSync(process.execPath, ['cli.ts', ...args], {
+        env, encoding: 'utf8', cwd: new URL('..', import.meta.url).pathname,
+      }) };
+    } catch (error) {
+      const e = error as { status: number; stderr: string };
+      return { code: e.status, out: e.stderr };
+    }
+  };
+
   test('JSON by default, --human for tables, exit codes distinguish data from failure', async () => {
-    const { execFileSync } = await import('node:child_process');
-    const run = (args: string[]) => {
-      try {
-        return { code: 0, out: execFileSync(process.execPath, ['cli.ts', ...args], {
-          env: { ...process.env, YOUINC_DB_PATH: join(dir, 'ledger.sqlite3') }, encoding: 'utf8', cwd: new URL('..', import.meta.url).pathname,
-        }) };
-      } catch (error) {
-        const e = error as { status: number; stderr: string };
-        return { code: e.status, out: e.stderr };
-      }
-    };
+    const run = (args: string[]) => runCli(args, dir);
 
     const status = run(['status']);
     expect(status.code).toBe(0);
@@ -306,5 +326,31 @@ describe('the CLI as an agent would call it', () => {
     expect(syncOut.code).toBe(2);
     expect(syncOut.out).toContain('AKAHU_APP_TOKEN');
     expect(syncOut.out).not.toContain('token=');
+  });
+
+  test('a report larger than one pipe buffer arrives intact', async () => {
+    // Regression: process.exit() straight after a stdout write cut the JSON at
+    // the 64KB pipe buffer. Piped output is the agent interface, so a big
+    // report must parse.
+    const bigDir = mkdtempSync(join(tmpdir(), 'youinc-big-'));
+    try {
+      const big = openLedger(join(bigDir, 'ledger.sqlite3')).db;
+      const insert = big.prepare(`INSERT INTO account_mappings VALUES (?,?,?,?,?,1,'BNZ',NULL,1,NULL,NULL,'2026-01-01','2026-01-01')`);
+      const basis = big.prepare(`INSERT INTO account_basis (akahu_account_id, anchor_cents, anchored_at, anchor_balance_id, reason, updated_at) VALUES (?,?,?,NULL,'reported','2026-01-01')`);
+      for (let i = 0; i < 1200; i += 1) {
+        const id = `acc_pad${String(i).padStart(18, '0')}`;
+        insert.run(`m${i}`, id, `Account ${i}`, `Assets:BNZ:Operating:VeryLongAccountNameNumber${i}`, 'asset');
+        basis.run(id, 100_000 + i, '2026-10-17T00:00:00.000Z');
+      }
+      big.close();
+
+      const result = runCli(['balances'], bigDir);
+      expect(result.code).toBe(0);
+      expect(result.out.length).toBeGreaterThan(70_000);
+      const parsed = JSON.parse(result.out);
+      expect(parsed.accounts).toHaveLength(1200);
+    } finally {
+      rmSync(bigDir, { recursive: true, force: true });
+    }
   });
 });

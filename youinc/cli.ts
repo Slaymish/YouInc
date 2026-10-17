@@ -364,10 +364,24 @@ function netWorth(accounts: ReturnType<typeof reconcile>): number {
   return total;
 }
 
+/**
+ * Exit only once stdout has drained.
+ *
+ * `process.exit()` straight after a write cuts a report larger than the 64KB
+ * pipe buffer mid-string: piped JSON arrives truncated and an agent reads that
+ * as corrupt output from a command that actually succeeded. Setting
+ * `exitCode` lets Node flush; the unref'd timer is a safety net so a stray
+ * handle can never hang a caller's shell.
+ */
+function finish(code: number): void {
+  process.exitCode = code;
+  setTimeout(() => process.exit(code), 5000).unref();
+}
+
 main(process.argv.slice(2))
-  .then((code) => process.exit(code))
+  .then((code) => finish(code))
   .catch((error: unknown) => {
     const message = error instanceof AkahuError ? `${error.message} (${error.status ?? 'no status'})` : error instanceof Error ? error.message : String(error);
     process.stderr.write(`youinc: ${message}\n`);
-    process.exit(error instanceof AkahuError ? 2 : 1);
+    finish(error instanceof AkahuError ? 2 : 1);
   });

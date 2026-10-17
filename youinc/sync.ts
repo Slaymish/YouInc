@@ -119,7 +119,6 @@ export async function sync(db: DatabaseSync, options: SyncOptions = {}): Promise
   const startedAt = now.toISOString();
   const config: AkahuConfig = options.config ?? akahuConfigFromEnv();
   const client = options.client ?? new AkahuClient(config);
-  const routing: RoutingConfig = loadRoutingConfig(db);
   const window = { ...defaultWindow(now, 90), ...(options.from ? { from: options.from } : {}), ...(options.to ? { to: options.to } : {}) };
 
   let refreshed = false;
@@ -135,10 +134,17 @@ export async function sync(db: DatabaseSync, options: SyncOptions = {}): Promise
     (a) => !options.only?.length || options.only.includes(a.akahuAccountId),
   );
 
+  // Mappings before routing: routing is read from the database, so a first
+  // sync that loaded it before upserting would post every transaction to
+  // Assets:Unmapped:<id> and never self-correct afterwards.
+  const mapped = new Map<string, string>();
+  for (const account of accounts) mapped.set(account.akahuAccountId, upsertMapping(db, account).ledgerAccount);
+  const routing: RoutingConfig = loadRoutingConfig(db);
+
   const outcomes: AccountSyncOutcome[] = [];
   for (const account of accounts) {
     const logId = randomUUID();
-    const { ledgerAccount } = upsertMapping(db, account);
+    const ledgerAccount = mapped.get(account.akahuAccountId) ?? upsertMapping(db, account).ledgerAccount;
     const outcome: AccountSyncOutcome = {
       akahuAccountId: account.akahuAccountId,
       ledgerAccount,
