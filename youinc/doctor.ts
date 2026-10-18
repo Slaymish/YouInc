@@ -2,6 +2,7 @@ import type { DatabaseSync } from 'node:sqlite';
 import { execute, one, rows } from './database.ts';
 import { reconcile, type AccountReconciliation, type Gap } from './balances.ts';
 import { unbalancedJournals } from './journal-store.ts';
+import { SUSPENSE_NET_SQL } from './reports.ts';
 
 /**
  * `doctor`: the checks that decide whether the ledger can be trusted.
@@ -50,9 +51,10 @@ export function doctor(db: DatabaseSync, ledgerPath: string, now = new Date()): 
   const suspenseCount = Number(
     one<{ n: number }>(
       db,
-      `SELECT COUNT(*) AS n FROM journal_entries
-        WHERE (account = 'Expenses:Uncategorized:Suspense' AND side = 'debit')
-           OR (account = 'Income:Unidentified' AND side = 'credit')`,
+      `SELECT COUNT(*) AS n FROM (
+         ${SUSPENSE_NET_SQL}
+         SELECT root_id FROM net WHERE suspense_cents > 0 OR unidentified_cents > 0
+       )`,
     )?.n ?? 0,
   );
 

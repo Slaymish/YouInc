@@ -42,7 +42,11 @@ export function reclassify(db: DatabaseSync, externalId: string, targetAccount: 
     'SELECT ledger_account FROM account_mappings WHERE akahu_account_id = ?',
     journal.source_account_id,
   );
-  const current = entries.find((e) => e.account !== mapping?.ledger_account);
+  // Without a mapping there is no way to tell the bank leg from the classified
+  // leg, and guessing reverses the wrong side of the entry — silently moving
+  // money between the asset account and an expense. Refuse instead.
+  if (!mapping) throw new Error(`Account ${journal.source_account_id} has no ledger mapping; cannot tell which leg to correct`);
+  const current = entries.find((e) => e.account !== mapping.ledger_account);
   if (!current) throw new Error('Could not identify the classified leg of this transaction');
   if (current.account === targetAccount) throw new Error(`Transaction is already classified as ${targetAccount}`);
 

@@ -107,23 +107,69 @@ export interface UncategorisedRow {
   account: string;
 }
 
+/**
+ * Suspense is a **net** figure, not a count of entries.
+ *
+ * A reclassify does not rewrite the original journal — it posts a second one
+ * with the external id `reclassify:<original>:<target>:<amount>` and the
+ * opposite side on the suspense account. So a cleared item still leaves its
+ * original suspense debit behind, offset by an equal credit in the correction.
+ * Counting raw debits therefore keeps reporting money that Hamish has already
+ * classified (the $67 groceries, the WOW ticket, the pizza) and inflates the
+ * unclassified total — the doctor said 30 pending when four of them were done.
+ *
+ * Grouping each correction back to its original transaction and netting the two
+ * legs leaves only the residue that genuinely has no decision behind it.
+ */
+export const SUSPENSE_NET_SQL = `
+  WITH legs AS (
+    SELECT
+      CASE WHEN COALESCE(j.rule_id, '') = 'manual:reclassify'
+           THEN CASE WHEN instr(substr(j.external_id, 12), ':') > 0
+                     THEN substr(substr(j.external_id, 12), 1, instr(substr(j.external_id, 12), ':') - 1)
+                     ELSE substr(j.external_id, 12) END
+           ELSE j.external_id END AS root_id,
+      j.transaction_date AS transaction_date,
+      j.description AS description,
+      COALESCE(j.rule_id, '') AS rule_id,
+      e.account AS account,
+      e.side AS side,
+      e.amount_cents AS amount_cents
+    FROM journal_entries e
+    JOIN journal_transactions j ON j.id = e.journal_transaction_id
+  ),
+  net AS (
+    SELECT root_id,
+           MAX(transaction_date) AS transaction_date,
+           MIN(CASE WHEN rule_id <> 'manual:reclassify' THEN description END) AS description,
+           SUM(CASE WHEN account = 'Expenses:Uncategorized:Suspense'
+                    THEN (CASE side WHEN 'debit' THEN amount_cents ELSE -amount_cents END) ELSE 0 END) AS suspense_cents,
+           SUM(CASE WHEN account = 'Income:Unidentified'
+                    THEN (CASE side WHEN 'credit' THEN amount_cents ELSE -amount_cents END) ELSE 0 END) AS unidentified_cents
+    FROM legs GROUP BY root_id
+  )`;
+
 /** Suspense backlog: what is waiting for a rule or a decision. */
 export function suspenseQueue(db: DatabaseSync, limit = 50): UncategorisedRow[] {
   const rows = db.prepare(
-    `SELECT j.external_id AS externalId, j.transaction_date AS transactionDate, j.description,
-            e.amount_cents AS cents, e.account
-       FROM journal_entries e JOIN journal_transactions j ON j.id = e.journal_transaction_id
-      WHERE (e.account = 'Expenses:Uncategorized:Suspense' AND e.side = 'debit')
-         OR (e.account = 'Income:Unidentified' AND e.side = 'credit')
-      ORDER BY j.transaction_date DESC LIMIT ?`,
+    `${SUSPENSE_NET_SQL}
+     SELECT root_id AS externalId, transaction_date AS transactionDate, description,
+            suspense_cents AS suspenseCents, unidentified_cents AS unidentifiedCents
+       FROM net
+      WHERE suspense_cents > 0 OR unidentified_cents > 0
+      ORDER BY transaction_date DESC LIMIT ?`,
   ).all(limit) as Array<Record<string, unknown>>;
-  return rows.map((r) => ({
-    externalId: String(r.externalId),
-    transactionDate: String(r.transactionDate),
-    description: String(r.description),
-    cents: Number(r.cents),
-    account: String(r.account),
-  }));
+  return rows.map((r) => {
+    const suspense = Number(r.suspenseCents);
+    const unidentified = Number(r.unidentifiedCents);
+    return {
+      externalId: String(r.externalId),
+      transactionDate: String(r.transactionDate),
+      description: r.description === null ? '' : String(r.description),
+      cents: suspense > 0 ? suspense : unidentified,
+      account: suspense > 0 ? 'Expenses:Uncategorized:Suspense' : 'Income:Unidentified',
+    } satisfies UncategorisedRow;
+  });
 }
 
 /** Monthly cash flow: income, spend (excluding suspense), and net. */

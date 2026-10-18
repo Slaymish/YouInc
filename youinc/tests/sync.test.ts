@@ -71,7 +71,7 @@ describe('anchored balances', () => {
     const { client } = stubClient([BNZ, SHARESIES_SPEND, SHARESIES_GROWTH], {});
     await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
 
-    const accounts = reconcile(db);
+    const accounts = reconcile(db, { now: new Date('2026-10-17T00:00:00Z') });
     expect(accounts).toHaveLength(3);
     const operating = accounts.find((a) => a.ledgerAccount === 'Assets:BNZ:Operating');
     expect(operating?.reportedCents).toBe(100_000);
@@ -94,7 +94,7 @@ describe('anchored balances', () => {
     });
     await sync(db, { client, config: { appToken: 'a', userToken: 'u' }, now: new Date('2026-10-17T00:00:00Z') });
     // The bank's figure predates the transaction, so the ledger is 50 lower.
-    const operating = reconcile(db).find((a) => a.ledgerAccount === 'Assets:BNZ:Operating');
+    const operating = reconcile(db, { now: new Date('2026-10-17T00:00:00Z') }).find((a) => a.ledgerAccount === 'Assets:BNZ:Operating');
     expect(operating?.reportedCents).toBe(100_000);
     // The transaction is dated on the same day as the bank's refresh, so its
     // day is not strictly after the anchor and it is assumed to be inside the
