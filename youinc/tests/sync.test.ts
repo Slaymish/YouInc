@@ -431,11 +431,16 @@ describe('the CLI as an agent would call it', () => {
       const big = openLedger(join(bigDir, 'ledger.sqlite3')).db;
       const insert = big.prepare(`INSERT INTO account_mappings VALUES (?,?,?,?,?,1,'BNZ',NULL,1,NULL,NULL,'2026-01-01','2026-01-01')`);
       const basis = big.prepare(`INSERT INTO account_basis (akahu_account_id, anchor_cents, anchored_at, anchor_balance_id, reason, updated_at) VALUES (?,?,?,NULL,'reported','2026-01-01')`);
+      // One transaction for the fixture: 2,400 autocommitted inserts take about
+      // ten seconds on a laptop disk and blew the 5s test budget, which made a
+      // passing CLI look broken. The rows are the input, not the thing measured.
+      big.exec('BEGIN');
       for (let i = 0; i < 1200; i += 1) {
         const id = `acc_pad${String(i).padStart(18, '0')}`;
         insert.run(`m${i}`, id, `Account ${i}`, `Assets:BNZ:Operating:VeryLongAccountNameNumber${i}`, 'asset');
         basis.run(id, 100_000 + i, '2026-10-17T00:00:00.000Z');
       }
+      big.exec('COMMIT');
       big.close();
 
       const result = runCli(['balances'], bigDir);
